@@ -170,7 +170,8 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // run continuous pitch detection, set isactive on detected sound input
+    // if input amplitude != 0, store isActive,store(true)
+    detectSound(buffer);
 
     if (!isActive.load())
     {
@@ -190,6 +191,10 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
 
         inputAudioBuffer_writePos.store(inputAudioBuffer_writePos.load() + toCopy);  // like the position of the vertex of an hourglass relative to the level of remaining sand
+
+
+
+
 
         if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
         {
@@ -216,6 +221,34 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 //      J V |    |:|"|/|||::||::|\|||/||:|
 //___  '    /  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //\  \/    |        ~~~ ~~~ ~~~~~ ~~~~~
+
+void EnCounterAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer)
+{
+    // Compute RMS amplitude of the current block (sum channels for detection)
+    float blockEnergy = 0.0f;
+    int numChannels = juce::jmin(getTotalNumInputChannels(), buffer.getNumChannels());
+    int numSamples = buffer.getNumSamples();
+
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        for (int i = 0; i < numSamples; ++i)
+        {
+            float sample = buffer.getSample(ch, i);
+            blockEnergy += sample * sample;
+        }
+    }
+
+    float rms = std::sqrt(blockEnergy / (numSamples * numChannels));
+
+    // Threshold: -40 dBFS RMS in linear scale (10^(-40/20) =~ 0.01)
+    const float threshold = 0.01f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
+
+    if (rms > threshold)
+    {
+        DBG("sound detected");
+        isActive.store(true);
+    }
+}
 
 juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote(juce::AudioBuffer<float> inputAudio)
 {
