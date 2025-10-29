@@ -170,6 +170,8 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 {
     juce::ScopedNoDenormals noDenormals;
 
+    // FIGURE OUT THE MOST USEFUL OF DBG VISUAL OUTPUT
+
 
     if (!isActive.load())
     {
@@ -219,8 +221,8 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         {
             float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
             int midiNote = frequencyToMidiNote(pitch);
-            if (midiNote != -1) detectedNoteNumbers.push_back(midiNote);
-            DBG("Detected Pitch: " + juce::String(pitch) + " Hz, MIDI: " + juce::String(midiNote));
+            detectedNoteNumbers.push_back(midiNote);
+//            DBG("Detected Pitch: " + juce::String(pitch) + " Hz, MIDI: " + juce::String(midiNote));
             fillPos = 0;
         }
 
@@ -244,10 +246,22 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
             DBG(inputAudioBuffer.getNumSamples());
 
-            resetTiming(); // ?
+            // DBG print the detected note numbers
+            juce::String noteStr = "Detected Note Numbers: ";
+            for (int note : detectedNoteNumbers)
+            {
+                noteStr += juce::String(note) + ", ";
+            }
+            DBG(noteStr);
 
 
-            // depending on whether detectedNoteNumbers is all -1, set isActive.store(false)
+
+            // depending on whether capturedmelody is all -1, set isActive.store(false)
+
+//            if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
+//                isActive.store(false);
+
+            resetTiming();
 
         }
     }
