@@ -240,6 +240,14 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
 
 
+
+        // if HALFway through recording the inputAudioBuffer, make copies and isolate best note
+        //  - copy the inputAudioBuffer at its half-recorded state
+        //  - copy the detectedNoteNumbers at its current state
+        //  - send it off to isolateBestNote to asynchronously perform isolation and time-stretch
+
+
+
         if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
         {
             // this means recording of input audio for this cycle is complete
