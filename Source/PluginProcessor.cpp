@@ -172,15 +172,36 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
     // run continuous pitch detection, set isactive on detected sound input
 
-    if (isActive.load())    
+    if (!isActive.load())
     {
-        // populate inputAudioBuffer on a sample-by-sample basis
+        resetTiming();
+    }
+    else
+    {
+        // first, record input audio to inputAudioBuffer
 
-        // populate detectedNoteNumbers on a chunk-by-chunk basis (1 chunk = 1024 samples)
+        int numSamples = buffer.getNumSamples();
+        int spaceLeft = inputAudioBuffer_samplesToRecord.load() - inputAudioBuffer_writePos.load();
+        int toCopy = juce::jmin(numSamples, spaceLeft);
 
-        // process capturedMelody and generatedMelody on a symbol-by-symbol basis (1 symbol = sPs samples)
+        for (int ch = 0; ch < juce::jmin(getTotalNumInputChannels(), inputAudioBuffer.getNumChannels()); ++ch)
+        {
+            inputAudioBuffer.copyFrom(ch, inputAudioBuffer_writePos.load(), buffer, ch, 0, toCopy);
+        }
 
-        // after 32 symbols, again clear buffers, updateBpm, updateSps, size inputAudioBuffer according to sPs, set isActive.store(false) if entire current capturedMelody is empty
+        inputAudioBuffer_writePos.store(inputAudioBuffer_writePos.load() + toCopy);  // like the position of the vertex of an hourglass relative to the level of remaining sand
+
+        if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
+        {
+            // this means recording of input audio for this cycle is complete
+
+            DBG(inputAudioBuffer.getNumSamples());
+
+            resetTiming(); // ?
+
+        }
+
+
     }
 
 
