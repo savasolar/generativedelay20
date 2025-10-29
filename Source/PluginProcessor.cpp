@@ -166,19 +166,34 @@ bool EnCounterAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 //            .-' '-._)
 //          .'                     PjP
 
-void EnCounterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // updateBpm
+    // run continuous pitch detection
 
-    // updateSpS
+    if (!isActive.load())
+    {
+        // clear buffers
 
-    // size inputAudioBuffer according to sPs
+        // updateBpm
 
+        // updateSpS
 
-    synthesize(capturedMelody, voiceBuffer);
+        // size inputAudioBuffer according to sPs
 
+        // set isActive.store(true) based on detected input pitch
+    }
+    else
+    {
+        // populate inputAudioBuffer on a sample-by-sample basis
+
+        // populate detectedNoteNumbers on a chunk-by-chunk basis (1 chunk = 1024 samples)
+
+        // process capturedMelody and generatedMelody on a symbol-by-symbol basis (1 symbol = sPs samples)
+
+        // after 32 symbols, again clear buffers, updateBpm, updateSps, size inputAudioBuffer according to sPs, set isActive.store(false) if entire current capturedMelody is empty
+    }
 
 /*
     // Lightning quick real-time pitch detection!
