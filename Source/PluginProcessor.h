@@ -60,6 +60,7 @@ public:
 
         int requiredSize = 32 * sPs + 4096;
         inputAudioBuffer.setSize(2, requiredSize, false, true);
+        inputAudioBuffer_samplesToRecord.store(requiredSize);
         inputAudioBuffer_writePos.store(0);
     }
 
