@@ -48,6 +48,7 @@ public:
     void resetTiming()
     {
         inputAudioBuffer.clear();
+        fillPos = 0;
         detectedNoteNumbers.clear();
         std::fill(capturedMelody.begin(), capturedMelody.end(), -1);
 

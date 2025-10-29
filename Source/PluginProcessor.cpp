@@ -170,11 +170,10 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // if input amplitude != 0, store isActive,store(true)
-    detectSound(buffer);
 
     if (!isActive.load())
     {
+        detectSound(buffer);
         resetTiming();
     }
     else
@@ -196,6 +195,49 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
 
 
+        // during recording, also detect pitch
+
+        // Mix current block to mono for pitch detection
+        juce::AudioBuffer<float> monoBlock(1, numSamples);
+        monoBlock.clear();
+        int numChannels = juce::jmin(getTotalNumInputChannels(), buffer.getNumChannels());
+        for (int ch = 0; ch < numChannels; ++ch)
+        {
+            monoBlock.addFrom(0, 0, buffer, ch, 0, numSamples);
+        }
+        if (numChannels > 0) monoBlock.applyGain(1.0f / numChannels);
+        auto* monoData = monoBlock.getReadPointer(0);
+
+        // Accumulate for pitch detection
+        int analysisSpaceLeft = analysisBuffer.getNumSamples() - fillPos;
+        int analysisToCopy = juce::jmin(analysisSpaceLeft, numSamples);
+        analysisBuffer.copyFrom(0, fillPos, monoData, analysisToCopy);
+        fillPos += analysisToCopy;
+
+        // If full, detect pitch and store MIDI note
+        if (fillPos >= analysisBuffer.getNumSamples())
+        {
+            float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
+            int midiNote = frequencyToMidiNote(pitch);
+            if (midiNote != -1) detectedNoteNumbers.push_back(midiNote);
+            DBG("Detected Pitch: " + juce::String(pitch) + " Hz, MIDI: " + juce::String(midiNote));
+            fillPos = 0;
+        }
+
+        // Handle overflow
+        if (analysisToCopy < numSamples)
+        {
+            analysisBuffer.copyFrom(0, 0, monoData + analysisToCopy, numSamples - analysisToCopy);
+            fillPos = numSamples - analysisToCopy;
+        }
+
+        // .....................
+
+
+
+
+
+
         if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
         {
             // this means recording of input audio for this cycle is complete
@@ -204,9 +246,10 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
             resetTiming(); // ?
 
+
+            // depending on whether detectedNoteNumbers is all -1, set isActive.store(false)
+
         }
-
-
     }
 
 
@@ -240,8 +283,7 @@ void EnCounterAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer
 
     float rms = std::sqrt(blockEnergy / (numSamples * numChannels));
 
-    // Threshold: -40 dBFS RMS in linear scale (10^(-40/20) =~ 0.01)
-    const float threshold = 0.01f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
+    const float threshold = 0.015f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
 
     if (rms > threshold)
     {
