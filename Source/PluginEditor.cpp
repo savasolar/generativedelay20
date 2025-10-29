@@ -6,12 +6,10 @@
 EnCounterAudioProcessorEditor::EnCounterAudioProcessorEditor (EnCounterAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
-    setSize (400, 400);
+    setSize (560, 464);
 
 //    backgroundImage = juce::ImageCache::getFromMemory(BinaryData::encounterbodywide_png, BinaryData::encounterbodywide_pngSize);
 
-    customLookAndFeel = std::make_unique<CustomLookAndFeel>();
-    setLookAndFeel (customLookAndFeel.get());
     
     startTimer(30);
 }

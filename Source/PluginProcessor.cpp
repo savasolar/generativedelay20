@@ -16,7 +16,9 @@ EnCounterAudioProcessor::EnCounterAudioProcessor()
     pitchDetector(44100, 1024)
 #endif
 {
-    section1_audio.setSize(2, 1);
+    inputAudioBuffer.setSize(2, 1); // dummy size for now
+
+
 
 }
 
@@ -25,11 +27,22 @@ EnCounterAudioProcessor::~EnCounterAudioProcessor()
 
 }
 
+//  ........::::::::::::..           .......|...............::::::::........
+//     .:::::;;;;;;;;;;;:::::.... .     \   | ../....::::;;;;:::::.......
+//         .       ...........   / \\_   \  |  /     ......  .     ........./\
+//...:::../\\_  ......     ..._/'   \\\_  \###/   /\_    .../ \_.......   _//
+//.::::./   \\\ _   .../\    /'      \\\\#######//   \/\   //   \_   ....////
+//    _/      \\\\   _/ \\\ /  x       \\\\###////      \////     \__  _/////
+//  ./   x       \\\/     \/ x X           \//////                   \/////
+// /     XxX     \\/         XxX X                                    ////   x
+//-----XxX-------------|-------XxX-----------*--------|---*-----|------------X--
+//       X        _X      *    X      **         **             x   **    *  X
+//      _X                    _X           x                *          x     X_
+
 const juce::String EnCounterAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
-
 bool EnCounterAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
@@ -38,7 +51,6 @@ bool EnCounterAudioProcessor::acceptsMidi() const
     return false;
    #endif
 }
-
 bool EnCounterAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
@@ -47,7 +59,6 @@ bool EnCounterAudioProcessor::producesMidi() const
     return false;
    #endif
 }
-
 bool EnCounterAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
@@ -56,34 +67,41 @@ bool EnCounterAudioProcessor::isMidiEffect() const
     return false;
    #endif
 }
-
 double EnCounterAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
-
 int EnCounterAudioProcessor::getNumPrograms()
 {
     return 1;
 }
-
 int EnCounterAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
-
 void EnCounterAudioProcessor::setCurrentProgram (int index)
 {
 }
-
 const juce::String EnCounterAudioProcessor::getProgramName (int index)
 {
     return {};
 }
-
 void EnCounterAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
+
+//           _  _             _  _
+//  .       /\\/%\       .   /%\/%\     .
+//      __.<\\%#//\,_       <%%#/%%\,__  .
+//.    <%#/|\\%%%#///\    /^%#%%\///%#\\
+//      ""/%/""\ \""//|   |/""'/ /\//"//'
+// .     L/'`   \ \  `    "   / /  ```
+//        `      \ \     .   / /       .
+// .       .      \ \       / /  .
+//        .        \ \     / /          .
+//   .      .    ..:\ \:::/ /:.     .     .
+//______________/ \__;\___/\;_/\________________________________
+//YwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYw
 
 void EnCounterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {    
@@ -93,18 +111,26 @@ void EnCounterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     analysisBuffer.setSize(1, 1024, true);  // Mono, matches bufferSize, keep data
     fillPos = 0;  // Reset accumulator
 
+    stretcher.presetCheaper(getTotalNumInputChannels(), static_cast<float>(sampleRate));
+
 //    offlineAnalysisBuffer.setSize(1, 1024, true);
 //    offlineFillPos = 0;
 
-    section1_audio.setSize(getTotalNumInputChannels(), static_cast<int>(sampleRate * 60.0 + 0.5), true, true, true);
+    inputAudioBuffer.setSize(getTotalNumInputChannels(), static_cast<int>(sampleRate * 60.0 + 0.5), true, true, true);
 
 }
+
+//              (\_/)
+//      .-""-.-.-' a\
+//     /  \      _.--'
+//    (\  /_---\\_\_
+//     `'-.
+//jgs   ,__)
 
 void EnCounterAudioProcessor::releaseResources()
 {
 
 }
-
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool EnCounterAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
@@ -127,12 +153,25 @@ bool EnCounterAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 }
 #endif
 
+//         /',  _
+//       _(  ;-'.'
+//  _,-'~     '".
+//'"          ~. .
+//        _.      '. 
+//    _.-'  ~'--.   ) 
+//  '~           ~--'=._
+//               /)_.-.
+//           _.-' ' <~
+//        .-"    _ ~ \
+//            .-' '-._)
+//          .'                     PjP
+
 void EnCounterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
 
 
-    /*
+/*
     // Lightning quick real-time pitch detection!
 
     // Accumulate mono audio (left channel) for pitch detection
@@ -160,9 +199,19 @@ void EnCounterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
         analysisBuffer.copyFrom(0, 0, inputData + toCopy, numSamples - toCopy);
         fillPos = numSamples - toCopy;
     }
-    */
+*/
 
 }
+
+//           W            __  __
+//          [ ]          |::||::|
+//           3   ._.     |::||::|   ._.
+//          /|   |:| ._. |::||::|   |/|
+//      \|// /   |:|_|/| |::||::|_  |/|
+//     -( )-|    |:|"|/|_|::||::|\|_|/| _
+//      J V |    |:|"|/|||::||::|\|||/||:|
+//___  '    /  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//\  \/    |        ~~~ ~~~ ~~~~~ ~~~~~
 
 juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote(juce::AudioBuffer<float> inputAudio)
 {
@@ -205,26 +254,35 @@ juce::AudioBuffer<float> EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<
     return timeStretchedAudio;
 }
 
+//    |\   "Music should be heard not only with the ears, but also the soul."
+//|---|--\-----------------------|-----------------------------------------|  
+//|   |   |\                     |                   |@     |\             |
+//|---|---|--\-------------------|-------------/|----|------|--\----|------|     
+//|  @|   |   |\          |O     |        3  /  |    |@     |       |      | 
+//|---|--@|---|--\--------|------|---------/----|----|------|-------|------|      
+//|  @|      @|    \      |O     |       / |    |    |@    @|      @|.     | 
+//|-----------|-----|-----|------|-----/---|---@|----|--------------|------|     
+//|          @|     |     |O     |    |    |         |             @|.     | 
+//|-----------|----@|-----|------|----|---@|------------------------|------|  
+//           @|           |           |        Larry Komro         @|.     
+//                                  -@-        [kom...@uwec.edu]
+
 bool EnCounterAudioProcessor::hasEditor() const
 {
     return true;
 }
-
 juce::AudioProcessorEditor* EnCounterAudioProcessor::createEditor()
 {
     return new EnCounterAudioProcessorEditor (*this);
 }
-
 void EnCounterAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
 
 }
-
 void EnCounterAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
 
 }
-
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new EnCounterAudioProcessor();

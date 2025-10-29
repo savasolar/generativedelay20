@@ -12,19 +12,15 @@ class EnCounterAudioProcessor  : public juce::AudioProcessor
 public:
     EnCounterAudioProcessor();
     ~EnCounterAudioProcessor() override;
-
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
-
    #ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
-
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
     juce::AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
     const juce::String getName() const override;
-
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     bool isMidiEffect() const override;
@@ -37,26 +33,74 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-    // Section 1
-    // process vars
-    juce::AudioBuffer<float> section1_audio;
+//   _______________________________________________________________
+//  || | | ||| | ||| | | ||| | ||| | | ||| | ||| | | ||| | ||| | | ||
+//  ||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_||
+//  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
+//  |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|hjw
+
+
+
+    juce::AudioBuffer<float> inputAudioBuffer;
+
+
+    std::vector<int> detectedNoteNumbers;
+
+
+    std::vector<int> capturedMelody
+    { 
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1
+    };
+
+
+
+
 
     juce::AudioBuffer<float> isolateBestNote(juce::AudioBuffer<float> inputAudio);
     
     int frequencyToMidiNote(float frequency);
 
     juce::AudioBuffer<float> timeStretch(juce::AudioBuffer<float> inputAudio, int length);
+
+//                         `. ___
+//                    __,' __`.                _..----....____
+//        __...--.'``;.   ,.   ;``--..__     .'    ,-._    _.-'
+//  _..-''-------'   `'   `'   `'     O ``-''._   (,;') _,'
+//,'________________                          \`-._`-','
+// `._              ```````````------...___   '-.._'-:
+//    ```--.._      ,.                     ````--...__\-.
+//            `.--. `-`                       ____    |  |`
+//              `. `.                       ,'`````.  ;  ;`
+//                `._`.        __________   `.      \'__/`
+//                   `-:._____/______/___/____`.     \  `
+//                               |       `._    `.    \
+//                               `._________`-.   `.   `.___
+//                                             SSt  `------'`
     
 private:
     
     // Pitch detection utilities, on/offline
     PitchMPM pitchDetector;    
     juce::AudioBuffer<float> analysisBuffer {1, 1024};
-    int fillPos = 0;
-    
-//    juce::AudioBuffer<float> offlineAnalysisBuffer{ 1, 1024 };
-//    int offlineFillPos = 0;
+    int fillPos = 0;    
 
+    signalsmith::stretch::SignalsmithStretch<float> stretcher;
+
+//     ________________________________         
+//    /                                "-_          
+//   /      .  |  .                       \          
+//  /      : \ | / :                       \         
+// /        '-___-'                         \      
+///_________________________________________ \      
+//     _______| |________________________--""-L 
+//    /       F J                              \ 
+//   /       F   J                              L
+//  /      :'     ':                            F
+// /        '-___-'                            / 
+///_________________________________________--"  
 
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnCounterAudioProcessor)
