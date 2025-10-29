@@ -85,13 +85,15 @@ public:
     std::vector<int> detectedNoteNumbers;
 
 
-    std::vector<int> capturedMelody
-    { 
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1
-    };
+    //std::vector<int> capturedMelody
+    //{ 
+    //    -1, -1, -1, -1, -1, -1, -1, -1,
+    //    -1, -1, -1, -1, -1, -1, -1, -1,
+    //    -1, -1, -1, -1, -1, -1, -1, -1,
+    //    -1, -1, -1, -1, -1, -1, -1, -1
+    //};
+
+    std::vector<int> capturedMelody = std::vector<int>(32, -1);
 
 
     juce::AudioBuffer<float> isolateBestNote(juce::AudioBuffer<float> inputAudio);
@@ -104,13 +106,24 @@ public:
     juce::AudioBuffer<float> voiceBuffer;
 
 
-    std::vector<int> generatedMelody
+    //std::vector<int> generatedMelody
+    //{
+    //    -1, -1, -1, -1, -1, -1, -1, -1,
+    //    -1, -1, -1, -1, -1, -1, -1, -1,
+    //    -1, -1, -1, -1, -1, -1, -1, -1,
+    //    -1, -1, -1, -1, -1, -1, -1, -1
+    //};
+
+    std::vector<int> generatedMelody = std::vector<int>(32, -1);
+
+
+    std::vector<std::vector<int>> visualMelodies(std::vector<int> captured, std::vector<int> generated)
     {
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1,
-        -1, -1, -1, -1, -1, -1, -1, -1
-    };
+        std::vector<std::vector<int>> result = { captured, generated };
+
+        return result;
+    }
+
 
 
     void synthesize(std::vector<int> melody, juce::AudioBuffer<float> voice)

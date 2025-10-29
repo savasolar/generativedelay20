@@ -238,34 +238,6 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
         int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
         int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
-        /*
-        for (int n = 0; n < 32; ++n)
-        {
-            if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
-            {
-                if (!symbolExecuted.test(n))
-                {
-                    // transcribe:
-                    capturedMelody[n] = detectedNoteNumbers.back(); // SET TO LAST CAPTURED INDEX OF detectedNoteNumbers
-                    // playback
-
-                    positionMarkerX = n;
-
-//                    DBG(positionMarkerX);
-
-                    symbolExecuted.set(n);
-                }
-            }
-
-        }
-        melodyCaptureFillPos += captureToCopy;*/
-
-
-
-
-
-
-
 
         for (int n = 0; n < 32; ++n)
         {
@@ -283,22 +255,12 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
                     // playback
 
                     positionMarkerX = n;
-
-                    // DBG(positionMarkerX);
-
+                    visualMelodies(capturedMelody, generatedMelody);
                     symbolExecuted.set(n);
                 }
             }
         }
         melodyCaptureFillPos += captureToCopy;
-
-
-
-
-
-        
-
-
 
         // if HALFway through recording the inputAudioBuffer, make copies and isolate best note
         //  - copy the inputAudioBuffer at its half-recorded state
