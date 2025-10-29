@@ -40,6 +40,8 @@ public:
 //  |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|hjw
 
 
+    std::atomic<bool> isActive{ false };
+
 
     juce::AudioBuffer<float> inputAudioBuffer;
 
@@ -56,14 +58,31 @@ public:
     };
 
 
-
-
-
     juce::AudioBuffer<float> isolateBestNote(juce::AudioBuffer<float> inputAudio);
-    
+
     int frequencyToMidiNote(float frequency);
 
     juce::AudioBuffer<float> timeStretch(juce::AudioBuffer<float> inputAudio, int length);
+
+
+    juce::AudioBuffer<float> voiceBuffer;
+
+
+    std::vector<int> generatedMelody
+    {
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1,
+        -1, -1, -1, -1, -1, -1, -1, -1
+    };
+
+
+    void synthesize(std::vector<int> melody, juce::AudioBuffer<float> voice)
+    {
+        
+    }
+    
+    
 
 //                         `. ___
 //                    __,' __`.                _..----....____
@@ -82,12 +101,14 @@ public:
     
 private:
     
-    // Pitch detection utilities, on/offline
+    // Pitch detection utilities
     PitchMPM pitchDetector;    
     juce::AudioBuffer<float> analysisBuffer {1, 1024};
     int fillPos = 0;    
 
+    // Time stretch utilities
     signalsmith::stretch::SignalsmithStretch<float> stretcher;
+
 
 //     ________________________________         
 //    /                                "-_          

@@ -170,6 +170,15 @@ void EnCounterAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, ju
 {
     juce::ScopedNoDenormals noDenormals;
 
+    // updateBpm
+
+    // updateSpS
+
+    // size inputAudioBuffer according to sPs
+
+
+    synthesize(capturedMelody, voiceBuffer);
+
 
 /*
     // Lightning quick real-time pitch detection!

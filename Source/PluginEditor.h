@@ -23,9 +23,9 @@ private:
     juce::Image backgroundImage;
     
 
-    // button: start
-    // button: stop
-    
+//    juce::TextButton startButton;
+//    juce::TextButton stopButton;
+
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnCounterAudioProcessorEditor)
 };
