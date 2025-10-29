@@ -238,7 +238,7 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
         int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
         int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
-
+        /*
         for (int n = 0; n < 32; ++n)
         {
             if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
@@ -258,7 +258,39 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
             }
 
         }
+        melodyCaptureFillPos += captureToCopy;*/
+
+
+
+
+
+
+
+
+        for (int n = 0; n < 32; ++n)
+        {
+            if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
+            {
+                // Always update to the latest detected note
+                if (!detectedNoteNumbers.empty())
+                {
+                    capturedMelody[n] = detectedNoteNumbers.back();
+                }
+
+                if (!symbolExecuted.test(n))
+                {
+                    // playback
+
+                    positionMarkerX = n;
+
+                    // DBG(positionMarkerX);
+
+                    symbolExecuted.set(n);
+                }
+            }
+        }
         melodyCaptureFillPos += captureToCopy;
+
 
 
 

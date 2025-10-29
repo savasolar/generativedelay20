@@ -52,7 +52,8 @@ public:
         inputAudioBuffer.clear();
         inputAudioBuffer_writePos.store(0);
         pitchDetectorFillPos = 0;
-        detectedNoteNumbers = { -1 };
+        detectedNoteNumbers.clear();
+//        detectedNoteNumbers = { -1 };
         melodyCaptureFillPos = 0;
         symbolExecuted.reset();
         std::fill(capturedMelody.begin(), capturedMelody.end(), -1);
@@ -81,7 +82,7 @@ public:
     std::atomic<int> inputAudioBuffer_writePos{ 0 };
 
 
-    std::vector<int> detectedNoteNumbers{ -1 };
+    std::vector<int> detectedNoteNumbers;
 
 
     std::vector<int> capturedMelody
