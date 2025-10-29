@@ -6,6 +6,7 @@
 #include <pitch_detector.h>
 #include <source/PitchMPM.h>
 #include "signalsmith-stretch.h"
+#include <bitset>
 
 class EnCounterAudioProcessor  : public juce::AudioProcessor
 {
@@ -41,16 +42,21 @@ public:
     
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
-    int sampleCounter = -1;
     int sPs = 0;
-    int sampleDrift = 0;
+//    int sampleDrift = 0; // ? 
+    std::bitset<32> symbolExecuted;
+    int positionMarkerX = 0;
 
     void resetTiming()
     {
         inputAudioBuffer.clear();
-        fillPos = 0;
-        detectedNoteNumbers.clear();
+        inputAudioBuffer_writePos.store(0);
+        pitchDetectorFillPos = 0;
+        detectedNoteNumbers = { -1 };
+        melodyCaptureFillPos = 0;
+        symbolExecuted.reset();
         std::fill(capturedMelody.begin(), capturedMelody.end(), -1);
+        positionMarkerX = 0;
 
         float currentBpm = placeholderBpm;
         float currentBeats = placeholderBeats;
@@ -62,7 +68,7 @@ public:
         int requiredSize = 32 * sPs + 4096;
         inputAudioBuffer.setSize(2, requiredSize, false, true);
         inputAudioBuffer_samplesToRecord.store(requiredSize);
-        inputAudioBuffer_writePos.store(0);
+        
     }
 
 
@@ -75,7 +81,7 @@ public:
     std::atomic<int> inputAudioBuffer_writePos{ 0 };
 
 
-    std::vector<int> detectedNoteNumbers;
+    std::vector<int> detectedNoteNumbers{ -1 };
 
 
     std::vector<int> capturedMelody
@@ -136,10 +142,16 @@ private:
     // Pitch detection utilities
     PitchMPM pitchDetector;    
     juce::AudioBuffer<float> analysisBuffer {1, 1024};
-    int fillPos = 0;    
+    int pitchDetectorFillPos = 0;    
 
     // Time stretch utilities
     signalsmith::stretch::SignalsmithStretch<float> stretcher;
+
+
+
+
+    // Melody capture utilities
+    int melodyCaptureFillPos = 0;
 
 
 //     ________________________________         

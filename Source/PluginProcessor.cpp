@@ -109,12 +109,9 @@ void EnCounterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
     pitchDetector.setBufferSize(1024);  // Fixed power-of-2; or use juce::nextPowerOfTwo(samplesPerBlock) if you want dynamic
 
     analysisBuffer.setSize(1, 1024, true);  // Mono, matches bufferSize, keep data
-    fillPos = 0;  // Reset accumulator
+    pitchDetectorFillPos = 0;  // Reset accumulator
 
     stretcher.presetCheaper(getTotalNumInputChannels(), static_cast<float>(sampleRate));
-
-//    offlineAnalysisBuffer.setSize(1, 1024, true);
-//    offlineFillPos = 0;
 
     inputAudioBuffer.setSize(getTotalNumInputChannels(), static_cast<int>(sampleRate * 60.0 + 0.5), true, true, true);
 
@@ -180,9 +177,10 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
     }
     else
     {
+        int numSamples = buffer.getNumSamples();
+
         // first, record input audio to inputAudioBuffer
 
-        int numSamples = buffer.getNumSamples();
         int spaceLeft = inputAudioBuffer_samplesToRecord.load() - inputAudioBuffer_writePos.load();
         int toCopy = juce::jmin(numSamples, spaceLeft);
 
@@ -211,33 +209,61 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         auto* monoData = monoBlock.getReadPointer(0);
 
         // Accumulate for pitch detection
-        int analysisSpaceLeft = analysisBuffer.getNumSamples() - fillPos;
+        int analysisSpaceLeft = analysisBuffer.getNumSamples() - pitchDetectorFillPos;
         int analysisToCopy = juce::jmin(analysisSpaceLeft, numSamples);
-        analysisBuffer.copyFrom(0, fillPos, monoData, analysisToCopy);
-        fillPos += analysisToCopy;
+        analysisBuffer.copyFrom(0, pitchDetectorFillPos, monoData, analysisToCopy);
+        pitchDetectorFillPos += analysisToCopy;
 
         // If full, detect pitch and store MIDI note
-        if (fillPos >= analysisBuffer.getNumSamples())
+        if (pitchDetectorFillPos >= analysisBuffer.getNumSamples())
         {
             float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
             int midiNote = frequencyToMidiNote(pitch);
             detectedNoteNumbers.push_back(midiNote);
 //            DBG("Detected Pitch: " + juce::String(pitch) + " Hz, MIDI: " + juce::String(midiNote));
-            fillPos = 0;
+            pitchDetectorFillPos = 0;
         }
 
         // Handle overflow
         if (analysisToCopy < numSamples)
         {
             analysisBuffer.copyFrom(0, 0, monoData + analysisToCopy, numSamples - analysisToCopy);
-            fillPos = numSamples - analysisToCopy;
+            pitchDetectorFillPos = numSamples - analysisToCopy;
         }
 
         // .....................
 
 
+        // transcribe to capturedMelody
+
+        int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
+        int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
+
+        for (int n = 0; n < 32; ++n)
+        {
+            if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
+            {
+                if (!symbolExecuted.test(n))
+                {
+                    // transcribe:
+                    capturedMelody[n] = detectedNoteNumbers.back(); // SET TO LAST CAPTURED INDEX OF detectedNoteNumbers
+                    // playback
+
+                    positionMarkerX = n;
+
+//                    DBG(positionMarkerX);
+
+                    symbolExecuted.set(n);
+                }
+            }
+
+        }
+        melodyCaptureFillPos += captureToCopy;
 
 
+
+
+        
 
 
 
@@ -255,19 +281,32 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
             DBG(inputAudioBuffer.getNumSamples());
 
             // DBG print the detected note numbers
-            juce::String noteStr = "Detected Note Numbers: ";
+            juce::String noteStrA = "Detected Note Numbers: ";
             for (int note : detectedNoteNumbers)
             {
-                noteStr += juce::String(note) + ", ";
+                noteStrA += juce::String(note) + ", ";
             }
-            DBG(noteStr);
+            DBG(noteStrA);
+
+
+            // DBG print the captured melody
+            juce::String noteStrB = "Captured Melody: ";
+            for (int note : capturedMelody)
+            {
+                noteStrB += juce::String(note) + ", ";
+            }
+            DBG(noteStrB);
 
 
 
             // depending on whether capturedmelody is all -1, set isActive.store(false)
 
 //            if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
+//            {
 //                isActive.store(false);
+//            }
+
+            // handle offlinedetection, captureWallTime() or something
 
             resetTiming();
 
