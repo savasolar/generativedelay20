@@ -279,6 +279,7 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
                 if (!symbolExecuted.test(n))
                 {
+
                     // playback
 
                     positionMarkerX = n;
@@ -333,12 +334,14 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
             // depending on whether capturedmelody is all -1, set isActive.store(false)
 
-//            if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
-//            {
-//                isActive.store(false);
-//            }
+            if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
+            {
+                isActive.store(false);
 
-            // handle offlinedetection, captureWallTime() or something
+                // handle ending playback, too
+            }
+
+            // handle offline detection, captureWallTime() or something
 
             resetTiming();
 
