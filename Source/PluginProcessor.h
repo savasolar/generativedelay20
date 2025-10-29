@@ -39,14 +39,28 @@ public:
 //  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
 //  |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|hjw
     
-    int placeholderBpm = 120;
-    float placeHolderBeats = 8.0;
+    float placeholderBpm = 120.0;
+    float placeholderBeats = 8.0;
+    int sampleCounter = -1;
     int sPs = 0;
-    int sampleDrift;
+    int sampleDrift = 0;
 
     void resetTiming()
     {
+        inputAudioBuffer.clear();
+        detectedNoteNumbers.clear();
+        std::fill(capturedMelody.begin(), capturedMelody.end(), -1);
 
+        float currentBpm = placeholderBpm;
+        float currentBeats = placeholderBeats;
+
+        sPs = static_cast<int>(std::round(
+            60.0 / currentBpm * getSampleRate() / 4.0 * currentBeats / 8.0
+        ));
+
+        int requiredSize = 32 * sPs + 4096;
+        inputAudioBuffer.setSize(2, requiredSize, false, true);
+        inputAudioBuffer_writePos.store(0);
     }
 
 
