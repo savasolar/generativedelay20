@@ -38,12 +38,25 @@ public:
 //  ||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_||
 //  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
 //  |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|hjw
+    
+    int placeholderBpm = 120;
+    float placeHolderBeats = 8.0;
+    int sPs = 0;
+    int sampleDrift;
+
+    void resetTiming()
+    {
+
+    }
+
 
 
     std::atomic<bool> isActive{ false };
 
 
     juce::AudioBuffer<float> inputAudioBuffer;
+    std::atomic<int> inputAudioBuffer_samplesToRecord{ 0 };
+    std::atomic<int> inputAudioBuffer_writePos{ 0 };
 
 
     std::vector<int> detectedNoteNumbers;

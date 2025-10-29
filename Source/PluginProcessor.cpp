@@ -170,21 +170,9 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // run continuous pitch detection
+    // run continuous pitch detection, set isactive on detected sound input
 
-    if (!isActive.load())
-    {
-        // clear buffers
-
-        // updateBpm
-
-        // updateSpS
-
-        // size inputAudioBuffer according to sPs
-
-        // set isActive.store(true) based on detected input pitch
-    }
-    else
+    if (isActive.load())    
     {
         // populate inputAudioBuffer on a sample-by-sample basis
 
@@ -195,35 +183,6 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         // after 32 symbols, again clear buffers, updateBpm, updateSps, size inputAudioBuffer according to sPs, set isActive.store(false) if entire current capturedMelody is empty
     }
 
-/*
-    // Lightning quick real-time pitch detection!
-
-    // Accumulate mono audio (left channel) for pitch detection
-    int numSamples = buffer.getNumSamples();
-    auto* inputData = buffer.getReadPointer(0);  // Use channel 0 (left/mono)
-    
-    int spaceLeft = analysisBuffer.getNumSamples() - fillPos;
-    int toCopy = jmin(spaceLeft, numSamples);
-    
-    analysisBuffer.copyFrom(0, fillPos, inputData, toCopy);
-    fillPos += toCopy;
-    
-    // If full, detect pitch and DBG print
-    if (fillPos >= analysisBuffer.getNumSamples())
-    {
-        float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
-        DBG("Detected Pitch: " + juce::String(pitch) + " Hz");
-        
-        fillPos = 0;  // Reset for next accumulation
-    }
-    
-    // Handle overflow if block > analysis size (copy remaining to start)
-    if (toCopy < numSamples)
-    {
-        analysisBuffer.copyFrom(0, 0, inputData + toCopy, numSamples - toCopy);
-        fillPos = numSamples - toCopy;
-    }
-*/
 
 }
 
