@@ -318,10 +318,8 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         // populate voice buffer with latest info 
 //        voiceBuffer = timeStretch(isolateBestNote(), (8 * sPs));
 
-            voiceBuffer = isolateBestNote();
-            DBG(voiceBuffer.getNumSamples());
-            
-            timeStretch(voiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
+            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();            
+            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
 
             resetTiming();

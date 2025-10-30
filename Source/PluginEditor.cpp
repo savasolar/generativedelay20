@@ -30,6 +30,11 @@ EnCounterAudioProcessorEditor::EnCounterAudioProcessorEditor (EnCounterAudioProc
     //    audioProcessor.isActive.store(false);
     //    stopButton.setEnabled(false);
     //};
+
+
+    addAndMakeVisible(section1_waveform);
+    section1_waveform.setBounds(10, 10, 400, 120);
+
     
     startTimer(30);
 }
@@ -45,6 +50,9 @@ void EnCounterAudioProcessorEditor::timerCallback()
     //{
     //    startButton.setEnabled(true);
     //}
+
+    section1_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
+
 }
 
 void EnCounterAudioProcessorEditor::paint (juce::Graphics& g)
@@ -58,3 +66,5 @@ void EnCounterAudioProcessorEditor::resized()
 {
 
 }
+
+
