@@ -267,13 +267,21 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         //  - copy the detectedNoteNumbers at its current state
         //  - send it off to isolateBestNote to asynchronously perform isolation and time-stretch
 
+        // for now do it at the end of a full cycle, in or after resetTiming
 
 
+
+
+        // End of a full cycle
         if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
         {
             // this means recording of input audio for this cycle is complete
 
+
+
+
             DBG(inputAudioBuffer.getNumSamples());
+
 
             // DBG print the detected note numbers
             juce::String noteStrA = "Detected Note Numbers: ";
@@ -350,13 +358,6 @@ void EnCounterAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer
     }
 }
 
-juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote(juce::AudioBuffer<float> inputAudio)
-{
-
-
-    return inputAudio;
-}
-
 int EnCounterAudioProcessor::frequencyToMidiNote(float frequency)
 {
     if (frequency <= 0.0f)
@@ -365,6 +366,111 @@ int EnCounterAudioProcessor::frequencyToMidiNote(float frequency)
     }
 
     return static_cast<int>(std::round(12.0f * std::log2(frequency / 440.0f) + 69.0f));
+}
+
+juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote()
+{
+    if (detectedNoteNumbers.empty())
+    {
+        return juce::AudioBuffer<float>(inputAudioBuffer.getNumChannels(), 0);
+    }
+
+    struct NoteSequence
+    {
+        int note;
+        int length;
+        int startIndex;
+    };
+
+    std::vector<NoteSequence> sequences;
+
+    int currentNote = -1;
+    int currentStart = 0;
+
+    for (size_t i = 0; i < detectedNoteNumbers.size(); ++i)
+    {
+        int note = detectedNoteNumbers[i];
+
+        if (note >= 0 && note == currentNote)
+        {
+            continue;
+        }
+        else
+        {
+            if (currentNote >= 0)
+            {
+                int length = static_cast<int>(i) - currentStart;
+                if (length >= 3)
+                {
+                    sequences.push_back({ currentNote, length, currentStart });
+                }
+            }
+
+            if (note >= 0)
+            {
+                currentNote = note;
+                currentStart = static_cast<int>(i);
+            }
+            else
+            {
+                currentNote = -1;
+            }
+        }
+    }
+
+    // Check the last sequence
+    if (currentNote >= 0)
+    {
+        int length = static_cast<int>(detectedNoteNumbers.size()) - currentStart;
+        if (length >= 3)
+        {
+            sequences.push_back({ currentNote, length, currentStart });
+        }
+    }
+
+    if (sequences.empty())
+    {
+        return juce::AudioBuffer<float>(inputAudioBuffer.getNumChannels(), 0);
+    }
+
+    // Find the best sequence
+    int bestLength = -1;
+    int bestNote = -1;
+    int bestStart = -1;
+
+    for (const auto& seq : sequences)
+    {
+        if (seq.length > bestLength ||
+            (seq.length == bestLength && seq.note > bestNote) ||
+            (seq.length == bestLength && seq.note == bestNote && seq.startIndex < bestStart))
+        {
+            bestLength = seq.length;
+            bestNote = seq.note;
+            bestStart = seq.startIndex;
+        }
+    }
+
+    const int chunkSize = 1024;
+    int startSample = (bestStart + 1) * chunkSize;
+    int numSamples = (bestLength - 2) * chunkSize;
+
+    // Ensure we don't exceed buffer bounds
+    numSamples = juce::jmin(numSamples, inputAudioBuffer.getNumSamples() - startSample);
+
+    if (numSamples <= 0)
+    {
+        return juce::AudioBuffer<float>(inputAudioBuffer.getNumChannels(), 0);
+    }
+
+    juce::AudioBuffer<float> result(inputAudioBuffer.getNumChannels(), numSamples);
+
+    for (int ch = 0; ch < result.getNumChannels(); ++ch)
+    {
+        result.copyFrom(ch, 0, inputAudioBuffer, ch, startSample, numSamples);
+    }
+
+    return result;
+
 }
 
 juce::AudioBuffer<float> EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)

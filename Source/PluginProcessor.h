@@ -53,10 +53,10 @@ public:
         inputAudioBuffer_writePos.store(0);
         pitchDetectorFillPos = 0;
         detectedNoteNumbers.clear();
-//        detectedNoteNumbers = { -1 };
         melodyCaptureFillPos = 0;
         symbolExecuted.reset();
         std::fill(capturedMelody.begin(), capturedMelody.end(), -1);
+
         positionMarkerX = 0;
 
         float currentBpm = placeholderBpm;
@@ -69,7 +69,13 @@ public:
         int requiredSize = 32 * sPs + 4096;
         inputAudioBuffer.setSize(2, requiredSize, false, true);
         inputAudioBuffer_samplesToRecord.store(requiredSize);
-        
+
+
+        // populate voice buffer with latest info 
+//        voiceBuffer = timeStretch(isolateBestNote(), (8 * sPs));
+    
+        voiceBuffer = isolateBestNote();
+
     }
 
 
@@ -95,10 +101,9 @@ public:
 
     std::vector<int> capturedMelody = std::vector<int>(32, -1);
 
-
-    juce::AudioBuffer<float> isolateBestNote(juce::AudioBuffer<float> inputAudio);
-
     int frequencyToMidiNote(float frequency);
+
+    juce::AudioBuffer<float> isolateBestNote();
 
     juce::AudioBuffer<float> timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
