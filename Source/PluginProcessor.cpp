@@ -313,7 +313,19 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 
             // handle offline detection, captureWallTime() or something
 
+            
+
+        // populate voice buffer with latest info 
+//        voiceBuffer = timeStretch(isolateBestNote(), (8 * sPs));
+
+            voiceBuffer = isolateBestNote();
+            DBG(voiceBuffer.getNumSamples());
+            
+
+
             resetTiming();
+
+
 
         }
     }

@@ -71,11 +71,6 @@ public:
         inputAudioBuffer_samplesToRecord.store(requiredSize);
 
 
-        // populate voice buffer with latest info 
-//        voiceBuffer = timeStretch(isolateBestNote(), (8 * sPs));
-    
-        voiceBuffer = isolateBestNote();
-
     }
 
 
