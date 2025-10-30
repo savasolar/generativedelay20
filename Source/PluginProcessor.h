@@ -7,6 +7,7 @@
 #include <source/PitchMPM.h>
 #include "signalsmith-stretch.h"
 #include <bitset>
+#include <thread>
 
 class EnCounterAudioProcessor  : public juce::AudioProcessor
 {
@@ -100,7 +101,7 @@ public:
 
     juce::AudioBuffer<float> isolateBestNote();
 
-    juce::AudioBuffer<float> timeStretch(juce::AudioBuffer<float> inputAudio, int length);
+    void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
 
     juce::AudioBuffer<float> voiceBuffer;

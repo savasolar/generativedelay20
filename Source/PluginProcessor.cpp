@@ -321,6 +321,7 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
             voiceBuffer = isolateBestNote();
             DBG(voiceBuffer.getNumSamples());
             
+            timeStretch(voiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
 
             resetTiming();
@@ -485,28 +486,54 @@ juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote()
 
 }
 
-juce::AudioBuffer<float> EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
+void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
 {
-    using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
-        
-    Stretch stretcher;
-    
-    int channels = inputAudio.getNumChannels();
-    float sampleRateFloat = static_cast<float>(getSampleRate());
-    
-    stretcher.presetDefault(channels, sampleRateFloat);
-    
-    int inputSamples = inputAudio.getNumSamples();
-    int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
-    
-    juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
+    //using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
+    //    
+    //Stretch stretcher;
+    //
+    //int channels = inputAudio.getNumChannels();
+    //float sampleRateFloat = static_cast<float>(getSampleRate());
+    //
+    //stretcher.presetDefault(channels, sampleRateFloat);
+    //
+    //int inputSamples = inputAudio.getNumSamples();
+    //int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
+    //
+    //juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
 
-    float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
-    float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
+    //float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
+    //float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
 
-    stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
-    
-    return timeStretchedAudio;
+    //stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
+    //
+    //return timeStretchedAudio;
+
+    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable {
+        using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
+
+        Stretch stretcher;
+
+        int channels = inputAudio.getNumChannels();
+        float sampleRateFloat = static_cast<float>(getSampleRate());
+
+        stretcher.presetDefault(channels, sampleRateFloat);
+
+        int inputSamples = inputAudio.getNumSamples();
+        int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
+
+        juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
+
+        float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
+        float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
+
+        stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
+
+        this->voiceBuffer = std::move(timeStretchedAudio);
+
+        DBG(voiceBuffer.getNumSamples());
+        });
+    t.detach();
 }
 
 //    |\   "Music should be heard not only with the ears, but also the soul."
