@@ -32,10 +32,23 @@ EnCounterAudioProcessorEditor::EnCounterAudioProcessorEditor (EnCounterAudioProc
     //};
 
 
-    addAndMakeVisible(section1_waveform);
-    section1_waveform.setBounds(1, 121, 638, 358);
+    addAndMakeVisible(voiceBuffer_waveform);
+    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
+    addAndMakeVisible(playButton);
+    playButton.setBounds(1, 121, 80, 40);
+    playButton.setButtonText("Play");
+    playButton.onClick = [this]
+    {
+        if (audioProcessor.voiceBuffer.getNumSamples() > 0)
+        {
+            audioProcessor.voiceBuffer_readPos.store(0);
+            audioProcessor.voiceBuffer_isPlaying.store(true);
+        }
+    };
+
+
     startTimer(30);
 }
 
@@ -51,7 +64,7 @@ void EnCounterAudioProcessorEditor::timerCallback()
     //    startButton.setEnabled(true);
     //}
 
-    section1_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
+    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
 
 }
 

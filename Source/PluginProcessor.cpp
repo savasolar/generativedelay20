@@ -252,7 +252,6 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
                 if (!symbolExecuted.test(n))
                 {
 
-                    // playback
 
                     positionMarkerX = n;
                     visualMelodies(capturedMelody, generatedMelody);
@@ -309,17 +308,16 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
                 isActive.store(false);
 
                 // handle ending playback, too
+
+                voiceBuffer.clear();
             }
 
             // handle offline detection, captureWallTime() or something
 
             
 
-        // populate voice buffer with latest info 
-//        voiceBuffer = timeStretch(isolateBestNote(), (8 * sPs));
-
+            // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-            // dbg print isolated best note's number
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
 
@@ -330,6 +328,26 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         }
     }
 
+    // Play stored section2_audio
+    if (voiceBuffer_isPlaying.load())
+    {
+        int numSamples = buffer.getNumSamples();
+        int avail = voiceBuffer.getNumSamples() - voiceBuffer_readPos.load();
+        int toRead = juce::jmin(numSamples, avail);
+
+        for (int ch = 0; ch < getTotalNumOutputChannels(); ++ch)
+        {
+            int srcCh = ch % voiceBuffer.getNumChannels();
+            buffer.addFrom(ch, 0, voiceBuffer, srcCh, voiceBuffer_readPos.load(), toRead);
+        }
+
+        voiceBuffer_readPos.store(voiceBuffer_readPos.load() + toRead);
+
+        if (voiceBuffer_readPos.load() >= voiceBuffer.getNumSamples())
+        {
+            voiceBuffer_isPlaying.store(false);
+        }
+    }
 
 }
 
@@ -499,28 +517,8 @@ juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote()
 
 void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
 {
-    //using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
-    //    
-    //Stretch stretcher;
-    //
-    //int channels = inputAudio.getNumChannels();
-    //float sampleRateFloat = static_cast<float>(getSampleRate());
-    //
-    //stretcher.presetDefault(channels, sampleRateFloat);
-    //
-    //int inputSamples = inputAudio.getNumSamples();
-    //int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
-    //
-    //juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
-
-    //float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
-    //float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
-
-    //stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
-    //
-    //return timeStretchedAudio;
-
-    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable {
+    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
+    {
         using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
 
         Stretch stretcher;
@@ -540,42 +538,27 @@ void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, i
 
         stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
 
-
-
-
-
-        // NEW: Isolate middle 50% here.
+        // Isolate middle 50% here.
         int trimStart = static_cast<int>(outputSamples * 0.25f);  // Left 25%
         int trimLength = static_cast<int>(outputSamples * 0.5f);  // Middle 50%
         // Ensure we don't exceed bounds (though unlikely).
         trimStart = juce::jmax(0, trimStart);
         trimLength = juce::jmin(trimLength, outputSamples - trimStart);
 
-        if (trimLength > 0) {
+        if (trimLength > 0)
+        {
             juce::AudioBuffer<float> trimmedAudio(channels, trimLength);
-            for (int ch = 0; ch < channels; ++ch) {
+            for (int ch = 0; ch < channels; ++ch)
+            {
                 trimmedAudio.copyFrom(ch, 0, timeStretchedAudio, ch, trimStart, trimLength);
             }
             this->voiceBuffer = std::move(trimmedAudio);
         }
-        else {
+        else
+        {
             // Fallback: Use full buffer if trimLength is invalid (rare).
             this->voiceBuffer = std::move(timeStretchedAudio);
         }
-
-
-
-
-
-
-
-//        this->voiceBuffer = std::move(timeStretchedAudio);
-
-
-
-
-
-
 
         // Apply 50ms linear fade-in and fade-out
         int numSamples = voiceBuffer.getNumSamples();
@@ -588,15 +571,9 @@ void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, i
             }
         }
 
-
-
-
-
-
-
-
         DBG(voiceBuffer.getNumSamples());
-        });
+
+    });
     t.detach();
 }
 

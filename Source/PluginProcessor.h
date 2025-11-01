@@ -44,7 +44,6 @@ public:
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
     int sPs = 0;
-//    int sampleDrift = 0; // ? 
     std::bitset<32> symbolExecuted;
     int positionMarkerX = 0;
 
@@ -98,26 +97,27 @@ public:
     std::vector<int> capturedMelody = std::vector<int>(32, -1);
 
     int frequencyToMidiNote(float frequency);
-
     juce::AudioBuffer<float> isolateBestNote();
+    void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
     std::atomic<int> voiceBufferNoteNumber{ -1 };
 
-    void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
-
-
     juce::AudioBuffer<float> voiceBuffer;
 
+    std::atomic<int> voiceBuffer_readPos{ 0 };
+    std::atomic<bool> voiceBuffer_isPlaying{ false };
 
-    //std::vector<int> generatedMelody
-    //{
-    //    -1, -1, -1, -1, -1, -1, -1, -1,
-    //    -1, -1, -1, -1, -1, -1, -1, -1,
-    //    -1, -1, -1, -1, -1, -1, -1, -1,
-    //    -1, -1, -1, -1, -1, -1, -1, -1
-    //};
 
-    std::vector<int> generatedMelody = std::vector<int>(32, -1);
+    std::vector<int> generatedMelody
+    {
+        60, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2,
+        60, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2
+    };
+
+//    std::vector<int> generatedMelody = std::vector<int>(32, -1);
+
 
 
     std::vector<std::vector<int>> visualMelodies(std::vector<int> captured, std::vector<int> generated)
@@ -126,15 +126,6 @@ public:
 
         return result;
     }
-
-
-
-    void synthesize(std::vector<int> melody, juce::AudioBuffer<float> voice)
-    {
-        
-    }
-    
-    
 
 //                         `. ___
 //                    __,' __`.                _..----....____
@@ -164,12 +155,8 @@ private:
     // Time stretch utilities
     signalsmith::stretch::SignalsmithStretch<float> stretcher;
 
-
-
-
     // Melody capture utilities
     int melodyCaptureFillPos = 0;
-
 
 //     ________________________________         
 //    /                                "-_          

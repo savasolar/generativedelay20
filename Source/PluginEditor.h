@@ -28,7 +28,7 @@ private:
 
 
 
-
+    juce::TextButton playButton;
 
 
 
@@ -89,7 +89,7 @@ private:
         int numSamples = 0;
     };
 
-    WaveformViewer section1_waveform;
+    WaveformViewer voiceBuffer_waveform;
 
 
 
