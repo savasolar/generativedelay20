@@ -488,6 +488,11 @@ juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote()
         result.copyFrom(ch, 0, inputAudioBuffer, ch, startSample, numSamples);
     }
 
+
+
+
+
+
     return result;
 
 }
@@ -562,7 +567,30 @@ void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, i
 
 
 
+
+
 //        this->voiceBuffer = std::move(timeStretchedAudio);
+
+
+
+
+
+
+
+        // Apply 50ms linear fade-in and fade-out
+        int numSamples = voiceBuffer.getNumSamples();
+        if (numSamples > 0) {
+            int fadeSamples = static_cast<int>(0.01 * getSampleRate() + 0.5f);
+            fadeSamples = juce::jmin(fadeSamples, numSamples / 2);
+            for (int ch = 0; ch < voiceBuffer.getNumChannels(); ++ch) {
+                voiceBuffer.applyGainRamp(ch, 0, fadeSamples, 0.0f, 1.0f);
+                voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
+            }
+        }
+
+
+
+
 
 
 
