@@ -101,6 +101,8 @@ public:
 
     juce::AudioBuffer<float> isolateBestNote();
 
+    std::atomic<int> voiceBufferNoteNumber{ -1 };
+
     void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
 

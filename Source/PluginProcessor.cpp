@@ -318,7 +318,8 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
         // populate voice buffer with latest info 
 //        voiceBuffer = timeStretch(isolateBestNote(), (8 * sPs));
 
-            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();            
+            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
+            // dbg print isolated best note's number
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
 
@@ -461,6 +462,13 @@ juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote()
         }
     }
 
+
+    // Store the best note number and DBG print it
+    voiceBufferNoteNumber.store(bestNote);
+    DBG("Isolated best note number: " + juce::String(voiceBufferNoteNumber.load()));
+
+
+
     const int chunkSize = 1024;
     int startSample = (bestStart + 1) * chunkSize;
     int numSamples = (bestLength - 2) * chunkSize;
@@ -527,7 +535,37 @@ void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, i
 
         stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
 
-        this->voiceBuffer = std::move(timeStretchedAudio);
+
+
+
+
+        // NEW: Isolate middle 50% here.
+        int trimStart = static_cast<int>(outputSamples * 0.25f);  // Left 25%
+        int trimLength = static_cast<int>(outputSamples * 0.5f);  // Middle 50%
+        // Ensure we don't exceed bounds (though unlikely).
+        trimStart = juce::jmax(0, trimStart);
+        trimLength = juce::jmin(trimLength, outputSamples - trimStart);
+
+        if (trimLength > 0) {
+            juce::AudioBuffer<float> trimmedAudio(channels, trimLength);
+            for (int ch = 0; ch < channels; ++ch) {
+                trimmedAudio.copyFrom(ch, 0, timeStretchedAudio, ch, trimStart, trimLength);
+            }
+            this->voiceBuffer = std::move(trimmedAudio);
+        }
+        else {
+            // Fallback: Use full buffer if trimLength is invalid (rare).
+            this->voiceBuffer = std::move(timeStretchedAudio);
+        }
+
+
+
+
+
+//        this->voiceBuffer = std::move(timeStretchedAudio);
+
+
+
 
         DBG(voiceBuffer.getNumSamples());
         });
