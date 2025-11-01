@@ -239,28 +239,54 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
         int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
 
+        //for (int n = 0; n < 32; ++n)
+        //{
+        //    if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
+        //    {
+        //        
+
+
+        //        //// Always update to the latest detected note
+        //        //if (!detectedNoteNumbers.empty() && detectedNoteNumbers.back() != -1)
+        //        //{
+        //        //    capturedMelody[n] = detectedNoteNumbers.back();
+        //        //}
+
+        //        if (!symbolExecuted.test(n))
+        //        {
+
+        //            //// DBG print
+        //            //juce::String noteStrB = "DNN: ";
+        //            //for (int note : detectedNoteNumbers)
+        //            //{
+        //            //    noteStrB += juce::String(note) + ", ";
+        //            //}
+        //            //DBG(noteStrB);
+
+        //            DBG(detectedNoteNumbers.back());
+
+        //            sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
+
+        //            positionMarkerX = n;
+        //            visualMelodies(capturedMelody, generatedMelody);
+        //            symbolExecuted.set(n);
+        //        }
+        //    }
+        //}
+
         for (int n = 0; n < 32; ++n)
         {
-            if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
+            if (melodyCaptureFillPos >= (n + 1) * sPs)
             {
-                
-
-
-                // Always update to the latest detected note
-                if (!detectedNoteNumbers.empty() && detectedNoteNumbers.back() != -1)
-                {
-                    capturedMelody[n] = detectedNoteNumbers.back();
-                }
-
                 if (!symbolExecuted.test(n))
                 {
-                    // DBG print the captured melody
-                    juce::String noteStrB = "Captured Melody: ";
-                    for (int note : capturedMelody)
+                    if (!detectedNoteNumbers.empty()/* && detectedNoteNumbers.back() != -1*/)
                     {
-                        noteStrB += juce::String(note) + ", ";
+                        DBG(n);
+                        DBG(detectedNoteNumbers.back());
+
+                        //capturedMelody[n] = detectedNoteNumbers.back();
                     }
-                    DBG(noteStrB);
 
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
 
@@ -270,6 +296,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 }
             }
         }
+
+
         melodyCaptureFillPos += captureToCopy;
 
 
