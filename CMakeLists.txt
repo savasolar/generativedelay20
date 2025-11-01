@@ -172,7 +172,6 @@ target_sources(generativedelay20 PRIVATE
 
 # Binary data
 juce_add_binary_data(BinaryResources SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/B612Mono-Regular.ttf
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part1.bin
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part2.bin
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part3.bin
@@ -180,6 +179,13 @@ juce_add_binary_data(BinaryResources SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part5.bin
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/int_to_note.json
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/note_to_int.json
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/B612Mono-Regular.ttf
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/cap-mel-texture.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/gen-mel-texture.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/overlap-mel-texture.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/preset-menu.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/preset-menu-hover.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/ui-body.png
 )
 
 

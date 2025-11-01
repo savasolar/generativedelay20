@@ -8,7 +8,7 @@ EnCounterAudioProcessorEditor::EnCounterAudioProcessorEditor (EnCounterAudioProc
 {
     setSize (640, 480);
 
-//    backgroundImage = juce::ImageCache::getFromMemory(BinaryData::encounterbodywide_png, BinaryData::encounterbodywide_pngSize);
+    backgroundImage = juce::ImageCache::getFromMemory(BinaryData::uibody_png, BinaryData::uibody_pngSize);
 
 
     //addAndMakeVisible(startButton);
@@ -33,7 +33,7 @@ EnCounterAudioProcessorEditor::EnCounterAudioProcessorEditor (EnCounterAudioProc
 
 
     addAndMakeVisible(section1_waveform);
-    section1_waveform.setBounds(10, 10, 400, 120);
+    section1_waveform.setBounds(1, 121, 638, 358);
 
     
     startTimer(30);
@@ -58,7 +58,7 @@ void EnCounterAudioProcessorEditor::timerCallback()
 void EnCounterAudioProcessorEditor::paint (juce::Graphics& g)
 {
 
-//    g.drawImage(backgroundImage, getLocalBounds().toFloat());
+    g.drawImage(backgroundImage, getLocalBounds().toFloat());
     
 }
 

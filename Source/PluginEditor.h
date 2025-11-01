@@ -49,7 +49,7 @@ private:
             if (audioBuffer == nullptr || numSamples == 0) return;
             if (audioBuffer->getNumChannels() == 0) return;
 
-            g.setColour(juce::Colours::lime);
+            g.setColour(juce::Colour::fromRGB(0, 255, 174));
 
             float w = static_cast<float> (getWidth());
             float h = static_cast<float> (getHeight()) / 2.0f;
