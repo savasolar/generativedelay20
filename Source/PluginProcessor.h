@@ -9,11 +9,11 @@
 #include <bitset>
 #include <thread>
 
-class EnCounterAudioProcessor  : public juce::AudioProcessor
+class CounterTuneAudioProcessor  : public juce::AudioProcessor
 {
 public:
-    EnCounterAudioProcessor();
-    ~EnCounterAudioProcessor() override;
+    CounterTuneAudioProcessor();
+    ~CounterTuneAudioProcessor() override;
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
    #ifndef JucePlugin_PreferredChannelConfigurations
@@ -172,5 +172,5 @@ private:
 ///_________________________________________--"  
 
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (EnCounterAudioProcessor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CounterTuneAudioProcessor)
 };

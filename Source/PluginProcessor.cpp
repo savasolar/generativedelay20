@@ -3,7 +3,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-EnCounterAudioProcessor::EnCounterAudioProcessor()
+CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
@@ -22,7 +22,7 @@ EnCounterAudioProcessor::EnCounterAudioProcessor()
 
 }
 
-EnCounterAudioProcessor::~EnCounterAudioProcessor()
+CounterTuneAudioProcessor::~CounterTuneAudioProcessor()
 {
 
 }
@@ -39,11 +39,11 @@ EnCounterAudioProcessor::~EnCounterAudioProcessor()
 //       X        _X      *    X      **         **             x   **    *  X
 //      _X                    _X           x                *          x     X_
 
-const juce::String EnCounterAudioProcessor::getName() const
+const juce::String CounterTuneAudioProcessor::getName() const
 {
     return JucePlugin_Name;
 }
-bool EnCounterAudioProcessor::acceptsMidi() const
+bool CounterTuneAudioProcessor::acceptsMidi() const
 {
    #if JucePlugin_WantsMidiInput
     return true;
@@ -51,7 +51,7 @@ bool EnCounterAudioProcessor::acceptsMidi() const
     return false;
    #endif
 }
-bool EnCounterAudioProcessor::producesMidi() const
+bool CounterTuneAudioProcessor::producesMidi() const
 {
    #if JucePlugin_ProducesMidiOutput
     return true;
@@ -59,7 +59,7 @@ bool EnCounterAudioProcessor::producesMidi() const
     return false;
    #endif
 }
-bool EnCounterAudioProcessor::isMidiEffect() const
+bool CounterTuneAudioProcessor::isMidiEffect() const
 {
    #if JucePlugin_IsMidiEffect
     return true;
@@ -67,26 +67,26 @@ bool EnCounterAudioProcessor::isMidiEffect() const
     return false;
    #endif
 }
-double EnCounterAudioProcessor::getTailLengthSeconds() const
+double CounterTuneAudioProcessor::getTailLengthSeconds() const
 {
     return 0.0;
 }
-int EnCounterAudioProcessor::getNumPrograms()
+int CounterTuneAudioProcessor::getNumPrograms()
 {
     return 1;
 }
-int EnCounterAudioProcessor::getCurrentProgram()
+int CounterTuneAudioProcessor::getCurrentProgram()
 {
     return 0;
 }
-void EnCounterAudioProcessor::setCurrentProgram (int index)
+void CounterTuneAudioProcessor::setCurrentProgram (int index)
 {
 }
-const juce::String EnCounterAudioProcessor::getProgramName (int index)
+const juce::String CounterTuneAudioProcessor::getProgramName (int index)
 {
     return {};
 }
-void EnCounterAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void CounterTuneAudioProcessor::changeProgramName (int index, const juce::String& newName)
 {
 }
 
@@ -103,7 +103,7 @@ void EnCounterAudioProcessor::changeProgramName (int index, const juce::String& 
 //______________/ \__;\___/\;_/\________________________________
 //YwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYw
 
-void EnCounterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {    
     pitchDetector.setSampleRate(sampleRate);
     pitchDetector.setBufferSize(1024);  // Fixed power-of-2; or use juce::nextPowerOfTwo(samplesPerBlock) if you want dynamic
@@ -124,12 +124,12 @@ void EnCounterAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBl
 //     `'-.
 //jgs   ,__)
 
-void EnCounterAudioProcessor::releaseResources()
+void CounterTuneAudioProcessor::releaseResources()
 {
 
 }
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool EnCounterAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool CounterTuneAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
   #if JucePlugin_IsMidiEffect
     juce::ignoreUnused (layouts);
@@ -163,7 +163,7 @@ bool EnCounterAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts
 //            .-' '-._)
 //          .'                     PjP
 
-void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
     juce::ScopedNoDenormals noDenormals;
 
@@ -361,7 +361,7 @@ void EnCounterAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juc
 //___  '    /  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //\  \/    |        ~~~ ~~~ ~~~~~ ~~~~~
 
-void EnCounterAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer)
+void CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer)
 {
     // Compute RMS amplitude of the current block (sum channels for detection)
     float blockEnergy = 0.0f;
@@ -388,7 +388,7 @@ void EnCounterAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer
     }
 }
 
-int EnCounterAudioProcessor::frequencyToMidiNote(float frequency)
+int CounterTuneAudioProcessor::frequencyToMidiNote(float frequency)
 {
     if (frequency <= 0.0f)
     {
@@ -398,7 +398,7 @@ int EnCounterAudioProcessor::frequencyToMidiNote(float frequency)
     return static_cast<int>(std::round(12.0f * std::log2(frequency / 440.0f) + 69.0f));
 }
 
-juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote()
+juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
 {
     if (detectedNoteNumbers.empty())
     {
@@ -515,7 +515,7 @@ juce::AudioBuffer<float> EnCounterAudioProcessor::isolateBestNote()
 
 }
 
-void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
+void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
 {
     std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
     {
@@ -590,23 +590,23 @@ void EnCounterAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, i
 //           @|           |           |        Larry Komro         @|.     
 //                                  -@-        [kom...@uwec.edu]
 
-bool EnCounterAudioProcessor::hasEditor() const
+bool CounterTuneAudioProcessor::hasEditor() const
 {
     return true;
 }
-juce::AudioProcessorEditor* EnCounterAudioProcessor::createEditor()
+juce::AudioProcessorEditor* CounterTuneAudioProcessor::createEditor()
 {
-    return new EnCounterAudioProcessorEditor (*this);
+    return new CounterTuneAudioProcessorEditor (*this);
 }
-void EnCounterAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void CounterTuneAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
 
 }
-void EnCounterAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void CounterTuneAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
 
 }
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
-    return new EnCounterAudioProcessor();
+    return new CounterTuneAudioProcessor();
 }

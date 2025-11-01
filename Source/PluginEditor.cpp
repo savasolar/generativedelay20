@@ -3,7 +3,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-EnCounterAudioProcessorEditor::EnCounterAudioProcessorEditor (EnCounterAudioProcessor& p)
+CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAudioProcessor& p)
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     setSize (640, 480);
@@ -52,12 +52,12 @@ EnCounterAudioProcessorEditor::EnCounterAudioProcessorEditor (EnCounterAudioProc
     startTimer(30);
 }
 
-EnCounterAudioProcessorEditor::~EnCounterAudioProcessorEditor()
+CounterTuneAudioProcessorEditor::~CounterTuneAudioProcessorEditor()
 {
     setLookAndFeel(nullptr);
 }
 
-void EnCounterAudioProcessorEditor::timerCallback()
+void CounterTuneAudioProcessorEditor::timerCallback()
 {
     //if (!audioProcessor.isActive.load())
     //{
@@ -68,14 +68,14 @@ void EnCounterAudioProcessorEditor::timerCallback()
 
 }
 
-void EnCounterAudioProcessorEditor::paint (juce::Graphics& g)
+void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 {
 
     g.drawImage(backgroundImage, getLocalBounds().toFloat());
     
 }
 
-void EnCounterAudioProcessorEditor::resized()
+void CounterTuneAudioProcessorEditor::resized()
 {
 
 }
