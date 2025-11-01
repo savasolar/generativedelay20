@@ -243,6 +243,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         {
             if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
             {
+                
+
+
                 // Always update to the latest detected note
                 if (!detectedNoteNumbers.empty() && detectedNoteNumbers.back() != -1)
                 {
@@ -251,8 +254,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
                 if (!symbolExecuted.test(n))
                 {
-
-
                     // DBG print the captured melody
                     juce::String noteStrB = "Captured Melody: ";
                     for (int note : capturedMelody)
@@ -361,7 +362,7 @@ void CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     float rms = std::sqrt(blockEnergy / (numSamples * numChannels));
 
-    const float threshold = 0.015f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
+    const float threshold = 0.007f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
 
     if (rms > threshold)
     {
