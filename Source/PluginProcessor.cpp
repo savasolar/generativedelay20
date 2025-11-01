@@ -253,6 +253,16 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 {
 
 
+                    // DBG print the captured melody
+                    juce::String noteStrB = "Captured Melody: ";
+                    for (int note : capturedMelody)
+                    {
+                        noteStrB += juce::String(note) + ", ";
+                    }
+                    DBG(noteStrB);
+
+                    sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
+
                     positionMarkerX = n;
                     visualMelodies(capturedMelody, generatedMelody);
                     symbolExecuted.set(n);
@@ -261,45 +271,13 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         }
         melodyCaptureFillPos += captureToCopy;
 
-        // if HALFway through recording the inputAudioBuffer, make copies and isolate best note
-        //  - copy the inputAudioBuffer at its half-recorded state
-        //  - copy the detectedNoteNumbers at its current state
-        //  - send it off to isolateBestNote to asynchronously perform isolation and time-stretch
-
-        // for now do it at the end of a full cycle, in or after resetTiming
-
-
-
 
         // End of a full cycle
-        if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
+//        if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
+
+        if (melodyCaptureFillPos >= sPs * 32 + sampleDrift)
         {
-            // this means recording of input audio for this cycle is complete
-
-
-
-
-            DBG(inputAudioBuffer.getNumSamples());
-
-
-            // DBG print the detected note numbers
-            juce::String noteStrA = "Detected Note Numbers: ";
-            for (int note : detectedNoteNumbers)
-            {
-                noteStrA += juce::String(note) + ", ";
-            }
-            DBG(noteStrA);
-
-
-            // DBG print the captured melody
-            juce::String noteStrB = "Captured Melody: ";
-            for (int note : capturedMelody)
-            {
-                noteStrB += juce::String(note) + ", ";
-            }
-            DBG(noteStrB);
-
-
+            symbolExecuted.reset();
 
             // depending on whether capturedmelody is all -1, set isActive.store(false)
 
@@ -312,9 +290,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 voiceBuffer.clear();
             }
 
-            // handle offline detection, captureWallTime() or something
-
-            
 
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
@@ -327,6 +302,13 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         }
     }
+
+
+
+
+
+
+
 
     // Play stored section2_audio
     if (voiceBuffer_isPlaying.load())

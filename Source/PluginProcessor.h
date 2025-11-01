@@ -46,6 +46,7 @@ public:
     int sPs = 0;
     std::bitset<32> symbolExecuted;
     int positionMarkerX = 0;
+    int sampleDrift = 0;
 
     void resetTiming()
     {
