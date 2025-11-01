@@ -276,16 +276,29 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         for (int n = 0; n < 32; ++n)
         {
+            // play melody at START of a symbol to align
+
+
+            // fill captured melody at END of a symbol to increase accuracy
             if (melodyCaptureFillPos >= (n + 1) * sPs)
             {
                 if (!symbolExecuted.test(n))
                 {
                     if (!detectedNoteNumbers.empty()/* && detectedNoteNumbers.back() != -1*/)
                     {
-                        DBG(n);
-                        DBG(detectedNoteNumbers.back());
+                        capturedMelody[n] = detectedNoteNumbers.back();
 
-                        //capturedMelody[n] = detectedNoteNumbers.back();
+                        // DBG print
+                        juce::String noteStrB = "cM: ";
+                        for (int note : capturedMelody)
+                        {
+                            noteStrB += juce::String(note) + ", ";
+                        }
+                        DBG(noteStrB);
+
+
+                        // test playback here for now (it'll probably be out of sync)
+                        playback(generatedMelody[n]);
                     }
 
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));

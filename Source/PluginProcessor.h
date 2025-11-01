@@ -121,6 +121,13 @@ public:
 
 
 
+    void playback(int symbol)
+    {
+
+    }
+
+
+
     std::vector<std::vector<int>> visualMelodies(std::vector<int> captured, std::vector<int> generated)
     {
         std::vector<std::vector<int>> result = { captured, generated };
