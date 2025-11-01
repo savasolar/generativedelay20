@@ -244,7 +244,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
             {
                 // Always update to the latest detected note
-                if (!detectedNoteNumbers.empty())
+                if (!detectedNoteNumbers.empty() && detectedNoteNumbers.back() != -1)
                 {
                     capturedMelody[n] = detectedNoteNumbers.back();
                 }
