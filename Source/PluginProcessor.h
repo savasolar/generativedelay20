@@ -104,7 +104,6 @@ public:
     
     juce::AudioBuffer<float> voiceBuffer;
     std::atomic<int> voiceBufferNoteNumber{ -1 };
-//    std::atomic<int> voiceBuffer_readPos{ 0 };
     std::atomic<int> voiceBuffer_readPos{ 0 };
     std::atomic<bool> voiceBuffer_isPlaying{ false };
     float playbackInc{ 1.0f };
@@ -124,27 +123,10 @@ public:
     int playbackNote = -1;
     bool playbackNoteActive = false;
 
-    void playback(int symbol)
-    {
-        if (symbol >= 0 && voiceBufferNoteNumber.load() != -1)
-        {
-            float semitoneDiff = static_cast<float>(symbol - voiceBufferNoteNumber.load());
-            playbackInc = std::pow(2.0f, semitoneDiff / 12.0f);
-            voiceBuffer_readPos.store(0.0f);
-            voiceBuffer_isPlaying.store(true);
-        }
-    }
-
     juce::dsp::DryWetMixer<float> dryWetMixer;
 
 
 
-    std::vector<std::vector<int>> visualMelodies(std::vector<int> captured, std::vector<int> generated)
-    {
-        std::vector<std::vector<int>> result = { captured, generated };
-
-        return result;
-    }
 
 //                         `. ___
 //                    __,' __`.                _..----....____

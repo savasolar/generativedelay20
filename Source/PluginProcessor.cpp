@@ -242,41 +242,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
         int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
 
-        //for (int n = 0; n < 32; ++n)
-        //{
-        //    if (melodyCaptureFillPos >= n * sPs && melodyCaptureFillPos < sPs * (n + 1))
-        //    {
-        //        
-
-
-        //        //// Always update to the latest detected note
-        //        //if (!detectedNoteNumbers.empty() && detectedNoteNumbers.back() != -1)
-        //        //{
-        //        //    capturedMelody[n] = detectedNoteNumbers.back();
-        //        //}
-
-        //        if (!symbolExecuted.test(n))
-        //        {
-
-        //            //// DBG print
-        //            //juce::String noteStrB = "DNN: ";
-        //            //for (int note : detectedNoteNumbers)
-        //            //{
-        //            //    noteStrB += juce::String(note) + ", ";
-        //            //}
-        //            //DBG(noteStrB);
-
-        //            DBG(detectedNoteNumbers.back());
-
-        //            sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
-
-        //            positionMarkerX = n;
-        //            visualMelodies(capturedMelody, generatedMelody);
-        //            symbolExecuted.set(n);
-        //        }
-        //    }
-        //}
-
         for (int n = 0; n < 32; ++n)
         {
             // play melody at START of a symbol to align
@@ -298,16 +263,13 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                             noteStrB += juce::String(note) + ", ";
                         }
                         DBG(noteStrB);
-
-
-                        // test playback here for now (it'll probably be out of sync)
-                        playback(generatedMelody[n]);
                     }
 
-                    sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
+                    // on a symbol-by-symbol basis:
+                    // use generatedMelody[n] to
+                    // set pitch RATIO which will be applied to voicebuffer during playback
 
-                    positionMarkerX = n;
-                    visualMelodies(capturedMelody, generatedMelody);
+                    sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
                 }
             }
@@ -318,14 +280,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
 
         // End of a full cycle
-//        if (inputAudioBuffer_writePos.load() >= inputAudioBuffer_samplesToRecord.load())
-
         if (melodyCaptureFillPos >= sPs * 32 + sampleDrift)
         {
             symbolExecuted.reset();
 
-            // depending on whether capturedmelody is all -1, set isActive.store(false)
-
+            // if captured melody is empty
             if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
             {
                 isActive.store(false);
@@ -338,94 +297,39 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
+            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
 
 
             resetTiming();
-
-
-
         }
     }
-
-
-
-
-
-
-
-
-    //// Play stored section2_audio
-    //if (voiceBuffer_isPlaying.load())
-    //{
-    //    int numSamples = buffer.getNumSamples();
-    //    int avail = voiceBuffer.getNumSamples() - voiceBuffer_readPos.load();
-    //    int toRead = juce::jmin(numSamples, avail);
-
-    //    for (int ch = 0; ch < getTotalNumOutputChannels(); ++ch)
-    //    {
-    //        int srcCh = ch % voiceBuffer.getNumChannels();
-    //        buffer.addFrom(ch, 0, voiceBuffer, srcCh, voiceBuffer_readPos.load(), toRead);
-    //    }
-
-    //    voiceBuffer_readPos.store(voiceBuffer_readPos.load() + toRead);
-
-    //    if (voiceBuffer_readPos.load() >= voiceBuffer.getNumSamples())
-    //    {
-    //        voiceBuffer_isPlaying.store(false);
-    //    }
-    //}
-
 
 
     juce::dsp::AudioBlock<float> block(buffer);
     dryWetMixer.pushDrySamples(block);
     block.clear();
 
-    if (voiceBuffer_isPlaying.load())
+    // synthesized voice playback here?
+
+    if (voiceBuffer.getNumSamples() > 0)
     {
-        float pos = voiceBuffer_readPos.load();
-        float inc = playbackInc;
-        const int numSamples = buffer.getNumSamples();
-        const int vbLen = voiceBuffer.getNumSamples();
+        int numSamples = buffer.getNumSamples();
+        int voiceBufferSize = voiceBuffer.getNumSamples();
+        int readPos = voiceBuffer_readPos.load();
 
-        if (vbLen <= 1)
+        for (int i = 0; i < numSamples; ++i)
         {
-            voiceBuffer_isPlaying.store(false);
-        }
-        else
-        {
-            const int vbChans = voiceBuffer.getNumChannels();
-            const int outChans = getTotalNumOutputChannels();
-            int i = 0;
-            for (; i < numSamples; ++i)
+            int currentPos = (readPos + i) % voiceBufferSize;
+
+            for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), voiceBuffer.getNumChannels()); ++ch)
             {
-                if (pos >= vbLen - 1)
-                    break;
-
-                const int intPos = static_cast<int>(pos);
-                const float frac = pos - static_cast<float>(intPos);
-
-                for (int ch = 0; ch < outChans; ++ch)
-                {
-                    const int srcCh = ch % vbChans;
-                    const float s0 = voiceBuffer.getSample(srcCh, intPos);
-                    const float s1 = voiceBuffer.getSample(srcCh, intPos + 1);
-                    const float sample = s0 + frac * (s1 - s0);
-                    buffer.addSample(ch, i, sample);
-                }
-
-                pos += inc;
+                buffer.addSample(ch, i, voiceBuffer.getSample(ch, currentPos));  // Reduce gain
             }
-
-            if (i < numSamples)
-            {
-                voiceBuffer_isPlaying.store(false);
-            }
-
-            voiceBuffer_readPos.store(pos);
         }
+
+        voiceBuffer_readPos.store((readPos + numSamples) % voiceBufferSize);
     }
+
 
     dryWetMixer.mixWetSamples(block);
 
