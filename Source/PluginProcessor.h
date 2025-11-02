@@ -101,12 +101,13 @@ public:
     juce::AudioBuffer<float> isolateBestNote();
     void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
-    std::atomic<int> voiceBufferNoteNumber{ -1 };
-
+    
     juce::AudioBuffer<float> voiceBuffer;
-
+    std::atomic<int> voiceBufferNoteNumber{ -1 };
+//    std::atomic<int> voiceBuffer_readPos{ 0 };
     std::atomic<int> voiceBuffer_readPos{ 0 };
     std::atomic<bool> voiceBuffer_isPlaying{ false };
+    float playbackInc{ 1.0f };
 
 
     std::vector<int> generatedMelody
@@ -120,11 +121,21 @@ public:
 //    std::vector<int> generatedMelody = std::vector<int>(32, -1);
 
 
+    int playbackNote = -1;
+    bool playbackNoteActive = false;
 
     void playback(int symbol)
     {
-
+        if (symbol >= 0 && voiceBufferNoteNumber.load() != -1)
+        {
+            float semitoneDiff = static_cast<float>(symbol - voiceBufferNoteNumber.load());
+            playbackInc = std::pow(2.0f, semitoneDiff / 12.0f);
+            voiceBuffer_readPos.store(0.0f);
+            voiceBuffer_isPlaying.store(true);
+        }
     }
+
+    juce::dsp::DryWetMixer<float> dryWetMixer;
 
 
 

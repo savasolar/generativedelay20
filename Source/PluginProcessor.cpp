@@ -19,7 +19,6 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
     inputAudioBuffer.setSize(2, 1); // dummy size for now
 
 
-
 }
 
 CounterTuneAudioProcessor::~CounterTuneAudioProcessor()
@@ -115,6 +114,10 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     inputAudioBuffer.setSize(getTotalNumInputChannels(), static_cast<int>(sampleRate * 60.0 + 0.5), true, true, true);
 
+
+    dryWetMixer.prepare(juce::dsp::ProcessSpec{ sampleRate, static_cast<std::uint32_t> (samplesPerBlock), static_cast<std::uint32_t> (getTotalNumOutputChannels()) });
+    dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::linear);
+    dryWetMixer.setWetMixProportion(0.5f);
 }
 
 //              (\_/)
@@ -352,26 +355,81 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
 
 
-    // Play stored section2_audio
+    //// Play stored section2_audio
+    //if (voiceBuffer_isPlaying.load())
+    //{
+    //    int numSamples = buffer.getNumSamples();
+    //    int avail = voiceBuffer.getNumSamples() - voiceBuffer_readPos.load();
+    //    int toRead = juce::jmin(numSamples, avail);
+
+    //    for (int ch = 0; ch < getTotalNumOutputChannels(); ++ch)
+    //    {
+    //        int srcCh = ch % voiceBuffer.getNumChannels();
+    //        buffer.addFrom(ch, 0, voiceBuffer, srcCh, voiceBuffer_readPos.load(), toRead);
+    //    }
+
+    //    voiceBuffer_readPos.store(voiceBuffer_readPos.load() + toRead);
+
+    //    if (voiceBuffer_readPos.load() >= voiceBuffer.getNumSamples())
+    //    {
+    //        voiceBuffer_isPlaying.store(false);
+    //    }
+    //}
+
+
+
+    juce::dsp::AudioBlock<float> block(buffer);
+    dryWetMixer.pushDrySamples(block);
+    block.clear();
+
     if (voiceBuffer_isPlaying.load())
     {
-        int numSamples = buffer.getNumSamples();
-        int avail = voiceBuffer.getNumSamples() - voiceBuffer_readPos.load();
-        int toRead = juce::jmin(numSamples, avail);
+        float pos = voiceBuffer_readPos.load();
+        float inc = playbackInc;
+        const int numSamples = buffer.getNumSamples();
+        const int vbLen = voiceBuffer.getNumSamples();
 
-        for (int ch = 0; ch < getTotalNumOutputChannels(); ++ch)
-        {
-            int srcCh = ch % voiceBuffer.getNumChannels();
-            buffer.addFrom(ch, 0, voiceBuffer, srcCh, voiceBuffer_readPos.load(), toRead);
-        }
-
-        voiceBuffer_readPos.store(voiceBuffer_readPos.load() + toRead);
-
-        if (voiceBuffer_readPos.load() >= voiceBuffer.getNumSamples())
+        if (vbLen <= 1)
         {
             voiceBuffer_isPlaying.store(false);
         }
+        else
+        {
+            const int vbChans = voiceBuffer.getNumChannels();
+            const int outChans = getTotalNumOutputChannels();
+            int i = 0;
+            for (; i < numSamples; ++i)
+            {
+                if (pos >= vbLen - 1)
+                    break;
+
+                const int intPos = static_cast<int>(pos);
+                const float frac = pos - static_cast<float>(intPos);
+
+                for (int ch = 0; ch < outChans; ++ch)
+                {
+                    const int srcCh = ch % vbChans;
+                    const float s0 = voiceBuffer.getSample(srcCh, intPos);
+                    const float s1 = voiceBuffer.getSample(srcCh, intPos + 1);
+                    const float sample = s0 + frac * (s1 - s0);
+                    buffer.addSample(ch, i, sample);
+                }
+
+                pos += inc;
+            }
+
+            if (i < numSamples)
+            {
+                voiceBuffer_isPlaying.store(false);
+            }
+
+            voiceBuffer_readPos.store(pos);
+        }
     }
+
+    dryWetMixer.mixWetSamples(block);
+
+
 
 }
 
