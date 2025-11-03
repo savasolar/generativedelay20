@@ -36,17 +36,17 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
-    addAndMakeVisible(playButton);
-    playButton.setBounds(1, 121, 80, 40);
-    playButton.setButtonText("Play");
-    playButton.onClick = [this]
-    {
-        if (audioProcessor.voiceBuffer.getNumSamples() > 0)
-        {
-            audioProcessor.voiceBuffer_readPos.store(0);
-            audioProcessor.voiceBuffer_isPlaying.store(true);
-        }
-    };
+//    addAndMakeVisible(playButton);
+//    playButton.setBounds(1, 121, 80, 40);
+//    playButton.setButtonText("Play");
+//    playButton.onClick = [this]
+//    {
+//        if (audioProcessor.voiceBuffer.getNumSamples() > 0)
+//        {
+//            audioProcessor.voiceBuffer_readPos.store(0);
+//            audioProcessor.voiceBuffer_isPlaying.store(true);
+//        }
+//    };
 
 
     startTimer(30);

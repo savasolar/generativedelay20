@@ -180,9 +180,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     }
     else
     {
-        int numSamples = buffer.getNumSamples();
+        // 1/6: RECORD INPUT AUDIO BUFFER====================================================================================
 
-        // first, record input audio to inputAudioBuffer
+        int numSamples = buffer.getNumSamples();
 
         int spaceLeft = inputAudioBuffer_samplesToRecord.load() - inputAudioBuffer_writePos.load();
         int toCopy = juce::jmin(numSamples, spaceLeft);
@@ -192,13 +192,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             inputAudioBuffer.copyFrom(ch, inputAudioBuffer_writePos.load(), buffer, ch, 0, toCopy);
         }
 
-        inputAudioBuffer_writePos.store(inputAudioBuffer_writePos.load() + toCopy);  // like the position of the vertex of an hourglass relative to the level of remaining sand
+        inputAudioBuffer_writePos.store(inputAudioBuffer_writePos.load() + toCopy);
 
 
-
-
-
-        // during recording, also detect pitch
+        // 2/6: PITCH DETECTION====================================================================================
 
         // Mix current block to mono for pitch detection
         juce::AudioBuffer<float> monoBlock(1, numSamples);
@@ -223,7 +220,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
             int midiNote = frequencyToMidiNote(pitch);
             detectedNoteNumbers.push_back(midiNote);
-//            DBG("Detected Pitch: " + juce::String(pitch) + " Hz, MIDI: " + juce::String(midiNote));
             pitchDetectorFillPos = 0;
         }
 
@@ -234,11 +230,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             pitchDetectorFillPos = numSamples - analysisToCopy;
         }
 
-        // .....................
-
-
-
-        // transcribe to capturedMelody
+        // 3/6: CAPTURED MELODY TRANSCRIPTION====================================================================================
 
         int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
         int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
@@ -253,34 +245,18 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             {
                 if (!symbolExecuted.test(n))
                 {
-                    if (!detectedNoteNumbers.empty()/* && detectedNoteNumbers.back() != -1*/)
+                    if (!detectedNoteNumbers.empty())
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
-
-                        // DBG print
-                        juce::String noteStrB = "cM: ";
-                        for (int note : capturedMelody)
-                        {
-                            noteStrB += juce::String(note) + ", ";
-                        }
-                        DBG(noteStrB);
+                        // DBG print // juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
-
-                    // on a symbol-by-symbol basis:
-                    // use generatedMelody[n] to
-                    // set pitch RATIO which will be applied to voicebuffer during playback
-
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
                 }
             }
         }
 
-
-
-
-
-
+        // 4/6: GENERATED MELODY SYMBOL READING====================================================================================
 
         for (int n = 0; n < 32; ++n)
         {
@@ -288,26 +264,20 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             {
                 if (!playbackSymbolExecuted.test(n))
                 {
+                    finalVoiceBuffer = voiceBuffer;
+                    finalVoiceBuffer_readPos.store(0);
 
-
+                    // (if the next symbol in generatedMelody is not -2, thus requiring a voice buffer restart) trigger a voice buffer fade-out in the final quartile of the current symbol.
 
                     playbackSymbolExecuted.set(n);
                 }
             }
         }
 
-
-
-
-
-
-
-
-
         melodyCaptureFillPos += captureToCopy;
 
+        // 5/6: END OF A CYCLE====================================================================================
 
-        // End of a full cycle
         if (melodyCaptureFillPos >= sPs * 32 + sampleDrift)
         {
             symbolExecuted.reset();
@@ -317,38 +287,36 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
             {
                 isActive.store(false);
-
-                // handle ending playback, too
-
                 voiceBuffer.clear();
+                finalVoiceBuffer.clear();
             }
-
 
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
-
 
             resetTiming();
         }
     }
 
 
+    // 6/6: SYNTHESIZED PLAYBACK AND MIXING====================================================================================
+
     juce::dsp::AudioBlock<float> block(buffer);
     dryWetMixer.pushDrySamples(block);
     block.clear();
 
-    // synthesized voice playback here?
-
-    if (voiceBuffer.getNumSamples() > 0)
+    if (finalVoiceBuffer.getNumSamples() > 0)
     {
         int numSamples = buffer.getNumSamples();
         int voiceBufferSize = voiceBuffer.getNumSamples();
-        int readPos = voiceBuffer_readPos.load();
+        int readPos = finalVoiceBuffer_readPos.load();
 
         for (int i = 0; i < numSamples; ++i)
         {
-            int currentPos = (readPos + i) % voiceBufferSize;
+            int currentPos = readPos + i;
+
+            if (currentPos >= voiceBufferSize) break;
 
             for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), voiceBuffer.getNumChannels()); ++ch)
             {
@@ -356,13 +324,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
         }
 
-        voiceBuffer_readPos.store((readPos + numSamples) % voiceBufferSize);
+        finalVoiceBuffer_readPos.store(readPos + numSamples);
     }
 
-
     dryWetMixer.mixWetSamples(block);
-
-
 
 }
 
@@ -497,8 +462,8 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
 
 
     // Store the best note number and DBG print it
-    voiceBufferNoteNumber.store(bestNote);
-    DBG("Isolated best note number: " + juce::String(voiceBufferNoteNumber.load()));
+    voiceNoteNumber.store(bestNote);
+    DBG("Isolated best note number: " + juce::String(voiceNoteNumber.load()));
 
 
 
@@ -586,7 +551,7 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
             }
         }
 
-        DBG(voiceBuffer.getNumSamples());
+        DBG("new voice buffer ready");
 
     });
     t.detach();
