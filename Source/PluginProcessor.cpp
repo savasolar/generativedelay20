@@ -237,6 +237,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         // .....................
 
 
+
         // transcribe to capturedMelody
 
         int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
@@ -276,6 +277,33 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         }
 
 
+
+
+
+
+
+        for (int n = 0; n < 32; ++n)
+        {
+            if (melodyCaptureFillPos >= n * sPs)
+            {
+                if (!playbackSymbolExecuted.test(n))
+                {
+
+
+
+                    playbackSymbolExecuted.set(n);
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
         melodyCaptureFillPos += captureToCopy;
 
 
@@ -283,6 +311,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         if (melodyCaptureFillPos >= sPs * 32 + sampleDrift)
         {
             symbolExecuted.reset();
+            playbackSymbolExecuted.reset();
 
             // if captured melody is empty
             if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))

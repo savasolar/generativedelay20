@@ -45,6 +45,7 @@ public:
     float placeholderBeats = 8.0;
     int sPs = 0;
     std::bitset<32> symbolExecuted;
+    std::bitset<32> playbackSymbolExecuted;
     int positionMarkerX = 0;
     int sampleDrift = 0;
 
