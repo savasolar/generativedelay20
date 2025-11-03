@@ -48,6 +48,7 @@ public:
     std::bitset<32> playbackSymbolExecuted;
     int positionMarkerX = 0;
     int sampleDrift = 0;
+    bool symbolFadeOut = false;
 
     void resetTiming()
     {

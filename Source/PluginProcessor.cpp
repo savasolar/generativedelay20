@@ -267,8 +267,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     finalVoiceBuffer = voiceBuffer;
                     finalVoiceBuffer_readPos.store(0);
 
-                    // (if the next symbol in generatedMelody is not -2, thus requiring a voice buffer restart) trigger a voice buffer fade-out in the final quartile of the current symbol.
-
                     playbackSymbolExecuted.set(n);
                 }
             }
@@ -306,10 +304,12 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     dryWetMixer.pushDrySamples(block);
     block.clear();
 
+
+
     if (finalVoiceBuffer.getNumSamples() > 0)
     {
         int numSamples = buffer.getNumSamples();
-        int voiceBufferSize = voiceBuffer.getNumSamples();
+        int voiceBufferSize = finalVoiceBuffer.getNumSamples();
         int readPos = finalVoiceBuffer_readPos.load();
 
         for (int i = 0; i < numSamples; ++i)
@@ -318,10 +318,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             if (currentPos >= voiceBufferSize) break;
 
-            for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), voiceBuffer.getNumChannels()); ++ch)
+            for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
             {
-                buffer.addSample(ch, i, voiceBuffer.getSample(ch, currentPos));  // Reduce gain
+                buffer.addSample(ch, i, finalVoiceBuffer.getSample(ch, currentPos));
             }
+
         }
 
         finalVoiceBuffer_readPos.store(readPos + numSamples);
