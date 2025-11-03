@@ -48,7 +48,9 @@ public:
     std::bitset<32> playbackSymbolExecuted;
     int positionMarkerX = 0;
     int sampleDrift = 0;
-    bool symbolFadeOut = false;
+
+    std::atomic<int> oldVoiceBuffer_readPos{ -1 };
+    juce::LinearSmoothedValue<float> crossfadeFrac{ 0.0f };
 
     void resetTiming()
     {
@@ -163,6 +165,9 @@ private:
 
     // Melody capture utilities
     int melodyCaptureFillPos = 0;
+
+
+
 
 //     ________________________________         
 //    /                                "-_          
