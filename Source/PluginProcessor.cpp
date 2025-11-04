@@ -272,33 +272,23 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 {
                     if (generatedMelody[n] >= 0)
                     {
-                        currentTargetNoteNumber.store(generatedMelody[n]);
+//                        currentTargetNoteNumber.store(generatedMelody[n]);
   
-                        finalVoiceBuffer = pitchShift(voiceBuffer, voiceNoteNumber.load(), currentTargetNoteNumber.load());
+                        finalVoiceBuffer = pitchShift(voiceBuffer, voiceNoteNumber.load(), generatedMelody[n]);
                         finalVoiceBuffer_readPos.store(0);
 
                         useADSR.store(false);
                     }
-
-//                    finalVoiceBuffer = pitchShift(voiceBuffer, voiceNoteNumber.load(), currentTargetNoteNumber.load());
-
-
-                        
-//                    finalVoiceBuffer_readPos.store(0);
-
                     
                     if (n + 1 < generatedMelody.size())
                     {
-                        DBG(generatedMelody[n + 1]);
+//                        DBG(generatedMelody[n + 1]);
 
-                        if (generatedMelody[n + 1] >= 0)
+                        if (generatedMelody[n + 1] >= -1)
                         {
                             useADSR.store(true);
                         }
                     }
-
-
-
 
                     if (useADSR.load())
                     {
@@ -306,12 +296,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                         adsr.noteOn();
                         adsr.noteOff();
                     }
-
-
-
-
-
-
 
                     playbackSymbolExecuted.set(n);
                 }
@@ -634,16 +618,40 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
 
 juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShift(juce::AudioBuffer<float> inputAudio, int baseNote, int targetNote)
 {
-    if (targetNote >= 0)
+    //if (targetNote >= 0)
+    //{
+    //    return inputAudio;
+    //}
+
+    //juce::AudioBuffer<float> result;
+
+
+
+    //return result;
+
+    int semitones = targetNote - baseNote;
+    if (semitones == 0 || baseNote < 0 || targetNote < 0)
     {
         return inputAudio;
     }
 
-    juce::AudioBuffer<float> result;
+    double ratio = std::pow(2.0, semitones / 12.0);
+    int inputLength = inputAudio.getNumSamples();
+    int outputLength = static_cast<int>(std::round(static_cast<double>(inputLength) / ratio));
+    if (outputLength <= 0)
+    {
+        return juce::AudioBuffer<float>(inputAudio.getNumChannels(), 0);
+    }
 
+    juce::AudioBuffer<float> output(inputAudio.getNumChannels(), outputLength);
+    juce::LagrangeInterpolator interpolator;
 
+    for (int ch = 0; ch < output.getNumChannels(); ++ch)
+    {
+        interpolator.process(ratio, inputAudio.getReadPointer(ch), output.getWritePointer(ch), outputLength);
+    }
 
-    return result;
+    return output;
 }
 
 //    |\   "Music should be heard not only with the ears, but also the soul."
