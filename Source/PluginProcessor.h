@@ -46,6 +46,7 @@ public:
     int sPs = 0;
     std::bitset<32> symbolExecuted;
     std::bitset<32> playbackSymbolExecuted;
+    std::bitset<32> fractionalSymbolExecuted;
     int positionMarkerX = 0;
     int sampleDrift = 0;
 
@@ -59,7 +60,7 @@ public:
         pitchDetectorFillPos = 0;
         detectedNoteNumbers.clear();
         melodyCaptureFillPos = 0;
-        symbolExecuted.reset();
+
         std::fill(capturedMelody.begin(), capturedMelody.end(), -1);
 
         positionMarkerX = 0;

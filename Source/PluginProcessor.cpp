@@ -290,6 +290,12 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
                     finalVoiceBuffer_readPos.store(0);
 
+                    // if next generatedMelody symbol indicates a fadeout in the current symbol is needed, activate useADSR here
+
+
+
+
+
                     if (useADSR.load())
                     {
                         adsr.reset();
@@ -297,10 +303,38 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                         adsr.noteOff();
                     }
 
+
+
+
+
+
+
                     playbackSymbolExecuted.set(n);
                 }
             }
         }
+
+
+
+
+
+        // trigger fadeout envelope at last 64th note of each symbol, if adsr is active (triggered conditionally based on evaluation of future generatedMelody symbols)
+
+
+        for (int n = 0; n < 32; ++n)
+        {
+            if (melodyCaptureFillPos >= n * (3 * sPs / 4))
+            {
+                if (!fractionalSymbolExecuted.test(n))
+                {
+                    
+
+
+                    fractionalSymbolExecuted.set(n);
+                }
+            }
+        }
+
 
 
         melodyCaptureFillPos += captureToCopy;
@@ -311,6 +345,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         {
             symbolExecuted.reset();
             playbackSymbolExecuted.reset();
+            fractionalSymbolExecuted.reset();
 
             // if captured melody is empty
             if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
