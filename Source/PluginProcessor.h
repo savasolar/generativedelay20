@@ -83,6 +83,9 @@ public:
         adsrParams.sustain = 1.0f;
         adsrParams.release = static_cast<float>(sPs) / static_cast<float>(getSampleRate());
         adsr.setParameters(adsrParams);
+
+
+
     }
 
 
@@ -178,6 +181,10 @@ private:
 
     // Melody capture utilities
     int melodyCaptureFillPos = 0;
+
+
+
+
 
 
 

@@ -263,22 +263,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         // 4/6: GENERATED MELODY SYMBOL READING====================================================================================
 
-        /*for (int n = 0; n < 32; ++n)
-        {
-            if (melodyCaptureFillPos >= n * sPs)
-            {
-                if (!playbackSymbolExecuted.test(n))
-                {
-                    finalVoiceBuffer = voiceBuffer;
-
-                    finalVoiceBuffer_readPos.store(0);
-
-                    playbackSymbolExecuted.set(n);
-                }
-            }
-        }*/
-
-
 
         for (int n = 0; n < 32; ++n)
         {
@@ -288,12 +272,20 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 {
                     finalVoiceBuffer = voiceBuffer;
 
+                        
                     finalVoiceBuffer_readPos.store(0);
+
+                    
+                    if (n + 1 < generatedMelody.size())
+                    {
+                        DBG(generatedMelody[n + 1]);
+                    }
+
 
                     // if next generatedMelody symbol indicates a fadeout in the current symbol is needed, activate useADSR here
 
 
-
+                    // or in reset() 
 
 
                     if (useADSR.load())
@@ -314,26 +306,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
         }
 
-
-
-
-
-        // trigger fadeout envelope at last 64th note of each symbol, if adsr is active (triggered conditionally based on evaluation of future generatedMelody symbols)
-
-
-        for (int n = 0; n < 32; ++n)
-        {
-            if (melodyCaptureFillPos >= n * (3 * sPs / 4))
-            {
-                if (!fractionalSymbolExecuted.test(n))
-                {
-                    
-
-
-                    fractionalSymbolExecuted.set(n);
-                }
-            }
-        }
 
 
 
@@ -372,31 +344,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
 
 
-
-
-
-
-    //if (finalVoiceBuffer.getNumSamples() > 0)
-    //{
-    //    int numSamples = buffer.getNumSamples();
-    //    int voiceBufferSize = finalVoiceBuffer.getNumSamples();
-    //    int readPos = finalVoiceBuffer_readPos.load();
-
-    //    for (int i = 0; i < numSamples; ++i)
-    //    {
-    //        int currentPos = readPos + i;
-
-    //        if (currentPos >= voiceBufferSize) break;
-
-    //        for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
-    //        {
-    //            buffer.addSample(ch, i, finalVoiceBuffer.getSample(ch, currentPos));
-    //        }
-
-    //    }
-
-    //    finalVoiceBuffer_readPos.store(readPos + numSamples);
-    //}
 
 
     if (finalVoiceBuffer.getNumSamples() > 0)
@@ -635,7 +582,12 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
             {
                 trimmedAudio.copyFrom(ch, 0, timeStretchedAudio, ch, trimStart, trimLength);
             }
+
+
+
+
             this->voiceBuffer = std::move(trimmedAudio);
+
 
         }
         else
