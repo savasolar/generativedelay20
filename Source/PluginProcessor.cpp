@@ -545,73 +545,145 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
 
 }
 
+//void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
+//{
+//    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
+//    {
+//        using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
+//
+//        Stretch stretcher;
+//
+//        int channels = inputAudio.getNumChannels();
+//        float sampleRateFloat = static_cast<float>(getSampleRate());
+//
+//        stretcher.presetDefault(channels, sampleRateFloat);
+//
+//        int inputSamples = inputAudio.getNumSamples();
+//        int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
+//
+//        juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
+//
+//        float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
+//        float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
+//
+//        stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
+//
+//        // Isolate middle 50% here.
+//        int trimStart = static_cast<int>(outputSamples * 0.25f);  // Left 25%
+//        int trimLength = static_cast<int>(outputSamples * 0.5f);  // Middle 50%
+//        // Ensure we don't exceed bounds (though unlikely).
+//        trimStart = juce::jmax(0, trimStart);
+//        trimLength = juce::jmin(trimLength, outputSamples - trimStart);
+//
+//        if (trimLength > 0)
+//        {
+//            juce::AudioBuffer<float> trimmedAudio(channels, trimLength);
+//            for (int ch = 0; ch < channels; ++ch)
+//            {
+//                trimmedAudio.copyFrom(ch, 0, timeStretchedAudio, ch, trimStart, trimLength);
+//            }
+//
+//
+//
+//
+//            this->voiceBuffer = std::move(trimmedAudio);
+//
+//
+//        }
+//        else
+//        {
+//            // Fallback: Use full buffer if trimLength is invalid (rare).
+//            this->voiceBuffer = std::move(timeStretchedAudio);
+//
+//
+//        }
+//
+//        // Apply 50ms linear fade-in and fade-out
+//        int numSamples = voiceBuffer.getNumSamples();
+//        if (numSamples > 0) {
+//            int fadeSamples = static_cast<int>(0.01 * getSampleRate() + 0.5f);
+//            fadeSamples = juce::jmin(fadeSamples, numSamples / 2);
+//            for (int ch = 0; ch < voiceBuffer.getNumChannels(); ++ch) {
+//                voiceBuffer.applyGainRamp(ch, 0, fadeSamples, 0.0f, 1.0f);
+//                voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
+//            }
+//        }
+//
+//        DBG("new voice buffer ready");
+//
+//    });
+//    t.detach();
+//}
+
 void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
 {
     std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
-    {
-        using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
-
-        Stretch stretcher;
-
-        int channels = inputAudio.getNumChannels();
-        float sampleRateFloat = static_cast<float>(getSampleRate());
-
-        stretcher.presetDefault(channels, sampleRateFloat);
-
-        int inputSamples = inputAudio.getNumSamples();
-        int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
-
-        juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
-
-        float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
-        float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
-
-        stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
-
-        // Isolate middle 50% here.
-        int trimStart = static_cast<int>(outputSamples * 0.25f);  // Left 25%
-        int trimLength = static_cast<int>(outputSamples * 0.5f);  // Middle 50%
-        // Ensure we don't exceed bounds (though unlikely).
-        trimStart = juce::jmax(0, trimStart);
-        trimLength = juce::jmin(trimLength, outputSamples - trimStart);
-
-        if (trimLength > 0)
         {
-            juce::AudioBuffer<float> trimmedAudio(channels, trimLength);
-            for (int ch = 0; ch < channels; ++ch)
+            // Removed: using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
+            // Removed: Stretch stretcher;  // No longer create local—use member this->stretcher instead
+
+            int channels = inputAudio.getNumChannels();
+            float sampleRateFloat = static_cast<float>(getSampleRate());
+
+            // No need to preset here—already done in prepareToPlay (or change to presetDefault if preferred for quality)
+
+            // New: Reset the stretcher state before processing to clear internals for reuse
+            this->stretcher.reset();
+
+            int inputSamples = inputAudio.getNumSamples();
+            int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
+
+            juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
+
+            // New: Explicitly clear the output buffer before processing, to be safe against any library assumptions
+            timeStretchedAudio.clear();
+
+            float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
+            float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
+
+            this->stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
+
+            // Isolate middle 50% here.
+            int trimStart = static_cast<int>(outputSamples * 0.25f);  // Left 25%
+            int trimLength = static_cast<int>(outputSamples * 0.5f);  // Middle 50%
+            // Ensure we don't exceed bounds (though unlikely).
+            trimStart = juce::jmax(0, trimStart);
+            trimLength = juce::jmin(trimLength, outputSamples - trimStart);
+
+            if (trimLength > 0)
             {
-                trimmedAudio.copyFrom(ch, 0, timeStretchedAudio, ch, trimStart, trimLength);
+                juce::AudioBuffer<float> trimmedAudio(channels, trimLength);
+                // New: Clear before copying, for safety
+                trimmedAudio.clear();
+                for (int ch = 0; ch < channels; ++ch)
+                {
+                    trimmedAudio.copyFrom(ch, 0, timeStretchedAudio, ch, trimStart, trimLength);
+                }
+
+
+                 this->voiceBuffer = std::move(trimmedAudio);
+
+            }
+            else
+            {
+
+                this->voiceBuffer = std::move(timeStretchedAudio);
+
             }
 
-
-
-
-            this->voiceBuffer = std::move(trimmedAudio);
-
-
-        }
-        else
-        {
-            // Fallback: Use full buffer if trimLength is invalid (rare).
-            this->voiceBuffer = std::move(timeStretchedAudio);
-
-
-        }
-
-        // Apply 50ms linear fade-in and fade-out
-        int numSamples = voiceBuffer.getNumSamples();
-        if (numSamples > 0) {
-            int fadeSamples = static_cast<int>(0.01 * getSampleRate() + 0.5f);
-            fadeSamples = juce::jmin(fadeSamples, numSamples / 2);
-            for (int ch = 0; ch < voiceBuffer.getNumChannels(); ++ch) {
-                voiceBuffer.applyGainRamp(ch, 0, fadeSamples, 0.0f, 1.0f);
-                voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
+            int numSamples = voiceBuffer.getNumSamples();
+            if (numSamples > 0) {
+                int fadeSamples = static_cast<int>(0.01 * getSampleRate() + 0.5f);
+                fadeSamples = juce::jmin(fadeSamples, numSamples / 2);
+                for (int ch = 0; ch < voiceBuffer.getNumChannels(); ++ch) {
+                    voiceBuffer.applyGainRamp(ch, 0, fadeSamples, 0.0f, 1.0f);
+                    voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
+                }
             }
-        }
 
-        DBG("new voice buffer ready");
+            DBG("new voice buffer ready");
 
-    });
+        });
     t.detach();
 }
 
