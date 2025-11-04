@@ -115,12 +115,14 @@ public:
     juce::AudioBuffer<float> isolateBestNote();
     void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
+    juce::AudioBuffer<float> pitchShift(juce::AudioBuffer<float> inputAudio, int baseNote, int targetNote);
     
     juce::AudioBuffer<float> voiceBuffer;
     std::atomic<int> voiceNoteNumber{ -1 };
 //    std::atomic<int> voiceBuffer_readPos{ 0 };
 //    std::atomic<bool> voiceBuffer_isPlaying{ false };
 //    float playbackInc{ 1.0f };
+    std::atomic<int> currentTargetNoteNumber{ -1 };
 
     juce::AudioBuffer<float> finalVoiceBuffer;
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
@@ -128,9 +130,9 @@ public:
 
     std::vector<int> generatedMelody
     {
-        60, -2, -2, -2, -2, -2, -2, -2,
+        64, -2, 64, -2, 64, -2, 64, -2,
         -2, -2, -2, -2, -2, -2, -2, -2,
-        60, -2, -2, -2, -2, -2, -2, -2,
+        64, -2, -2, -2, -2, -2, -2, -2,
         -2, -2, -2, -2, -2, -2, -2, -2
     };
 
@@ -146,7 +148,7 @@ public:
 
     juce::ADSR adsr;
     juce::ADSR::Parameters adsrParams;
-    std::atomic<bool> useADSR{ true };
+    std::atomic<bool> useADSR{ false };
 
 
 

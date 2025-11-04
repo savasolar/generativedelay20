@@ -270,22 +270,34 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             {
                 if (!playbackSymbolExecuted.test(n))
                 {
-                    finalVoiceBuffer = voiceBuffer;
+                    if (generatedMelody[n] >= 0)
+                    {
+                        currentTargetNoteNumber.store(generatedMelody[n]);
+  
+                        finalVoiceBuffer = pitchShift(voiceBuffer, voiceNoteNumber.load(), currentTargetNoteNumber.load());
+                        finalVoiceBuffer_readPos.store(0);
+
+                        useADSR.store(false);
+                    }
+
+//                    finalVoiceBuffer = pitchShift(voiceBuffer, voiceNoteNumber.load(), currentTargetNoteNumber.load());
+
 
                         
-                    finalVoiceBuffer_readPos.store(0);
+//                    finalVoiceBuffer_readPos.store(0);
 
                     
                     if (n + 1 < generatedMelody.size())
                     {
                         DBG(generatedMelody[n + 1]);
+
+                        if (generatedMelody[n + 1] >= 0)
+                        {
+                            useADSR.store(true);
+                        }
                     }
 
 
-                    // if next generatedMelody symbol indicates a fadeout in the current symbol is needed, activate useADSR here
-
-
-                    // or in reset() 
 
 
                     if (useADSR.load())
@@ -319,6 +331,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             playbackSymbolExecuted.reset();
             fractionalSymbolExecuted.reset();
 
+            finalVoiceBuffer_readPos.store(0);
+
             // if captured melody is empty
             if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
             {
@@ -330,6 +344,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
+
 
             resetTiming();
         }
@@ -545,76 +560,6 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
 
 }
 
-//void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
-//{
-//    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
-//    {
-//        using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
-//
-//        Stretch stretcher;
-//
-//        int channels = inputAudio.getNumChannels();
-//        float sampleRateFloat = static_cast<float>(getSampleRate());
-//
-//        stretcher.presetDefault(channels, sampleRateFloat);
-//
-//        int inputSamples = inputAudio.getNumSamples();
-//        int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
-//
-//        juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
-//
-//        float** inputPointers = const_cast<float**>(inputAudio.getArrayOfWritePointers());
-//        float** outputPointers = const_cast<float**>(timeStretchedAudio.getArrayOfWritePointers());
-//
-//        stretcher.process(inputPointers, inputSamples, outputPointers, outputSamples);
-//
-//        // Isolate middle 50% here.
-//        int trimStart = static_cast<int>(outputSamples * 0.25f);  // Left 25%
-//        int trimLength = static_cast<int>(outputSamples * 0.5f);  // Middle 50%
-//        // Ensure we don't exceed bounds (though unlikely).
-//        trimStart = juce::jmax(0, trimStart);
-//        trimLength = juce::jmin(trimLength, outputSamples - trimStart);
-//
-//        if (trimLength > 0)
-//        {
-//            juce::AudioBuffer<float> trimmedAudio(channels, trimLength);
-//            for (int ch = 0; ch < channels; ++ch)
-//            {
-//                trimmedAudio.copyFrom(ch, 0, timeStretchedAudio, ch, trimStart, trimLength);
-//            }
-//
-//
-//
-//
-//            this->voiceBuffer = std::move(trimmedAudio);
-//
-//
-//        }
-//        else
-//        {
-//            // Fallback: Use full buffer if trimLength is invalid (rare).
-//            this->voiceBuffer = std::move(timeStretchedAudio);
-//
-//
-//        }
-//
-//        // Apply 50ms linear fade-in and fade-out
-//        int numSamples = voiceBuffer.getNumSamples();
-//        if (numSamples > 0) {
-//            int fadeSamples = static_cast<int>(0.01 * getSampleRate() + 0.5f);
-//            fadeSamples = juce::jmin(fadeSamples, numSamples / 2);
-//            for (int ch = 0; ch < voiceBuffer.getNumChannels(); ++ch) {
-//                voiceBuffer.applyGainRamp(ch, 0, fadeSamples, 0.0f, 1.0f);
-//                voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
-//            }
-//        }
-//
-//        DBG("new voice buffer ready");
-//
-//    });
-//    t.detach();
-//}
-
 void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
 {
     std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
@@ -687,6 +632,20 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
     t.detach();
 }
 
+juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShift(juce::AudioBuffer<float> inputAudio, int baseNote, int targetNote)
+{
+    if (targetNote >= 0)
+    {
+        return inputAudio;
+    }
+
+    juce::AudioBuffer<float> result;
+
+
+
+    return result;
+}
+
 //    |\   "Music should be heard not only with the ears, but also the soul."
 //|---|--\-----------------------|-----------------------------------------|  
 //|   |   |\                     |                   |@     |\             |
@@ -699,6 +658,8 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
 //|-----------|----@|-----|------|----|---@|------------------------|------|  
 //           @|           |           |        Larry Komro         @|.     
 //                                  -@-        [kom...@uwec.edu]
+
+// "Music should be heard not only with the soul, but also the ears." - Sava Solar
 
 bool CounterTuneAudioProcessor::hasEditor() const
 {
