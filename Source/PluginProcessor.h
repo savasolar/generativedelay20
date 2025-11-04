@@ -76,6 +76,12 @@ public:
         inputAudioBuffer_samplesToRecord.store(requiredSize);
 
 
+
+        adsrParams.attack = 0.0f;
+        adsrParams.decay = 0.0f;
+        adsrParams.sustain = 1.0f;
+        adsrParams.release = static_cast<float>(sPs) / static_cast<float>(getSampleRate());
+        adsr.setParameters(adsrParams);
     }
 
 
@@ -131,6 +137,12 @@ public:
     bool playbackNoteActive = false;
 
     juce::dsp::DryWetMixer<float> dryWetMixer;
+
+
+
+    juce::ADSR adsr;
+    juce::ADSR::Parameters adsrParams;
+    std::atomic<bool> useADSR{ true };
 
 
 

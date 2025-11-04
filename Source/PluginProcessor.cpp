@@ -117,12 +117,11 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     dryWetMixer.prepare(juce::dsp::ProcessSpec{ sampleRate, static_cast<std::uint32_t> (samplesPerBlock), static_cast<std::uint32_t> (getTotalNumOutputChannels()) });
     dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::linear);
-    dryWetMixer.setWetMixProportion(0.5f);
+    dryWetMixer.setWetMixProportion(1.0f);
 
 
 
-    crossfadeFrac.reset(sampleRate, 0.005);  // 5ms
-
+    adsr.setSampleRate(sampleRate);
 
 }
 
@@ -264,6 +263,23 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         // 4/6: GENERATED MELODY SYMBOL READING====================================================================================
 
+        /*for (int n = 0; n < 32; ++n)
+        {
+            if (melodyCaptureFillPos >= n * sPs)
+            {
+                if (!playbackSymbolExecuted.test(n))
+                {
+                    finalVoiceBuffer = voiceBuffer;
+
+                    finalVoiceBuffer_readPos.store(0);
+
+                    playbackSymbolExecuted.set(n);
+                }
+            }
+        }*/
+
+
+
         for (int n = 0; n < 32; ++n)
         {
             if (melodyCaptureFillPos >= n * sPs)
@@ -272,17 +288,20 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 {
                     finalVoiceBuffer = voiceBuffer;
 
-                    oldVoiceBuffer_readPos.store(finalVoiceBuffer_readPos.load());  // Save old pos for crossfade out
-
                     finalVoiceBuffer_readPos.store(0);
 
-                    crossfadeFrac.setValue(0.0f);  // Instant reset to start of crossfade
-                    crossfadeFrac.setTargetValue(1.0f);  // Begin ramp to 1.0 over the set time
+                    if (useADSR.load())
+                    {
+                        adsr.reset();
+                        adsr.noteOn();
+                        adsr.noteOff();
+                    }
 
                     playbackSymbolExecuted.set(n);
                 }
             }
         }
+
 
         melodyCaptureFillPos += captureToCopy;
 
@@ -345,66 +364,28 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     //}
 
 
-
     if (finalVoiceBuffer.getNumSamples() > 0)
     {
         int numSamples = buffer.getNumSamples();
         int voiceBufferSize = finalVoiceBuffer.getNumSamples();
         int readPos = finalVoiceBuffer_readPos.load();
-        int oldPos = oldVoiceBuffer_readPos.load();
-        bool isCrossfading = (oldPos != -1);
-
-        int samplesAdded = 0;
 
         for (int i = 0; i < numSamples; ++i)
         {
-            int currentNewPos = readPos + i;
-            if (currentNewPos >= voiceBufferSize) break;  // Stop if new playback would exceed (applies to both modes)
+            int currentPos = readPos + i;
 
-            if (isCrossfading)
+            if (currentPos >= voiceBufferSize) break;
+
+            float gain = useADSR.load() ? adsr.getNextSample() : 1.0f;
+
+            for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
             {
-                // Get smoothed fraction and compute constant-power gains
-                float frac = crossfadeFrac.getNextValue();
-                float gainOld = std::cos(frac * juce::MathConstants<float>::halfPi);
-                float gainNew = std::sin(frac * juce::MathConstants<float>::halfPi);
-
-                // Add mixed sample
-                for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
-                {
-                    // Old sample (continuation from pre-reset position)
-                    int currentOldPos = oldPos + i;
-                    float oldSample = (currentOldPos < voiceBufferSize) ? finalVoiceBuffer.getSample(ch, currentOldPos) : 0.0f;
-
-                    // New sample (from reset position 0)
-                    float newSample = finalVoiceBuffer.getSample(ch, currentNewPos);
-
-                    buffer.addSample(ch, i, oldSample * gainOld + newSample * gainNew);
-                }
-            }
-            else
-            {
-                // Normal mode: just add from current readPos
-                for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
-                {
-                    buffer.addSample(ch, i, finalVoiceBuffer.getSample(ch, currentNewPos));
-                }
-            }
-
-            samplesAdded++;
-        }
-
-        // Advance positions
-        finalVoiceBuffer_readPos.store(readPos + samplesAdded);
-        if (isCrossfading)
-        {
-            oldVoiceBuffer_readPos.store(oldPos + samplesAdded);
-            if (!crossfadeFrac.isSmoothing())
-            {
-                oldVoiceBuffer_readPos.store(-1);  // End crossfade mode once ramp complete
+                buffer.addSample(ch, i, finalVoiceBuffer.getSample(ch, currentPos) * gain);
             }
         }
+
+        finalVoiceBuffer_readPos.store(readPos + numSamples);
     }
-
 
 
 
