@@ -123,6 +123,10 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     adsr.setSampleRate(sampleRate);
 
+
+
+    melodyGenerator = std::make_unique<MelodyGenerator>();
+
 }
 
 //              (\_/)

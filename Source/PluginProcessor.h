@@ -6,6 +6,7 @@
 #include <pitch_detector.h>
 #include <source/PitchMPM.h>
 #include "signalsmith-stretch.h"
+#include "MelodyGenerator.h"
 #include <bitset>
 #include <thread>
 
@@ -196,7 +197,7 @@ private:
 
 
 
-
+    std::unique_ptr<MelodyGenerator> melodyGenerator;
 
 
 
