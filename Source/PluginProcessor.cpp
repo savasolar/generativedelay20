@@ -117,7 +117,7 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     dryWetMixer.prepare(juce::dsp::ProcessSpec{ sampleRate, static_cast<std::uint32_t> (samplesPerBlock), static_cast<std::uint32_t> (getTotalNumOutputChannels()) });
     dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::linear);
-    dryWetMixer.setWetMixProportion(1.0f);
+    dryWetMixer.setWetMixProportion(0.5f);
 
 
 
@@ -255,6 +255,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                         capturedMelody[n] = detectedNoteNumbers.back();
                         // DBG print // juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
+
+                    isUpdatingVisualMelodies.store(true);
+                    updateVisualMelodies(capturedMelody, generatedMelody);
+                    isUpdatingVisualMelodies.store(false);
+
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
                 }
@@ -610,7 +615,7 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
                 }
             }
 
-            DBG("new voice buffer ready");
+//            DBG("new voice buffer ready");
 
         });
     t.detach();

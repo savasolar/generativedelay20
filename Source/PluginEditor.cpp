@@ -64,6 +64,11 @@ void CounterTuneAudioProcessorEditor::timerCallback()
     //    startButton.setEnabled(true);
     //}
 
+    if (!audioProcessor.isUpdatingVisualMelodies.load())
+    {
+        displayVisualMelodies(audioProcessor.visualMelodies);
+    }
+
     voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
 
 }

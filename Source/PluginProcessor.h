@@ -128,15 +128,15 @@ public:
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
 
 
-    std::vector<int> generatedMelody
-    {
-        64, 65, 66, 67, 68, 69, 70, 71,
-        -2, -2, -2, -2, -2, -2, -2, -2,
-        59, -2, -2, -2, -2, -2, -2, -2,
-        -2, -2, -2, -2, -2, -2, -2, -2
-    };
+    //std::vector<int> generatedMelody
+    //{
+    //    64, 65, 66, 67, 68, 69, 70, 71,
+    //    -2, -2, -2, -2, -2, -2, -2, -2,
+    //    59, -2, -2, -2, -2, -2, -2, -2,
+    //    -2, -2, -2, -2, -2, -2, -2, -2
+    //};
 
-//    std::vector<int> generatedMelody = std::vector<int>(32, -1);
+    std::vector<int> generatedMelody = std::vector<int>(32, -1);
 
 
     int playbackNote = -1;
@@ -150,6 +150,15 @@ public:
     juce::ADSR::Parameters adsrParams;
     std::atomic<bool> useADSR{ false };
 
+
+
+    std::vector<std::vector<int>> visualMelodies;
+    std::atomic<bool> isUpdatingVisualMelodies{ false };
+    void updateVisualMelodies(std::vector<int> captured, std::vector<int> generated)
+    {
+        std::vector<std::vector<int>> result = { captured, generated };
+        visualMelodies = result;
+    }
 
 
 
