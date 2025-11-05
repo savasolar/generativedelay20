@@ -18,6 +18,8 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
 
+    melodyGenerator = std::make_unique<MelodyGenerator>();
+    loadModel();
 
 }
 

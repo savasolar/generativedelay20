@@ -32,8 +32,8 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     //};
 
 
-    addAndMakeVisible(voiceBuffer_waveform);
-    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
+//    addAndMakeVisible(voiceBuffer_waveform);
+//    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
 //    addAndMakeVisible(playButton);
@@ -69,7 +69,7 @@ void CounterTuneAudioProcessorEditor::timerCallback()
         displayVisualMelodies(audioProcessor.visualMelodies);
     }
 
-    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
+//    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
 
 }
 

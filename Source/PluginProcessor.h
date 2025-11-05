@@ -198,6 +198,21 @@ private:
 
 
     std::unique_ptr<MelodyGenerator> melodyGenerator;
+    bool melodyServiceLoaded = false;
+
+    void loadModel()
+    {
+        bool success = melodyGenerator->initialize();
+        if (success)
+        {
+            melodyServiceLoaded = true;
+            DBG("melody model loaded successfully");
+        }
+        else
+        {
+            DBG("Melody model loading failed - " + melodyGenerator->getLastError());
+        }
+    }
 
 
 
