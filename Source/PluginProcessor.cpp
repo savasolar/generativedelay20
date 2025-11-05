@@ -18,7 +18,11 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
 
+    melodyGenerator = std::make_unique<MelodyGenerator>();
 
+    loadModel();
+
+    generatedMelody = lastGeneratedMelody;
 }
 
 CounterTuneAudioProcessor::~CounterTuneAudioProcessor()
@@ -362,6 +366,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 isActive.store(false);
                 voiceBuffer.clear();
                 finalVoiceBuffer.clear();
+            }
+            else
+            {
+                generateMelody(capturedMelody);
             }
 
             // populate voice buffer with latest info 
@@ -728,6 +736,108 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(
 //|-----------|----@|-----|------|----|---@|------------------------|------|  
 //           @|           |           |        Larry Komro         @|.     
 //                                  -@-        [kom...@uwec.edu]
+
+void CounterTuneAudioProcessor::generateMelody(const std::vector<int>& input)
+{
+    if (!melodyGenerator || !melodyGenerator->isInitialized())
+    {
+        DBG("Melody generator not initialized");
+        return;
+    }
+
+    //	if (awaitingResponse.load()) return;
+    //
+    //    awaitingResponse.store(true);
+    //
+    //    std::vector<int> formattedInput = formatMelody(input, false);
+    //
+    //    if (exportMode.load())
+    //    {
+    //		DBG("non-realtime");       
+    //		
+    //        std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, getNotesInt());
+    //
+    //        {
+    //            juce::ScopedLock sl(melodyLock);
+    //
+    //            if (!result.empty() && !getHoldBool())
+    //            {
+    //                generatedMelody = result;
+    //
+    //                lastGeneratedMelody = generatedMelody;
+    //
+    //                int currentOctaveShift = getOctaveInt() * 12;
+    //                for (int& note : generatedMelody)
+    //                {
+    //                    if (note >= 0)
+    //                    {
+    //                        note = juce::jlimit(0, 127, note + currentOctaveShift);
+    //                    }
+    //                }
+    //                lastAppliedOctaveShift = currentOctaveShift;
+    //
+    //#ifdef DEMO_BUILD
+    //                genCount++;
+    //#endif
+    //
+    //            }
+    //            else if (result.empty())
+    //            {
+    //                DBG("Melody generation failed");
+    //            }
+    //        }
+    //        awaitingResponse.store(false);
+    //    }
+    //    else
+    //    {
+    //        std::thread([this, formattedInput]()
+    //        {
+    //            std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, getNotesInt());
+    //            juce::MessageManager::callAsync([this, result]()
+    //            {
+    //
+    //                {
+    //                    juce::ScopedLock sl(melodyLock);
+    //
+    //                    if (!result.empty() && !getHoldBool())
+    //                    {
+    //                        generatedMelody = result;
+    //
+    //                        lastGeneratedMelody = generatedMelody;
+    //
+    //                        // Apply current octave shift to the newly generated melody
+    //                        int currentOctaveShift = getOctaveInt() * 12;
+    //                        for (int& note : generatedMelody)
+    //                        {
+    //                            if (note >= 0)
+    //                            {
+    //                                note = juce::jlimit(0, 127, note + currentOctaveShift);
+    //                            }
+    //                        }
+    //                        lastAppliedOctaveShift = currentOctaveShift;
+    //#ifdef DEMO_BUILD
+    //                        genCount++;
+    //#endif
+    //                    }
+    //                    else if (result.empty())
+    //                    {
+    //                        DBG("Melody generation failed");
+    //                    }
+    //                }
+    //
+    //                awaitingResponse.store(false);
+    //            });
+    //        }).detach();
+    //    }
+
+
+        // TESTING PLAYBACK MECHANISM WITH SIMPLE DUMMY GENERATED MELODY
+
+    generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
+
+
+
+}
 
 bool CounterTuneAudioProcessor::hasEditor() const
 {

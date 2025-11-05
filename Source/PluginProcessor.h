@@ -6,6 +6,7 @@
 #include <pitch_detector.h>
 #include <source/PitchMPM.h>
 #include "signalsmith-stretch.h"
+#include "MelodyGenerator.h"
 #include <bitset>
 #include <thread>
 
@@ -125,16 +126,16 @@ public:
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
 
 
-    std::vector<int> generatedMelody
-    {
-        70, -2, -2, -2, -2, -2, -2, -2,
-        -2, -2, -2, -2, -2, -2, -2, -2,
-        75, -2, -2, -2, -2, -2, -2, -2,
-        -2, -2, -2, -2, -2, -2, -2, 74
-    };
+    //std::vector<int> generatedMelody
+    //{
+    //    70, -2, -2, -2, -2, -2, -2, -2,
+    //    -2, -2, -2, -2, -2, -2, -2, -2,
+    //    75, -2, -2, -2, -2, -2, -2, -2,
+    //    -2, -2, -2, -2, -2, -2, -2, 74
+    //};
 
-//    std::vector<int> generatedMelody = std::vector<int>(32, -1);
-
+    std::vector<int> generatedMelody = std::vector<int>(32, -1);
+    std::vector<int> lastGeneratedMelody = std::vector<int>(32, -1);
 
     int playbackNote = -1;
     bool playbackNoteActive = false;
@@ -181,6 +182,24 @@ private:
     // Melody capture utilities
     int melodyCaptureFillPos = 0;
 
+    std::vector<int> formatMelody(const std::vector<int>& melody, bool isGeneratedMelody) const;
+
+    std::unique_ptr<MelodyGenerator> melodyGenerator;
+
+    void loadModel()
+    {
+        bool melodyGeneratorSuccess = melodyGenerator->initialize();
+        if (melodyGeneratorSuccess)
+        {
+            DBG("Melody model loaded successfully");
+        }
+        else
+        {
+            DBG("Melody model loading failed - " + melodyGenerator->getLastError());
+        }
+    }
+
+    void generateMelody(const std::vector<int>& input);
 
 
 
