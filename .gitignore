@@ -12,6 +12,3 @@ _deps
 CMakeUserPresets.json
 /Builds
 /cmake_build
-/Dependencies/adamski/audio_fft
-/Dependencies/adamski/pitch_detector
-/Dependencies/signalsmith/stretch
