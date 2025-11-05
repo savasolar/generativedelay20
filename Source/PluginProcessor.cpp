@@ -286,22 +286,22 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             {
                 if (!playbackSymbolExecuted.test(n))
                 {
-//                    finalVoiceBuffer = voiceBuffer;
+                    useADSR.store(false);
 
+                    // prepare a note for playback if there's a note number
+                    if (generatedMelody[n] >= 0)
+                    {
+                        finalVoiceBuffer = pitchShiftByResampling(voiceBuffer, voiceNoteNumber.load(), generatedMelody[n]);
+                        finalVoiceBuffer_readPos.store(0);
+                    }
 
-
-                    finalVoiceBuffer = pitchShiftByResampling(voiceBuffer,
-                        voiceNoteNumber.load(),
-                        70);
-
-
-
-
-                    finalVoiceBuffer_readPos.store(0);
 
                     // if next generatedMelody symbol indicates a fadeout in the current symbol is needed, activate useADSR here
 
-
+                    if ((generatedMelody[(n + 1) % 32]) >= -1)
+                    {
+                        useADSR.store(true);
+                    }
 
 
 
