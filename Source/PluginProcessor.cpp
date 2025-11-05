@@ -286,7 +286,16 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             {
                 if (!playbackSymbolExecuted.test(n))
                 {
-                    finalVoiceBuffer = voiceBuffer;
+//                    finalVoiceBuffer = voiceBuffer;
+
+
+
+                    finalVoiceBuffer = pitchShiftByResampling(voiceBuffer,
+                        voiceNoteNumber.load(),
+                        70);
+
+
+
 
                     finalVoiceBuffer_readPos.store(0);
 
@@ -371,32 +380,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     block.clear();
 
 
-
-
-
-
-
-    //if (finalVoiceBuffer.getNumSamples() > 0)
-    //{
-    //    int numSamples = buffer.getNumSamples();
-    //    int voiceBufferSize = finalVoiceBuffer.getNumSamples();
-    //    int readPos = finalVoiceBuffer_readPos.load();
-
-    //    for (int i = 0; i < numSamples; ++i)
-    //    {
-    //        int currentPos = readPos + i;
-
-    //        if (currentPos >= voiceBufferSize) break;
-
-    //        for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
-    //        {
-    //            buffer.addSample(ch, i, finalVoiceBuffer.getSample(ch, currentPos));
-    //        }
-
-    //    }
-
-    //    finalVoiceBuffer_readPos.store(readPos + numSamples);
-    //}
 
 
     if (finalVoiceBuffer.getNumSamples() > 0)
@@ -661,6 +644,76 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
 
     });
     t.detach();
+}
+
+juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(
+    const juce::AudioBuffer<float>& input,
+    int baseNote,
+    int targetNote)
+{
+    if (input.getNumSamples() == 0 || baseNote < 0 || targetNote < 0)
+    {
+        return juce::AudioBuffer<float>(input.getNumChannels(), 0);
+    }
+
+    // Calculate pitch ratio (semitones to frequency ratio)
+    float semitoneShift = static_cast<float>(targetNote - baseNote);
+    float pitchRatio = std::pow(2.0f, semitoneShift / 12.0f);
+
+    int numChannels = input.getNumChannels();
+    int inputSamples = input.getNumSamples();
+    int outputSamples = static_cast<int>(inputSamples / pitchRatio + 0.5f);
+
+    if (outputSamples <= 0)
+    {
+        return juce::AudioBuffer<float>(numChannels, 0);
+    }
+
+    juce::AudioBuffer<float> output(numChannels, outputSamples);
+
+    // Linear interpolation resampling
+    for (int ch = 0; ch < numChannels; ++ch)
+    {
+        const float* inputData = input.getReadPointer(ch);
+        float* outputData = output.getWritePointer(ch);
+
+        for (int i = 0; i < outputSamples; ++i)
+        {
+            float readPos = i * pitchRatio;
+            int readIndex = static_cast<int>(readPos);
+            float frac = readPos - readIndex;
+
+            if (readIndex < inputSamples - 1)
+            {
+                // Linear interpolation between samples
+                outputData[i] = inputData[readIndex] * (1.0f - frac) +
+                    inputData[readIndex + 1] * frac;
+            }
+            else if (readIndex < inputSamples)
+            {
+                outputData[i] = inputData[readIndex];
+            }
+            else
+            {
+                outputData[i] = 0.0f;
+            }
+        }
+    }
+
+    //// Apply short fade-in/out to eliminate clicks (5ms each)
+    //int fadeSamples = static_cast<int>(0.005 * getSampleRate() + 0.5f);
+    //fadeSamples = juce::jmin(fadeSamples, outputSamples / 4); // Max 25% of buffer
+
+    //if (fadeSamples > 0)
+    //{
+    //    for (int ch = 0; ch < numChannels; ++ch)
+    //    {
+    //        output.applyGainRamp(ch, 0, fadeSamples, 0.0f, 1.0f);
+    //        output.applyGainRamp(ch, outputSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
+    //    }
+    //}
+
+    return output;
 }
 
 //    |\   "Music should be heard not only with the ears, but also the soul."

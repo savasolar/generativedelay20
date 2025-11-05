@@ -112,6 +112,10 @@ public:
     juce::AudioBuffer<float> isolateBestNote();
     void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
+    juce::AudioBuffer<float> pitchShiftByResampling(const juce::AudioBuffer<float>& input,
+        int baseNote,
+        int targetNote);
+
     
     juce::AudioBuffer<float> voiceBuffer;
     std::atomic<int> voiceNoteNumber{ -1 };
