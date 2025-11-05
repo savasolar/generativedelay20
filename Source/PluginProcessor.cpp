@@ -119,7 +119,7 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     dryWetMixer.prepare(juce::dsp::ProcessSpec{ sampleRate, static_cast<std::uint32_t> (samplesPerBlock), static_cast<std::uint32_t> (getTotalNumOutputChannels()) });
     dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::linear);
-    dryWetMixer.setWetMixProportion(0.5f);
+    dryWetMixer.setWetMixProportion(0.8f);
 
 
 
@@ -284,9 +284,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     if (generatedMelody[n] >= 0)
                     {
 //                        currentTargetNoteNumber.store(generatedMelody[n]);
-  
-                        finalVoiceBuffer = pitchShift(voiceBuffer, voiceNoteNumber.load(), generatedMelody[n]);
+
                         finalVoiceBuffer_readPos.store(0);
+                        finalVoiceBuffer = pitchShift(voiceBuffer, voiceNoteNumber.load(), generatedMelody[n]);
+
 
                         useADSR.store(false);
                     }
@@ -299,6 +300,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                         {
                             useADSR.store(true);
                         }
+                    }
+                    if (n == 31) {
+                        useADSR.store(true);
                     }
 
                     if (useADSR.load())
@@ -346,7 +350,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                         if (genCount <= genLimit)
                         {
 #endif
-                            generateMelody(capturedMelody);
+//                            generateMelody(capturedMelody);
 #ifdef DEMO_BUILD
                         }
                         else

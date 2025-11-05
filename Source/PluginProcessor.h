@@ -44,7 +44,7 @@ public:
     
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
-    int placeholderNotes = 4;
+    int placeholderNotes = 16;
     bool placeholderHold = false;
 
     int sPs = 0;
@@ -132,15 +132,15 @@ public:
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
 
 
-    //std::vector<int> generatedMelody
-    //{
-    //    64, 65, 66, 67, 68, 69, 70, 71,
-    //    -2, -2, -2, -2, -2, -2, -2, -2,
-    //    59, -2, -2, -2, -2, -2, -2, -2,
-    //    -2, -2, -2, -2, -2, -2, -2, -2
-    //};
+    std::vector<int> generatedMelody
+    {
+        64, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2,
+        59, -2, -2, -2, -2, -2, -2, -2,
+        -2, -2, -2, -2, -2, -2, -2, -2
+    };
 
-    std::vector<int> generatedMelody = std::vector<int>(32, -1);
+//    std::vector<int> generatedMelody = std::vector<int>(32, -1);
     std::vector<int> lastGeneratedMelody = std::vector<int>(32, -1);
 
     int playbackNote = -1;
@@ -183,6 +183,7 @@ public:
     
 private:
     juce::CriticalSection melodyLock;
+//    juce::CriticalSection voiceLock;
 
     std::atomic<bool> exportMode{ false };
 
