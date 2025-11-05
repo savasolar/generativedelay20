@@ -44,6 +44,11 @@ public:
     
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
+    int placeholderNotes = 12;
+
+    bool placeholderHold = false;
+//    int placeholderOctave = 0;
+
     int sPs = 0;
     std::bitset<32> symbolExecuted;
     std::bitset<32> playbackSymbolExecuted;
@@ -167,6 +172,9 @@ public:
 //                                             SSt  `------'`
     
 private:
+    juce::CriticalSection melodyLock;
+    std::atomic<bool> awaitingResponse{ false };
+    std::atomic<bool> exportMode{ false };
 
     // Sound detection utilities
     void detectSound(const juce::AudioBuffer<float>& buffer);
