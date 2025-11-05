@@ -22,10 +22,11 @@ private:
     
     juce::Image backgroundImage;
     
-    void displayVisualMelodies(std::vector<std::vector<int>> melodies)
-    {
 
-    }
+    juce::TextButton startButton;
+    juce::TextButton stopButton;
+
+
 
     juce::TextButton playButton;
 

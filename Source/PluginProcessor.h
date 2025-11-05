@@ -6,7 +6,6 @@
 #include <pitch_detector.h>
 #include <source/PitchMPM.h>
 #include "signalsmith-stretch.h"
-#include "MelodyGenerator.h"
 #include <bitset>
 #include <thread>
 
@@ -44,9 +43,6 @@ public:
     
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
-    int placeholderNotes = 16;
-    bool placeholderHold = false;
-
     int sPs = 0;
     std::bitset<32> symbolExecuted;
     std::bitset<32> playbackSymbolExecuted;
@@ -87,9 +83,6 @@ public:
         adsrParams.sustain = 1.0f;
         adsrParams.release = static_cast<float>(sPs) / static_cast<float>(getSampleRate());
         adsr.setParameters(adsrParams);
-
-
-
     }
 
 
@@ -119,14 +112,12 @@ public:
     juce::AudioBuffer<float> isolateBestNote();
     void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
 
-    juce::AudioBuffer<float> pitchShift(juce::AudioBuffer<float> inputAudio, int baseNote, int targetNote);
     
     juce::AudioBuffer<float> voiceBuffer;
     std::atomic<int> voiceNoteNumber{ -1 };
 //    std::atomic<int> voiceBuffer_readPos{ 0 };
 //    std::atomic<bool> voiceBuffer_isPlaying{ false };
 //    float playbackInc{ 1.0f };
-    std::atomic<int> currentTargetNoteNumber{ -1 };
 
     juce::AudioBuffer<float> finalVoiceBuffer;
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
@@ -134,14 +125,14 @@ public:
 
     std::vector<int> generatedMelody
     {
-        64, -2, -2, -2, -2, -2, -2, -2,
+        60, -2, -2, -2, -2, -2, -2, -2,
         -2, -2, -2, -2, -2, -2, -2, -2,
-        59, -2, -2, -2, -2, -2, -2, -2,
+        60, -2, -2, -2, -2, -2, -2, -2,
         -2, -2, -2, -2, -2, -2, -2, -2
     };
 
 //    std::vector<int> generatedMelody = std::vector<int>(32, -1);
-    std::vector<int> lastGeneratedMelody = std::vector<int>(32, -1);
+
 
     int playbackNote = -1;
     bool playbackNoteActive = false;
@@ -152,17 +143,8 @@ public:
 
     juce::ADSR adsr;
     juce::ADSR::Parameters adsrParams;
-    std::atomic<bool> useADSR{ false };
+    std::atomic<bool> useADSR{ true };
 
-
-
-    std::vector<std::vector<int>> visualMelodies;
-    std::atomic<bool> isUpdatingVisualMelodies{ false };
-    void updateVisualMelodies(std::vector<int> captured, std::vector<int> generated)
-    {
-        std::vector<std::vector<int>> result = { captured, generated };
-        visualMelodies = result;
-    }
 
 
 
@@ -182,11 +164,6 @@ public:
 //                                             SSt  `------'`
     
 private:
-    juce::CriticalSection melodyLock;
-//    juce::CriticalSection voiceLock;
-
-    std::atomic<bool> exportMode{ false };
-
 
     // Sound detection utilities
     void detectSound(const juce::AudioBuffer<float>& buffer);
@@ -204,31 +181,6 @@ private:
 
 
 
-
-    std::unique_ptr<MelodyGenerator> melodyGenerator;
-    bool melodyServiceLoaded = false;
-
-    void loadModel()
-    {
-        bool success = melodyGenerator->initialize();
-        if (success)
-        {
-            melodyServiceLoaded = true;
-            DBG("melody model loaded successfully");
-        }
-        else
-        {
-            DBG("Melody model loading failed - " + melodyGenerator->getLastError());
-        }
-    }
-
-    std::atomic<bool> awaitingResponse{ false };
-
-
-
-    void generateMelody(const std::vector<int>& input);
-
-    std::vector<int> formatMelody(const std::vector<int>& melody, bool isGeneratedMelody) const;
 
 //     ________________________________         
 //    /                                "-_          
