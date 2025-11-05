@@ -44,6 +44,9 @@ public:
     
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
+    int placeholderNotes = 4;
+    bool placeholderHold = false;
+
     int sPs = 0;
     std::bitset<32> symbolExecuted;
     std::bitset<32> playbackSymbolExecuted;
@@ -138,7 +141,7 @@ public:
     //};
 
     std::vector<int> generatedMelody = std::vector<int>(32, -1);
-
+    std::vector<int> lastGeneratedMelody = std::vector<int>(32, -1);
 
     int playbackNote = -1;
     bool playbackNoteActive = false;
@@ -179,6 +182,10 @@ public:
 //                                             SSt  `------'`
     
 private:
+    juce::CriticalSection melodyLock;
+
+    std::atomic<bool> exportMode{ false };
+
 
     // Sound detection utilities
     void detectSound(const juce::AudioBuffer<float>& buffer);
@@ -214,7 +221,13 @@ private:
         }
     }
 
+    std::atomic<bool> awaitingResponse{ false };
 
+
+
+    void generateMelody(const std::vector<int>& input);
+
+    std::vector<int> formatMelody(const std::vector<int>& melody, bool isGeneratedMelody) const;
 
 //     ________________________________         
 //    /                                "-_          

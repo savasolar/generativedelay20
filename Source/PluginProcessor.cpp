@@ -127,7 +127,7 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 
 
-    melodyGenerator = std::make_unique<MelodyGenerator>();
+//    melodyGenerator = std::make_unique<MelodyGenerator>();
 
 }
 
@@ -328,17 +328,42 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             finalVoiceBuffer_readPos.store(0);
 
-            // if captured melody is empty
-            if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
             {
-                isActive.store(false);
-                voiceBuffer.clear();
-                finalVoiceBuffer.clear();
+                juce::ScopedLock sl(melodyLock);
+
+                // if captured melody is empty
+                if (std::all_of(capturedMelody.begin(), capturedMelody.end(), [](int n) { return n == -1; }))
+                {
+                    isActive.store(false);
+                    voiceBuffer.clear();
+                    finalVoiceBuffer.clear();
+                }
+                else
+                {
+                    if (!placeholderHold)
+                    {
+#ifdef DEMO_BUILD
+                        if (genCount <= genLimit)
+                        {
+#endif
+                            generateMelody(capturedMelody);
+#ifdef DEMO_BUILD
+                        }
+                        else
+                        {
+                            isDemoExpired = true;
+                        }
+#endif
+                    }
+                }
+
+
+
+                // populate voice buffer with latest info 
+                juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
+                timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
             }
 
-            // populate voice buffer with latest info 
-            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
 
 
             resetTiming();
@@ -664,6 +689,236 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShift(juce::AudioBuffer
 
     return output;
 }
+
+//          I s o m e t r i c   C i t i e s  -  M e t r o p o l i a
+//          -------------------------------------------------------
+//
+//                  ________            _______
+//         /\ \ \ \/_______/     ______/\      \  /\ \/ /\ \/ /\  \_____________
+//        /\ \ \ \/______ /     /\    /:\\      \ ::\  /::\  /::\ /____  ____ __
+//       /\ \ \ \/_______/     /:\\  /:\:\\______\::/  \::/  \::///   / /   //
+//      /\ \ \ \/_______/    _/____\/:\:\:/_____ / / /\ \/ /\ \///___/ /___//___
+//_____/___ \ \/_______/    /\::::::\\:\:/_____ / \ /::\  /::\ /____  ____  ____
+//         \ \/_______/    /:\\::::::\\:/_____ /   \\::/  \::///   / /   / /   /
+//          \/_______/    /:\:\\______\/______/_____\\/ /\ \///___/ /___/ /_____
+//\          \______/    /:\:\:/_____:/\      \ ___ /  /::\ /____  ____  _/\::::
+//\\__________\____/    /:\:\:/_____:/:\\      \__ /_______/____/_/___/_ /  \:::
+////__________/___/   _/____:/_____:/:\:\\______\ /                     /\  /\::
+/////\          \/   /\ .----.\___:/:\:\:/_____ // \                   /  \/  \:
+/////\\          \  /::\\ \_\ \\_:/:\:\:/_____ //:\ \                 /\  /\  /\
+////:/\\          \//\::\\ \ \ \\/:\:\:/_____ //:::\ \               /  \/  \/+/
+///:/:/\\_________/:\/:::\`----' \\:\:/_____ //o:/\:\ \_____________/\  /\  / /
+//:/:/://________//\::/\::\_______\\:/_____ ///\_\ \:\/____________/  \/  \/+/\
+///:/:///_/_/_/_/:\/::\ \:/__  __ /:/_____ ///\//\\/:/ _____  ____/\  /\  / /  \
+//:/:///_/_/_/_//\::/\:\///_/ /_//:/______/_/ :~\/::/ /____/ /___/  \/  \/+/\  /
+///:///_/_/_/_/:\/::\ \:/__  __ /:/____/\  / \\:\/:/ _____  ____/\  /\  / /  \/
+//:///_/_/_/_//\::/\:\///_/ /_//:/____/\:\____\\::/ /____/ /___/  \/  \/+/\  /\
+/////_/_/_/_/:\/::\ \:/__  __ /:/____/\:\/____/\\/____________/\  /\  / /  \/  \
+////_/_/_/_//\::/\:\///_/ /_//::::::/\:\/____/  /----/----/--/  \/  \/+/\  /\  /
+///_/_/_/_/:\/::\ \:/__  __ /\:::::/\:\/____/ \/____/____/__/\  /\  / /  \/  \/_
+//_/_/_/_//\::/\:\///_/ /_//\:\::::\:\/____/ \_____________/  \/  \/+/\  /\  /
+///_/_/_/:\/::\ \:/__  __ /\:\:\::::\/____/   \ _ _ _ _ _ /\  /\  / /  \/  \/___
+//_/_/_//\::/\:\///_/ /_//\:\:\:\              \_________/  \/  \/+/\  /\  /   /
+///_/_/:\/::\ \:/__  __ /\:\:\:\:\______________\       /\  /\  / /  \/  \/___/_
+//_/_//\::/\:\///_/ /_//::\:\:\:\/______________/      /  \/  \/+/\  /\  /   /
+///_/:\/::\ \:/__  __ /::::\:\:\/______________/\     /\  /\  / /  \/  \/___/___
+//_//\::/\:\///_/ /_//:\::::\:\/______________/  \   /  \/  \/+/\  /\  /   /   /
+///:\/::\ \:/__  __ /:\:\::::\/______________/    \ /\  /\  / /  \/  \/___/___/
+///\::/\:\///_/ /_//:\:\:\                         \  \/\\\/+/\  /\  /   /   /+/
+//\/::\ \:/__  __ /:\:\:\:\_________________________\ ///\\\/  \/  \/___/___/ /_
+//::/\:\///_/ /_//:\:\:\:\/_________________________////::\\\  /\  /   /   /+/
+//::\ \:/__  __ /:\:\:\:\/_________________________/:\/____\\\/  \/___/___/ /___
+///\:\///_/ /_//:\:\:\:\/_________________________/:::\    /\/\  /   /   /+/   /
+//\ \:/__  __ /:\:\:\:\/_________________________/:::::\  ///  \/___/___/ /___/_
+//:\///_/ /_//:\:\:\:\/_________________________/:\:::::\///\  /   /  __________
+//\:/__  __ /:\:\:\:\/_________________________/:::\:::::\/  \/___/__/\
+/////_/ /_//:\:\:\:\/_________________________/:\:::\:::::\  /   /  /::\
+///__  __ /\::\:\:\/_________________________/_____::\:::::\/___/__/:/\:\
+///_/ /_//::\::\:\/_____________________/\/_/_/_/_/\  \           /::\ \:\
+//_  __ /:\::\:8\/_____________________/\/\   /\_\\/\  \ 8       /:/\:\ \:\
+/// /_//\     \|______________________//\\/\::\/__\\/\  \|______/::\ \:\ \:\
+// __ /  \  \                        /:\/:\/\_______\/\        /:/\:\ \:\/::\
+///_//    8      -8  --  --  --  -- //\::/\\/_/_/_/_/_/ --  --/::\ \:\ \::/\:\
+//_ /     |\  \   |________________/:\/::\///__/ /__//_______/:/\:\ \:\/::\ \:\
+//__________\     \               //\::/\:/___  ___ /       /::\ \:\ \::/\:\ \:\
+//::::::::::\\  \  \             /:\/::\///__/ /__//       /:/\:\ \:\/::\ \:\ \:
+
+void CounterTuneAudioProcessor::generateMelody(const std::vector<int>& input)
+{
+    if (!melodyGenerator || !melodyGenerator->isInitialized())
+    {
+        DBG("Melody generator not initialized");
+        return;
+    }
+
+    if (awaitingResponse.load()) return;
+    
+    awaitingResponse.store(true);
+    
+    std::vector<int> formattedInput = formatMelody(input, false);
+    
+    if (exportMode.load())
+    {
+    	DBG("non-realtime");       
+    		
+        std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
+    
+        {
+            juce::ScopedLock sl(melodyLock);
+    
+            if (!result.empty()/* && !getHoldBool()*/)
+            {
+                generatedMelody = result;
+    
+                lastGeneratedMelody = generatedMelody;
+  
+
+                //int currentOctaveShift = getOctaveInt() * 12;
+                //for (int& note : generatedMelody)
+                //{
+                //    if (note >= 0)
+                //    {
+                //        note = juce::jlimit(0, 127, note + currentOctaveShift);
+                //    }
+                //}
+                //lastAppliedOctaveShift = currentOctaveShift;
+    
+#ifdef DEMO_BUILD
+                genCount++;
+#endif
+    
+            }
+            else if (result.empty())
+            {
+                DBG("Melody generation failed");
+            }
+        }
+        awaitingResponse.store(false);
+    }
+    else
+    {
+        std::thread([this, formattedInput]()
+        {
+            std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
+            juce::MessageManager::callAsync([this, result]()
+            {
+    
+                {
+                    juce::ScopedLock sl(melodyLock);
+    
+                    if (!result.empty()/* && !getHoldBool()*/)
+                    {
+                        generatedMelody = result;
+    
+                        lastGeneratedMelody = generatedMelody;
+    
+                        // Apply current octave shift to the newly generated melody
+                        //int currentOctaveShift = getOctaveInt() * 12;
+                        //for (int& note : generatedMelody)
+                        //{
+                        //    if (note >= 0)
+                        //    {
+                        //        note = juce::jlimit(0, 127, note + currentOctaveShift);
+                        //    }
+                        //}
+                        //lastAppliedOctaveShift = currentOctaveShift;
+#ifdef DEMO_BUILD
+                        genCount++;
+#endif
+                    }
+                    else if (result.empty())
+                    {
+                        DBG("Melody generation failed");
+                    }
+                }
+    
+                awaitingResponse.store(false);
+            });
+        }).detach();
+    }
+}
+
+
+// ___          ___       __   ___  ___       ___               ________  ___       ___       __   ________      ___    ___ ________      
+//|\  \        |\  \     |\  \|\  \|\  \     |\  \             |\   __  \|\  \     |\  \     |\  \|\   __  \    |\  \  /  /|\   ____\     
+//\ \  \       \ \  \    \ \  \ \  \ \  \    \ \  \            \ \  \|\  \ \  \    \ \  \    \ \  \ \  \|\  \   \ \  \/  / | \  \___|_    
+// \ \  \       \ \  \  __\ \  \ \  \ \  \    \ \  \            \ \   __  \ \  \    \ \  \  __\ \  \ \   __  \   \ \    / / \ \_____  \   
+//  \ \  \       \ \  \|\__\_\  \ \  \ \  \____\ \  \____        \ \  \ \  \ \  \____\ \  \|\__\_\  \ \  \ \  \   \/  /  /   \|____|\  \  
+//   \ \__\       \ \____________\ \__\ \_______\ \_______\       \ \__\ \__\ \_______\ \____________\ \__\ \__\__/  / /       ____\_\  \ 
+//    \|__|        \|____________|\|__|\|_______|\|_______|        \|__|\|__|\|_______|\|____________|\|__|\|__|\___/ /       |\_________\
+//                                                                                                             \|___|/        \|_________|
+//                                                                                                                                        
+//                                                                                                                                        
+// ___       ________  ___      ___ _______            ___    ___ ________  ___  ___                                                      
+//|\  \     |\   __  \|\  \    /  /|\  ___ \          |\  \  /  /|\   __  \|\  \|\  \                                                     
+//\ \  \    \ \  \|\  \ \  \  /  / | \   __/|         \ \  \/  / | \  \|\  \ \  \\\  \                                                    
+// \ \  \    \ \  \\\  \ \  \/  / / \ \  \_|/__        \ \    / / \ \  \\\  \ \  \\\  \                                                   
+//  \ \  \____\ \  \\\  \ \    / /   \ \  \_|\ \        \/  /  /   \ \  \\\  \ \  \\\  \                                                  
+//   \ \_______\ \_______\ \__/ /     \ \_______\     __/  / /      \ \_______\ \_______\                                                 
+//    \|_______|\|_______|\|__|/       \|_______|    |\___/ /        \|_______|\|_______|                                                 
+//                                                   \|___|/                                                                              
+
+
+std::vector<int> CounterTuneAudioProcessor::formatMelody(const std::vector<int>& melody, bool isGeneratedMelody) const
+{
+    std::vector<int> formattedMelody = melody;
+
+    // Rule 1: Rotate so it doesnt start with -1 or -2
+    auto it = std::find_if(formattedMelody.begin(), formattedMelody.end(), [](int n) { return n >= 0; });
+
+    if (it != formattedMelody.end())
+    {
+        std::rotate(formattedMelody.begin(), it, formattedMelody.end());
+    }
+
+    // Rule 2: Replace consecutive -1s with -2, keeping the first -1
+    for (size_t i = 0; i < formattedMelody.size(); ++i)
+    {
+        if (formattedMelody[i] == -1)
+        {
+            // Replace all subsequent consecutive -1s with -2
+            for (size_t j = i + 1; j < formattedMelody.size() && formattedMelody[j] == -1; ++j)
+            {
+                formattedMelody[j] = -2;
+            }
+        }
+    }
+
+    // Rule 3: Replace consecutive identical notes with -2, keeping the first
+    for (size_t i = 0; i < formattedMelody.size(); ++i)
+    {
+        if (formattedMelody[i] >= 0)
+        {
+            int currentNote = formattedMelody[i];
+            // Replace all subsequent consecutive identical notes with -2
+            for (size_t j = i + 1; j < formattedMelody.size() && formattedMelody[j] == currentNote; ++j)
+            {
+                formattedMelody[j] = -2;
+            }
+        }
+    }
+
+    // Rule 4: Eliminate redundant note-off events
+    // After a note-off (-1), replace any subsequent -1s with -2 until the next note (>= 0)
+    for (size_t i = 0; i < formattedMelody.size(); ++i)
+    {
+        if (formattedMelody[i] == -1)
+        {
+            // Replace all subsequent -1s with -2 until we hit a note (>= 0)
+            for (size_t j = i + 1; j < formattedMelody.size() && formattedMelody[j] < 0; ++j)
+            {
+                if (formattedMelody[j] == -1)
+                {
+                    formattedMelody[j] = -2;
+                }
+            }
+        }
+    }
+
+    return formattedMelody; // Return the new vector
+}
+
+
 
 //    |\   "Music should be heard not only with the ears, but also the soul."
 //|---|--\-----------------------|-----------------------------------------|  
