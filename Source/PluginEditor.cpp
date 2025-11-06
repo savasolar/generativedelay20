@@ -36,8 +36,11 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     tempoValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
     tempoValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
-    //updateTempoValueLabel();
-    tempoValueLabel.setText("120", false);
+    updateTempoValueLabel();
+
+
+
+
 
     // a good dropdown menu can be created simply with a rectangle and buttons
 

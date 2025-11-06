@@ -53,6 +53,12 @@ private:
 
     juce::Label tempoTitleLabel;
     juce::TextEditor tempoValueLabel;
+    void updateTempoValueLabel()
+    {
+        float value = audioProcessor.getTempoFloat();
+        juce::String text = juce::String(value);
+        tempoValueLabel.setText(text, false);
+    }
 
 
 
