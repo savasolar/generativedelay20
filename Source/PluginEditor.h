@@ -52,7 +52,9 @@ private:
 
 
     juce::Label tempoTitleLabel;
-    juce::Label tempoValueLabel;
+    juce::TextEditor tempoValueLabel;
+
+
 
 
 

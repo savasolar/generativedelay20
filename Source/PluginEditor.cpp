@@ -24,7 +24,20 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     tempoTitleLabel.setText("TEMPO", dontSendNotification);
     
-
+    addAndMakeVisible(tempoValueLabel);
+    tempoValueLabel.setBounds(25, 90, 50, 16);
+    tempoValueLabel.setJustification(juce::Justification::centredTop);
+    tempoValueLabel.setMultiLine(false);
+    tempoValueLabel.setReturnKeyStartsNewLine(false);
+    tempoValueLabel.setInputRestrictions(10, "0123456789.-+");
+    tempoValueLabel.setSelectAllWhenFocused(true);
+    tempoValueLabel.setFont(getCustomFont(16.0f));
+    tempoValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    tempoValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+    tempoValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    tempoValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    //updateTempoValueLabel();
+    tempoValueLabel.setText("120", false);
 
     // a good dropdown menu can be created simply with a rectangle and buttons
 
