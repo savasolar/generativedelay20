@@ -4,7 +4,7 @@
 #include "PluginEditor.h"
 
 CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p)
+    : AudioProcessorEditor (&p), audioProcessor (p), parameters(p.parameters)
 {
     setSize (640, 480);
     setWantsKeyboardFocus(true);
@@ -18,6 +18,18 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
 //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
+    tempoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "tempo", tempoKnob);
+    tempoKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
+    tempoKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    //bpmKnob.setLookAndFeel(knobLookAndFeel.get());
+    tempoKnob.setRotaryParameters(juce::MathConstants<float>::pi * 1.2f, juce::MathConstants<float>::pi * 2.8f, true);
+    tempoKnob.onDragStart = [this]() {};
+    tempoKnob.onDragEnd = [this]() {};
+    tempoKnob.setBounds(32, 404, 40, 40);
+    tempoKnob.setRange(1, 999, 1);
+    tempoKnob.onValueChange = [this]() { updateTempoValueLabel(); };
+    addAndMakeVisible(tempoKnob);
+
     addAndMakeVisible(tempoTitleLabel);
     tempoTitleLabel.setBounds(25, 75, 50, 16);
     tempoTitleLabel.setJustificationType(juce::Justification::centred);
@@ -51,7 +63,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
                 return;
             }
             value = juce::jlimit(1.0f, 999.0f, value);
-//            tempoSlider.setValue(value);
+            tempoKnob.setValue(value);
             updateTempoValueLabel();
             grabKeyboardFocus();
         };

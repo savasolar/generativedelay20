@@ -5,6 +5,12 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
+
+
+
+
+
+
 class CounterTuneAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
@@ -13,6 +19,7 @@ public:
 
     void paint (juce::Graphics&) override;
     void resized() override;
+    juce::AudioProcessorValueTreeState& parameters;
 
 private:
 
@@ -54,20 +61,25 @@ private:
     //  
 
 
+    // param ui and functionality setup
 
     juce::Label tempoTitleLabel;
     juce::TextEditor tempoValueLabel;
+    juce::Slider tempoKnob;
     void updateTempoValueLabel()
     {
         float value = audioProcessor.getTempoFloat();
         juce::String text = juce::String(value);
         tempoValueLabel.setText(text, false);
     }
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tempoAttachment;
 
 
 
 
 
+
+    // visual 
     struct WaveformViewer : public juce::Component
     {
         WaveformViewer() = default;
