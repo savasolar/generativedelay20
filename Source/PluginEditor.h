@@ -21,15 +21,37 @@ private:
     CounterTuneAudioProcessor& audioProcessor;
     
     juce::Image backgroundImage;
-    
 
-    juce::TextButton startButton;
-    juce::TextButton stopButton;
+    juce::Typeface::Ptr customTypeface;
+    juce::Font getCustomFont(float height)
+    {
+        if (customTypeface == nullptr)
+        {
+            customTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::B612MonoRegular_ttf, BinaryData::B612MonoRegular_ttfSize);
+        }
+        if (customTypeface != nullptr)
+        {
+            juce::Font font(customTypeface);
+            font.setHeight(height);
+            return font;
+        }
+        else
+        {
+            return juce::Font(height);
+        }
+    }
+
+    juce::Colour foregroundColor = juce::Colour(0xff00ffae);
+    juce::Colour backgroundColor = juce::Colour(0xff000000);
+
+
+    // add: 
+    //  - dropdown menu
+    //  
 
 
 
-    juce::TextButton playButton;
-
+    juce::Label testLabel;
 
 
 
