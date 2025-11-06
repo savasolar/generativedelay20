@@ -41,6 +41,18 @@ public:
 //  ||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_|||_|_|||_|_|_||
 //  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
 //  |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|hjw
+
+
+
+    float getTempoFloat() const { return *parameters.getRawParameterValue("tempo"); }
+    void setTempoFloat(float newTempoFloat) { auto* param = parameters.getParameter("tempo"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newTempoFloat)); }
+
+    juce::AudioProcessorValueTreeState parameters;
+
+
+
+
+
     
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;

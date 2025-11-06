@@ -13,7 +13,11 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-    pitchDetector(44100, 1024)
+    pitchDetector(44100, 1024),
+    parameters(*this, nullptr, "Parameters",
+        {
+            std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"tempo", 1}, "Tempo", 1, 999, 120)
+        })
 #endif
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
