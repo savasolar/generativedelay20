@@ -19,6 +19,10 @@ private:
     void timerCallback() override;
     
     CounterTuneAudioProcessor& audioProcessor;
+
+    bool firstLoad = true;
+
+
     
     juce::Image backgroundImage;
 

@@ -7,6 +7,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     : AudioProcessorEditor (&p), audioProcessor (p)
 {
     setSize (640, 480);
+    setWantsKeyboardFocus(true);
 
     backgroundImage = juce::ImageCache::getFromMemory(BinaryData::uibody_png, BinaryData::uibody_pngSize);
 
@@ -38,7 +39,24 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateTempoValueLabel();
 
+    auto commitTempo = [this]()
+        {
+            tempoValueLabel.moveCaretToEnd(false);
 
+            juce::String text = tempoValueLabel.getText().trim();
+            float value = text.getFloatValue();
+            if (text.isEmpty() || !std::isfinite(value))
+            {
+                updateTempoValueLabel();
+                return;
+            }
+            value = juce::jlimit(1.0f, 999.0f, value);
+//            tempoSlider.setValue(value);
+            updateTempoValueLabel();
+            grabKeyboardFocus();
+        };
+    tempoValueLabel.onReturnKey = commitTempo;
+    tempoValueLabel.onFocusLost = commitTempo;
 
 
 
@@ -59,6 +77,19 @@ void CounterTuneAudioProcessorEditor::timerCallback()
 {
 
 //    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
+
+
+    if (firstLoad)
+    {
+        updateTempoValueLabel();
+        //...
+        firstLoad = false;
+    }
+
+    // paint melodies
+
+
+
 
 }
 
