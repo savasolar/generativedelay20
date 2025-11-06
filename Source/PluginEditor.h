@@ -51,7 +51,8 @@ private:
 
 
 
-    juce::Label testLabel;
+    juce::Label tempoTitleLabel;
+    juce::Label tempoValueLabel;
 
 
 

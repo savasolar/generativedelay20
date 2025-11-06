@@ -17,11 +17,12 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
 //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
-    addAndMakeVisible(testLabel);
-    testLabel.setBounds(1, 121, 100, 20);
-    testLabel.setFont(getCustomFont(16.0f));
-    testLabel.setColour(juce::Label::textColourId, foregroundColor);
-    testLabel.setText("test text", dontSendNotification);
+    addAndMakeVisible(tempoTitleLabel);
+    tempoTitleLabel.setBounds(25, 75, 50, 16);
+    tempoTitleLabel.setJustificationType(juce::Justification::centred);
+    tempoTitleLabel.setFont(getCustomFont(16.0f));
+    tempoTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    tempoTitleLabel.setText("TEMPO", dontSendNotification);
     
 
 
