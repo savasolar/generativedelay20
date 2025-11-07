@@ -10,7 +10,8 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     setWantsKeyboardFocus(true);
 
     backgroundImage = juce::ImageCache::getFromMemory(BinaryData::uibody_png, BinaryData::uibody_pngSize);
-    presetImage = juce::ImageCache::getFromMemory(BinaryData::presetmenu_png, BinaryData::presetmenu_pngSize);
+    presetMenuDefault = juce::ImageCache::getFromMemory(BinaryData::presetmenu_png, BinaryData::presetmenu_pngSize);
+    presetMenuHover = juce::ImageCache::getFromMemory(BinaryData::presetmenuhover_png, BinaryData::presetmenuhover_pngSize);
 
     // custom font: B612Mono-Regular.ttf
 
@@ -422,7 +423,7 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 {
 
     g.drawImage(backgroundImage, getLocalBounds().toFloat());
-    g.drawImage(presetImage, juce::Rectangle<float>(481, 21, 140, 18));
+    g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 21, 140, 18));
 
 }
 

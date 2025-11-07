@@ -59,7 +59,8 @@ private:
     //  - dropdown menu
     //  
 
-    juce::Image presetImage;
+    juce::Image presetMenuDefault;
+    juce::Image presetMenuHover;
 
     // param ui and functionality setup
 
