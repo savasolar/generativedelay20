@@ -131,7 +131,7 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     dryWetMixer.prepare(juce::dsp::ProcessSpec{ sampleRate, static_cast<std::uint32_t> (samplesPerBlock), static_cast<std::uint32_t> (getTotalNumOutputChannels()) });
     dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::linear);
-    dryWetMixer.setWetMixProportion(1.0f);
+    dryWetMixer.setWetMixProportion(0.5f);
 
 
 

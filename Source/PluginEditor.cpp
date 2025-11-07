@@ -39,6 +39,8 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     tempoKnob.setBounds(25, 74, 50, 16);
     tempoKnob.setRange(1, 999, 1);
+//    tempoKnob.setSkewFactorFromMidPoint(150.0);
+    tempoKnob.setSkewFactor(0.3);
     tempoKnob.onValueChange = [this]() { updateTempoValueLabel(); };
     addAndMakeVisible(tempoKnob);
     
@@ -361,15 +363,18 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     loopTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     loopTitleLabel.setText("LOOP", juce::dontSendNotification);
 
-    // loop button logic here ...
+    // loop button logic here ... 
     loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
     loopButton.setClickingTogglesState(true);
     loopButton.setBounds(565, 74, 50, 16);
+    // NO BORDER, TRANSPARENT 
+    loopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
+    loopButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
     loopButton.onClick = [this]() { updateLoopValueLabel(); };
     addAndMakeVisible(loopButton);
 
     addAndMakeVisible(loopValueLabel);
-    loopValueLabel.setBounds(565, 90, 50, 16);
+    loopValueLabel.setBounds(565, 91, 50, 16);
     loopValueLabel.setJustificationType(juce::Justification::centred);
     loopValueLabel.setFont(getCustomFont(16.0f));
     loopValueLabel.setColour(juce::Label::textColourId, foregroundColor);
