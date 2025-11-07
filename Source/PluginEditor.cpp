@@ -18,17 +18,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
 //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
-    tempoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "tempo", tempoKnob);
-    tempoKnob.setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
-    tempoKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    //bpmKnob.setLookAndFeel(knobLookAndFeel.get());
-    tempoKnob.setRotaryParameters(juce::MathConstants<float>::pi * 1.2f, juce::MathConstants<float>::pi * 2.8f, true);
-    tempoKnob.onDragStart = [this]() {};
-    tempoKnob.onDragEnd = [this]() {};
-    tempoKnob.setBounds(32, 404, 40, 40);
-    tempoKnob.setRange(1, 999, 1);
-    tempoKnob.onValueChange = [this]() { updateTempoValueLabel(); };
-    addAndMakeVisible(tempoKnob);
+    
 
     addAndMakeVisible(tempoTitleLabel);
     tempoTitleLabel.setBounds(25, 75, 50, 16);
@@ -36,6 +26,23 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoTitleLabel.setFont(getCustomFont(16.0f));
     tempoTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     tempoTitleLabel.setText("TEMPO", dontSendNotification);
+
+    tempoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "tempo", tempoKnob);
+    tempoKnob.setSliderStyle(juce::Slider::LinearBar);
+    tempoKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+    tempoKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    tempoKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
+    tempoKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
+    tempoKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    tempoKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    //bpmKnob.setLookAndFeel(knobLookAndFeel.get());
+    tempoKnob.setRotaryParameters(juce::MathConstants<float>::pi * 1.2f, juce::MathConstants<float>::pi * 2.8f, true);
+    tempoKnob.onDragStart = [this]() {};
+    tempoKnob.onDragEnd = [this]() {};
+    tempoKnob.setBounds(25, 74, 50, 16);
+    tempoKnob.setRange(1, 999, 1);
+    tempoKnob.onValueChange = [this]() { updateTempoValueLabel(); };
+    addAndMakeVisible(tempoKnob);
     
     addAndMakeVisible(tempoValueLabel);
     tempoValueLabel.setBounds(25, 90, 50, 16);
