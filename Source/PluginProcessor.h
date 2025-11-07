@@ -6,7 +6,7 @@
 #include <pitch_detector.h>
 #include <source/PitchMPM.h>
 #include "signalsmith-stretch.h"
-#include "MelodyGenerator.h"
+//#include "MelodyGenerator.h"
 #include <bitset>
 #include <thread>
 
@@ -224,22 +224,6 @@ private:
 
     std::vector<int> formatMelody(const std::vector<int>& melody, bool isGeneratedMelody) const;
 
-    std::unique_ptr<MelodyGenerator> melodyGenerator;
-
-    void loadModel()
-    {
-        bool melodyGeneratorSuccess = melodyGenerator->initialize();
-        if (melodyGeneratorSuccess)
-        {
-            DBG("Melody model loaded successfully");
-        }
-        else
-        {
-            DBG("Melody model loading failed - " + melodyGenerator->getLastError());
-        }
-    }
-
-    void generateMelody(const std::vector<int>& input);
 
     void detectKey(const std::vector<int>& melody);
 

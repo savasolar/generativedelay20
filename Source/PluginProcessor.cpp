@@ -28,10 +28,6 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
 
-    melodyGenerator = std::make_unique<MelodyGenerator>();
-
-    loadModel();
-
     generatedMelody = lastGeneratedMelody;
 }
 
@@ -243,25 +239,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         // If full, detect pitch and store MIDI note
         if (pitchDetectorFillPos >= analysisBuffer.getNumSamples())
         {
-            //// <new>
-            //// Normalize the analysis buffer to maximize volume for pitch detection
-            //float maxAbs = 0.0f;
-            //const int bufferSize = analysisBuffer.getNumSamples();
-            //for (int i = 0; i < bufferSize; ++i) {
-            //    float sample = std::abs(analysisBuffer.getSample(0, i));
-            //    if (sample > maxAbs) maxAbs = sample;
-            //}
-
-            //if (maxAbs > 0.0f) {
-            //    float gain = 0.99f / maxAbs;
-            //    analysisBuffer.applyGain(gain);
-            //}
-            //// </new>
-
-
-
-
-
             float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
             int midiNote = frequencyToMidiNote(pitch);
             detectedNoteNumbers.push_back(midiNote);
@@ -290,11 +267,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         for (int n = 0; n < 32; ++n)
         {
-            // fill captured melody at END of a symbol to increase accuracy
-
-            // BUG: as note is transcribed at END of symbol, the last symbol never gets to be transcribed. Solution: transcribe halfway through a symbol
-
-//            if (melodyCaptureFillPos >= (n + 1) * sPs)
+            // fill captured melody at middle of a symbol
             if (melodyCaptureFillPos >= (n + 0.5) * sPs)
             {
                 if (!symbolExecuted.test(n))
@@ -312,7 +285,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         // 4/6: GENERATED MELODY SYMBOL READING====================================================================================
 
-
         for (int n = 0; n < 32; ++n)
         {
             if (melodyCaptureFillPos >= n * sPs)
@@ -328,15 +300,12 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                         finalVoiceBuffer_readPos.store(0);
                     }
 
-
                     // if next generatedMelody symbol indicates a fadeout in the current symbol is needed, activate useADSR here
 
                     if ((generatedMelody[(n + 1) % 32]) >= -1)
                     {
                         useADSR.store(true);
                     }
-
-
 
                     if (useADSR.load())
                     {
@@ -345,39 +314,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                         adsr.noteOff();
                     }
 
-
-
-
-
-
-
                     playbackSymbolExecuted.set(n);
                 }
             }
         }
-
-
-
-
-
-        // trigger fadeout envelope at last 64th note of each symbol, if adsr is active (triggered conditionally based on evaluation of future generatedMelody symbols)
-
-
-        for (int n = 0; n < 32; ++n)
-        {
-            if (melodyCaptureFillPos >= n * (3 * sPs / 4))
-            {
-                if (!fractionalSymbolExecuted.test(n))
-                {
-                    
-
-
-                    fractionalSymbolExecuted.set(n);
-                }
-            }
-        }
-
-
 
         melodyCaptureFillPos += captureToCopy;
 
@@ -401,8 +341,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
                 detectKey(capturedMelody);
 
-//                generateMelody(capturedMelody);
-
             }
 
             // populate voice buffer with latest info 
@@ -419,9 +357,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     juce::dsp::AudioBlock<float> block(buffer);
     dryWetMixer.pushDrySamples(block);
     block.clear();
-
-
-
 
     if (finalVoiceBuffer.getNumSamples() > 0)
     {
@@ -445,14 +380,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         finalVoiceBuffer_readPos.store(readPos + numSamples);
     }
-
-
-
-
-
-
-
-
 
     dryWetMixer.mixWetSamples(block);
 
@@ -826,108 +753,6 @@ std::vector<int> CounterTuneAudioProcessor::formatMelody(const std::vector<int>&
     return formattedMelody; // Return the new vector
 }
 
-void CounterTuneAudioProcessor::generateMelody(const std::vector<int>& input)
-{
-    if (!melodyGenerator || !melodyGenerator->isInitialized())
-    {
-        DBG("Melody generator not initialized");
-        return;
-    }
-
-//    if (awaitingResponse.load()) return;
-//    
-//    awaitingResponse.store(true);
-//    
-//    std::vector<int> formattedInput = formatMelody(input, false);
-//    
-//    if (exportMode.load())
-//    {
-//    	DBG("non-realtime");       
-//    		
-//        std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
-//    
-//        {
-//            juce::ScopedLock sl(melodyLock);
-//    
-//            if (!result.empty() && !placeholderHold)
-//            {
-//                generatedMelody = result;
-//    
-//                lastGeneratedMelody = generatedMelody;
-//    
-//                //int currentOctaveShift = getOctaveInt() * 12;
-//                //for (int& note : generatedMelody)
-//                //{
-//                //    if (note >= 0)
-//                //    {
-//                //        note = juce::jlimit(0, 127, note + currentOctaveShift);
-//                //    }
-//                //}
-//                //lastAppliedOctaveShift = currentOctaveShift;
-//    
-//#ifdef DEMO_BUILD
-//                genCount++;
-//#endif
-//    
-//            }
-//            else if (result.empty())
-//            {
-//                DBG("Melody generation failed");
-//            }
-//        }
-//        awaitingResponse.store(false);
-//    }
-//    else
-//    {
-//        std::thread([this, formattedInput]()
-//        {
-//            std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
-//            juce::MessageManager::callAsync([this, result]()
-//            {
-//    
-//                {
-//                    juce::ScopedLock sl(melodyLock);
-//    
-//                    if (!result.empty() && !placeholderHold)
-//                    {
-//                        generatedMelody = result;
-//    
-//                        lastGeneratedMelody = generatedMelody;
-//    
-//                        //// Apply current octave shift to the newly generated melody
-//                        //int currentOctaveShift = getOctaveInt() * 12;
-//                        //for (int& note : generatedMelody)
-//                        //{
-//                        //    if (note >= 0)
-//                        //    {
-//                        //        note = juce::jlimit(0, 127, note + currentOctaveShift);
-//                        //    }
-//                        //}
-//                        //lastAppliedOctaveShift = currentOctaveShift;
-//#ifdef DEMO_BUILD
-//                        genCount++;
-//#endif
-//                    }
-//                    else if (result.empty())
-//                    {
-//                        DBG("Melody generation failed");
-//                    }
-//                }
-//    
-//                awaitingResponse.store(false);
-//            });
-//        }).detach();
-//    }
-
-
-        // TESTING PLAYBACK MECHANISM WITH SIMPLE DUMMY GENERATED MELODY
-
-    generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
-
-
-
-}
-
 void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 {
     std::array<double, 12> hist{};
@@ -1003,29 +828,29 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
     DBG(key);
 
     if (key == 0)
-        generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, -2, -2, -2, -2, 72, -2, -2, -2 };
+        generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
     if (key == 1)
-        generatedMelody = { 61, -2, -2, -2, 63, -2, -2, -2, 65, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, -2, -2, -2, -2, 73, -2, -2, -2 };
+        generatedMelody = { 61, -2, -2, -2, 63, -2, -2, -2, 65, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2 };
     if (key == 2)
-        generatedMelody = { 62, -2, -2, -2, 64, -2, -2, -2, 66, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, -2, -2, -2, -2, 74, -2, -2, -2 };
+        generatedMelody = { 62, -2, -2, -2, 64, -2, -2, -2, 66, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2 };
     if (key == 3)
-        generatedMelody = { 63, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, -2, -2, -2, -2, 75, -2, -2, -2 };
+        generatedMelody = { 63, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2 };
     if (key == 4)
-        generatedMelody = { 64, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, -2, -2, -2, -2, 76, -2, -2, -2 };
+        generatedMelody = { 64, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2 };
     if (key == 5)
-        generatedMelody = { 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, -2, -2, -2, -2, 77, -2, -2, -2 };
+        generatedMelody = { 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 77, -2, -2, -2 };
     if (key == 6)
-        generatedMelody = { 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, -2, -2, -2, -2, 78, -2, -2, -2 };
+        generatedMelody = { 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 78, -2, -2, -2 };
     if (key == 7)
-        generatedMelody = { 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, -2, -2, -2, -2, 79, -2, -2, -2 };
+        generatedMelody = { 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 79, -2, -2, -2 };
     if (key == 8)
-        generatedMelody = { 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, -2, -2, -2, -2, 80, -2, -2, -2 };
+        generatedMelody = { 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 80, -2, -2, -2 };
     if (key == 9)
-        generatedMelody = { 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, -2, -2, -2, -2, 81, -2, -2, -2 };
+        generatedMelody = { 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 81, -2, -2, -2 };
     if (key == 10)
-        generatedMelody = { 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, -2, -2, -2, -2, 82, -2, -2, -2 };
+        generatedMelody = { 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 81, -2, -2, -2, 82, -2, -2, -2 };
     if (key == 11)
-        generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, -2, -2, -2, -2, 83, -2, -2, -2 };
+        generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
 }
 
 bool CounterTuneAudioProcessor::hasEditor() const

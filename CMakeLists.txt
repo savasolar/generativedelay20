@@ -134,8 +134,6 @@ target_sources(generativedelay20 PRIVATE
     Source/PluginEditor.h
     Source/PluginProcessor.cpp
     Source/PluginProcessor.h
-    Source/MelodyGenerator.cpp
-    Source/MelodyGenerator.h
     Dependencies/adamski/audio_fft/audio_fft.cpp
     Dependencies/adamski/audio_fft/audio_fft.mm
     Dependencies/adamski/pitch_detector/pitch_detector.cpp
@@ -143,42 +141,8 @@ target_sources(generativedelay20 PRIVATE
 )
 
 
-
-# if (APPLE)
-#     target_sources(generativedelay20 PRIVATE
-#         Source/PluginEditor.cpp
-#         Source/PluginEditor.h
-#         Source/PluginProcessor.cpp
-#         Source/PluginProcessor.h
-#         /Users/admin/Documents/repos/audio_fft/audio_fft.cpp
-#         /Users/admin/Documents/repos/audio_fft/audio_fft.mm
-#         /Users/admin/Documents/repos/pitch_detector/pitch_detector.cpp
-#         /Users/admin/Documents/repos/pitch_detector/pitch_detector.mm
-#     )
-# elseif(NOT APPLE)
-#     target_sources(generativedelay20 PRIVATE
-#         Source/PluginEditor.cpp
-#         Source/PluginEditor.h
-#         Source/PluginProcessor.cpp
-#         Source/PluginProcessor.h
-#         C:/repos/adamski/audio_fft/audio_fft.cpp
-#         C:/repos/adamski/audio_fft/audio_fft.mm
-#         C:/repos/adamski/pitch_detector/pitch_detector.cpp
-#         C:/repos/adamski/pitch_detector/pitch_detector.mm
-#     )
-# endif()
-
-
-
 # Binary data
 juce_add_binary_data(BinaryResources SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part1.bin
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part2.bin
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part3.bin
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part4.bin
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/floralv2_part5.bin
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/int_to_note.json
-    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/FLORALv2/note_to_int.json
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/B612Mono-Regular.ttf
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/cap-mel-texture.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/gen-mel-texture.png
