@@ -353,27 +353,27 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     mixValueLabel.onFocusLost = commitMix;
 
     // LOOP
-/*
+
     addAndMakeVisible(loopTitleLabel);
     loopTitleLabel.setBounds(565, 75, 50, 16);
     loopTitleLabel.setJustificationType(juce::Justification::centred);
     loopTitleLabel.setFont(getCustomFont(16.0f));
     loopTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
-    loopTitleLabel.setText("LOOP", dontSendNotification);
+    loopTitleLabel.setText("LOOP", juce::dontSendNotification);
 
-    loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "loop", loopKnob);
-    loopKnob.setSliderStyle(juce::Slider::LinearBar);
-    loopKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
-    loopKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
-    loopKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    loopKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    loopKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
-    loopKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    loopKnob.setBounds(565, 74, 50, 16);
-    loopKnob.setRange(0, 1, 1);
-    loopKnob.onValueChange = [this]() { updateLoopValueLabel(); };
-    addAndMakeVisible(loopKnob);
-*/
+    // loop button logic here ...
+    loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
+    loopButton.setClickingTogglesState(true);
+    loopButton.setBounds(565, 74, 50, 16);
+    loopButton.onClick = [this]() { updateLoopValueLabel(); };
+    addAndMakeVisible(loopButton);
+
+    addAndMakeVisible(loopValueLabel);
+    loopValueLabel.setBounds(565, 90, 50, 16);
+    loopValueLabel.setJustificationType(juce::Justification::centred);
+    loopValueLabel.setFont(getCustomFont(16.0f));
+    loopValueLabel.setColour(juce::Label::textColourId, foregroundColor);
+    updateLoopValueLabel();
 
 
 
@@ -401,7 +401,12 @@ void CounterTuneAudioProcessorEditor::timerCallback()
     if (firstLoad)
     {
         updateTempoValueLabel();
-        //...
+        updateBeatsValueLabel();
+        updateNotesValueLabel();
+        updateOctaveValueLabel();
+        updateDetuneValueLabel();
+        updateMixValueLabel();
+        updateLoopValueLabel();
         firstLoad = false;
     }
 

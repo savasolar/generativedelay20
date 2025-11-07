@@ -22,7 +22,7 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"octave", 1}, "Octave", -4, 4, 0),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"detune", 1}, "Detune", -1.0f, 1.0f, 0.0f),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"mix", 1}, "Mix", 0.0f, 1.0f, 0.5f),
-            std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"loop", 1}, "Loop", false)
+            std::make_unique<juce::AudioParameterBool>(juce::ParameterID{"loop", 1}, "Loop", 0)
         })
 #endif
 {
@@ -464,7 +464,7 @@ void CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     float rms = std::sqrt(blockEnergy / (numSamples * numChannels));
 
-    const float threshold = 0.007f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
+    const float threshold = 0.0056f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
 
     if (rms > threshold)
     {
@@ -972,9 +972,13 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
         }
     }
 
-    juce::StringArray keys{ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
-    juce::String key = keys[best_tonic] + " major";
-    DBG("Detected key: " + key);
+    //juce::StringArray keys{ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+    //juce::String key = keys[best_tonic] + " major";
+    //DBG("Detected key: " + key);
+
+    std::array<int, 12> keys{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
+    int key = keys[best_tonic];
+    DBG(key);
 }
 
 bool CounterTuneAudioProcessor::hasEditor() const

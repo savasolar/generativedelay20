@@ -124,15 +124,15 @@ private:
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> mixAttachment;
     
     juce::Label loopTitleLabel;
-    juce::Slider loopKnob;
-    juce::TextEditor loopValueLabel;
+    juce::TextButton loopButton;
+    juce::Label loopValueLabel;
     void updateLoopValueLabel()
     {
         bool value = audioProcessor.getLoopBool();
         juce::String text = value ? "ON" : "OFF";
         loopValueLabel.setText(text, juce::dontSendNotification);
     }
-    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> loopAttachment;
+    std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> loopAttachment;
 
 
 
