@@ -137,6 +137,8 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
     adsr.setSampleRate(sampleRate);
 
+    resetTiming();
+
 }
 
 //              (\_/)
@@ -196,6 +198,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     {
         detectSound(buffer);
         resetTiming();
+//        isActive.store(true);
+
     }
     else
     {
@@ -215,6 +219,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
 
         // 2/6: PITCH DETECTION====================================================================================
+
+        // if possible, without affecting the recording of input audio, maximize the volume of input audio for pitch detection on as granular a level as possible; maybe on a chunk-by-chunk basis
+
 
         // Mix current block to mono for pitch detection
         juce::AudioBuffer<float> monoBlock(1, numSamples);
@@ -239,6 +246,14 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
             int midiNote = frequencyToMidiNote(pitch);
             detectedNoteNumbers.push_back(midiNote);
+
+//            DBG(detectedNoteNumbers[0]);
+            //if (detectedNoteNumbers[0] == -1)
+            //{
+            //    resetTiming();
+            //}
+            // this works, and confirms that pitch detector is expecting normalized audio that is loud af
+
             pitchDetectorFillPos = 0;
         }
 
@@ -256,18 +271,19 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         for (int n = 0; n < 32; ++n)
         {
-            // play melody at START of a symbol to align
-
-
             // fill captured melody at END of a symbol to increase accuracy
-            if (melodyCaptureFillPos >= (n + 1) * sPs)
+
+            // BUG: as note is transcribed at END of symbol, the last symbol never gets to be transcribed. Solution: transcribe halfway through a symbol
+
+//            if (melodyCaptureFillPos >= (n + 1) * sPs)
+            if (melodyCaptureFillPos >= (n + 0.5) * sPs)
             {
                 if (!symbolExecuted.test(n))
                 {
                     if (!detectedNoteNumbers.empty())
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
-                        // DBG print // juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
+                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
@@ -276,22 +292,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         }
 
         // 4/6: GENERATED MELODY SYMBOL READING====================================================================================
-
-        /*for (int n = 0; n < 32; ++n)
-        {
-            if (melodyCaptureFillPos >= n * sPs)
-            {
-                if (!playbackSymbolExecuted.test(n))
-                {
-                    finalVoiceBuffer = voiceBuffer;
-
-                    finalVoiceBuffer_readPos.store(0);
-
-                    playbackSymbolExecuted.set(n);
-                }
-            }
-        }*/
-
 
 
         for (int n = 0; n < 32; ++n)
@@ -379,8 +379,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-//                generateMelody(capturedMelody);
+
                 detectKey(capturedMelody);
+
+                generateMelody(capturedMelody);
+
             }
 
             // populate voice buffer with latest info 
@@ -812,95 +815,95 @@ void CounterTuneAudioProcessor::generateMelody(const std::vector<int>& input)
         return;
     }
 
-    if (awaitingResponse.load()) return;
-    
-    awaitingResponse.store(true);
-    
-    std::vector<int> formattedInput = formatMelody(input, false);
-    
-    if (exportMode.load())
-    {
-    	DBG("non-realtime");       
-    		
-        std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
-    
-        {
-            juce::ScopedLock sl(melodyLock);
-    
-            if (!result.empty() && !placeholderHold)
-            {
-                generatedMelody = result;
-    
-                lastGeneratedMelody = generatedMelody;
-    
-                //int currentOctaveShift = getOctaveInt() * 12;
-                //for (int& note : generatedMelody)
-                //{
-                //    if (note >= 0)
-                //    {
-                //        note = juce::jlimit(0, 127, note + currentOctaveShift);
-                //    }
-                //}
-                //lastAppliedOctaveShift = currentOctaveShift;
-    
-#ifdef DEMO_BUILD
-                genCount++;
-#endif
-    
-            }
-            else if (result.empty())
-            {
-                DBG("Melody generation failed");
-            }
-        }
-        awaitingResponse.store(false);
-    }
-    else
-    {
-        std::thread([this, formattedInput]()
-        {
-            std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
-            juce::MessageManager::callAsync([this, result]()
-            {
-    
-                {
-                    juce::ScopedLock sl(melodyLock);
-    
-                    if (!result.empty() && !placeholderHold)
-                    {
-                        generatedMelody = result;
-    
-                        lastGeneratedMelody = generatedMelody;
-    
-                        //// Apply current octave shift to the newly generated melody
-                        //int currentOctaveShift = getOctaveInt() * 12;
-                        //for (int& note : generatedMelody)
-                        //{
-                        //    if (note >= 0)
-                        //    {
-                        //        note = juce::jlimit(0, 127, note + currentOctaveShift);
-                        //    }
-                        //}
-                        //lastAppliedOctaveShift = currentOctaveShift;
-#ifdef DEMO_BUILD
-                        genCount++;
-#endif
-                    }
-                    else if (result.empty())
-                    {
-                        DBG("Melody generation failed");
-                    }
-                }
-    
-                awaitingResponse.store(false);
-            });
-        }).detach();
-    }
+//    if (awaitingResponse.load()) return;
+//    
+//    awaitingResponse.store(true);
+//    
+//    std::vector<int> formattedInput = formatMelody(input, false);
+//    
+//    if (exportMode.load())
+//    {
+//    	DBG("non-realtime");       
+//    		
+//        std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
+//    
+//        {
+//            juce::ScopedLock sl(melodyLock);
+//    
+//            if (!result.empty() && !placeholderHold)
+//            {
+//                generatedMelody = result;
+//    
+//                lastGeneratedMelody = generatedMelody;
+//    
+//                //int currentOctaveShift = getOctaveInt() * 12;
+//                //for (int& note : generatedMelody)
+//                //{
+//                //    if (note >= 0)
+//                //    {
+//                //        note = juce::jlimit(0, 127, note + currentOctaveShift);
+//                //    }
+//                //}
+//                //lastAppliedOctaveShift = currentOctaveShift;
+//    
+//#ifdef DEMO_BUILD
+//                genCount++;
+//#endif
+//    
+//            }
+//            else if (result.empty())
+//            {
+//                DBG("Melody generation failed");
+//            }
+//        }
+//        awaitingResponse.store(false);
+//    }
+//    else
+//    {
+//        std::thread([this, formattedInput]()
+//        {
+//            std::vector<int> result = melodyGenerator->generateMelody(formattedInput, 1.0, placeholderNotes);
+//            juce::MessageManager::callAsync([this, result]()
+//            {
+//    
+//                {
+//                    juce::ScopedLock sl(melodyLock);
+//    
+//                    if (!result.empty() && !placeholderHold)
+//                    {
+//                        generatedMelody = result;
+//    
+//                        lastGeneratedMelody = generatedMelody;
+//    
+//                        //// Apply current octave shift to the newly generated melody
+//                        //int currentOctaveShift = getOctaveInt() * 12;
+//                        //for (int& note : generatedMelody)
+//                        //{
+//                        //    if (note >= 0)
+//                        //    {
+//                        //        note = juce::jlimit(0, 127, note + currentOctaveShift);
+//                        //    }
+//                        //}
+//                        //lastAppliedOctaveShift = currentOctaveShift;
+//#ifdef DEMO_BUILD
+//                        genCount++;
+//#endif
+//                    }
+//                    else if (result.empty())
+//                    {
+//                        DBG("Melody generation failed");
+//                    }
+//                }
+//    
+//                awaitingResponse.store(false);
+//            });
+//        }).detach();
+//    }
 
 
         // TESTING PLAYBACK MECHANISM WITH SIMPLE DUMMY GENERATED MELODY
 
-//    generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
+    generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
 
 
 
