@@ -353,7 +353,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     mixValueLabel.onFocusLost = commitMix;
 
     // LOOP
-
+/*
     addAndMakeVisible(loopTitleLabel);
     loopTitleLabel.setBounds(565, 75, 50, 16);
     loopTitleLabel.setJustificationType(juce::Justification::centred);
@@ -373,7 +373,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     loopKnob.setRange(0, 1, 1);
     loopKnob.onValueChange = [this]() { updateLoopValueLabel(); };
     addAndMakeVisible(loopKnob);
-
+*/
 
 
 

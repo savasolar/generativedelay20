@@ -379,7 +379,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-                generateMelody(capturedMelody);
+//                generateMelody(capturedMelody);
+                detectKey(capturedMelody);
             }
 
             // populate voice buffer with latest info 
@@ -664,10 +665,7 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
     t.detach();
 }
 
-juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(
-    const juce::AudioBuffer<float>& input,
-    int baseNote,
-    int targetNote)
+juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const juce::AudioBuffer<float>& input, int baseNote, int targetNote)
 {
     if (input.getNumSamples() == 0 || baseNote < 0 || targetNote < 0)
     {
@@ -906,6 +904,77 @@ void CounterTuneAudioProcessor::generateMelody(const std::vector<int>& input)
 
 
 
+}
+
+void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
+{
+    std::array<double, 12> hist{};
+    double total = 0.0;
+    for (int note : melody)
+    {
+        if (note >= 0)
+        {
+            int pc = note % 12;
+            hist[pc] += 1.0;
+            total += 1.0;
+        }
+    }
+
+    if (total == 0.0)
+    {
+        DBG("Detected key: Unknown");
+        return;
+    }
+
+    // Normalize histogram to probabilities
+    for (auto& v : hist) v /= total;
+
+    // KS reference profile for C major
+    std::array<double, 12> c_profile{ 6.35, 2.18, 3.48, 2.14, 4.38, 4.09, 2.52, 5.19, 2.39, 3.66, 2.29, 2.88 };
+
+    // Pearson correlation function
+    auto pearson = [](const std::array<double, 12>& a, const std::array<double, 12>& b) -> double
+        {
+            double meanA = 0.0, meanB = 0.0;
+            for (double x : a) meanA += x;
+            for (double x : b) meanB += x;
+            meanA /= 12.0;
+            meanB /= 12.0;
+
+            double cov = 0.0, varA = 0.0, varB = 0.0;
+            for (size_t i = 0; i < 12; ++i)
+            {
+                double da = a[i] - meanA;
+                double db = b[i] - meanB;
+                cov += da * db;
+                varA += da * da;
+                varB += db * db;
+            }
+
+            if (varA == 0.0 || varB == 0.0) return 0.0;
+            return cov / std::sqrt(varA * varB);
+        };
+
+    double max_r = -1.0;
+    int best_tonic = -1;
+    for (int tonic = 0; tonic < 12; ++tonic)
+    {
+        std::array<double, 12> shifted;
+        for (size_t i = 0; i < 12; ++i)
+        {
+            shifted[i] = hist[(i + tonic) % 12];
+        }
+        double r = pearson(shifted, c_profile);
+        if (r > max_r)
+        {
+            max_r = r;
+            best_tonic = tonic;
+        }
+    }
+
+    juce::StringArray keys{ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
+    juce::String key = keys[best_tonic] + " major";
+    DBG("Detected key: " + key);
 }
 
 bool CounterTuneAudioProcessor::hasEditor() const

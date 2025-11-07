@@ -241,6 +241,8 @@ private:
 
     void generateMelody(const std::vector<int>& input);
 
+    void detectKey(const std::vector<int>& melody);
+
 
 
 //     ________________________________         
