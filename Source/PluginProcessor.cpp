@@ -243,6 +243,25 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         // If full, detect pitch and store MIDI note
         if (pitchDetectorFillPos >= analysisBuffer.getNumSamples())
         {
+            //// <new>
+            //// Normalize the analysis buffer to maximize volume for pitch detection
+            //float maxAbs = 0.0f;
+            //const int bufferSize = analysisBuffer.getNumSamples();
+            //for (int i = 0; i < bufferSize; ++i) {
+            //    float sample = std::abs(analysisBuffer.getSample(0, i));
+            //    if (sample > maxAbs) maxAbs = sample;
+            //}
+
+            //if (maxAbs > 0.0f) {
+            //    float gain = 0.99f / maxAbs;
+            //    analysisBuffer.applyGain(gain);
+            //}
+            //// </new>
+
+
+
+
+
             float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
             int midiNote = frequencyToMidiNote(pitch);
             detectedNoteNumbers.push_back(midiNote);
