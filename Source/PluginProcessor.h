@@ -47,13 +47,33 @@ public:
     float getTempoFloat() const { return *parameters.getRawParameterValue("tempo"); }
     void setTempoFloat(float newTempoFloat) { auto* param = parameters.getParameter("tempo"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newTempoFloat)); }
 
+    float getBeatsFloat() const { return *parameters.getRawParameterValue("beats"); }
+    void setBeatsFloat(float newBeatsFloat) { auto* param = parameters.getParameter("beats"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newBeatsFloat)); }
+
+    int getNotesInt() const { return *parameters.getRawParameterValue("notes"); }
+    void setNotesInt(int newNotesInt) { auto* param = parameters.getParameter("notes"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newNotesInt)); }
+
+    int getOctaveInt() const { return *parameters.getRawParameterValue("octave"); }
+    void setOctaveInt(int newOctaveInt) { auto* param = parameters.getParameter("octave"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newOctaveInt)); }
+
+    float getDetuneFloat() const { return *parameters.getRawParameterValue("detune"); }
+    void setDetuneFloat(float newDetuneFloat) { auto* param = parameters.getParameter("detune"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newDetuneFloat)); }
+
+    float getWetDryFloat() const { return *parameters.getRawParameterValue("wetdry"); }
+    void setWetDryFloat(float newWetDryFloat) { auto* param = parameters.getParameter("wetdry"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newWetDryFloat)); }
+
+    bool getLoopBool() const { return static_cast<bool>(*parameters.getRawParameterValue("loop")); }
+    void setLoopBool(bool newLoopBool) { auto* param = parameters.getParameter("loop"); param->setValueNotifyingHost(newLoopBool ? 1.0f : 0.0f); }
+
+
+
     juce::AudioProcessorValueTreeState parameters;
 
 
 
 
 
-    
+    // cycle reset-based params should be double-buffered
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
     int placeholderNotes = 12;

@@ -19,7 +19,9 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
 
     
     
+    // param setup: i) TITLE, ii) KNOB, iii) VALUE
 
+    // TEMPO 
     addAndMakeVisible(tempoTitleLabel);
     tempoTitleLabel.setBounds(25, 75, 50, 16);
     tempoTitleLabel.setJustificationType(juce::Justification::centred);
@@ -35,7 +37,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
     tempoKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
     tempoKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    //bpmKnob.setLookAndFeel(knobLookAndFeel.get());
     tempoKnob.setRotaryParameters(juce::MathConstants<float>::pi * 1.2f, juce::MathConstants<float>::pi * 2.8f, true);
     tempoKnob.onDragStart = [this]() {};
     tempoKnob.onDragEnd = [this]() {};
@@ -57,7 +58,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
     tempoValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateTempoValueLabel();
-
     auto commitTempo = [this]()
         {
             tempoValueLabel.moveCaretToEnd(false);
@@ -76,6 +76,10 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
         };
     tempoValueLabel.onReturnKey = commitTempo;
     tempoValueLabel.onFocusLost = commitTempo;
+
+    // BEATS
+
+
 
 
 
