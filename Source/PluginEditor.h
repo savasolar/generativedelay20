@@ -27,6 +27,11 @@ private:
     
     juce::Image backgroundImage;
 
+    struct TransparentButton : public juce::TextButton
+    {
+        void paintButton(juce::Graphics&, bool, bool) override {}
+    };
+
     juce::Typeface::Ptr customTypeface;
     juce::Font getCustomFont(float height)
     {
@@ -54,6 +59,7 @@ private:
     //  - dropdown menu
     //  
 
+    juce::Image presetImage;
 
     // param ui and functionality setup
 
@@ -124,7 +130,7 @@ private:
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> mixAttachment;
     
     juce::Label loopTitleLabel;
-    juce::TextButton loopButton;
+    TransparentButton loopButton;
     juce::Label loopValueLabel;
     void updateLoopValueLabel()
     {
@@ -133,6 +139,13 @@ private:
         loopValueLabel.setText(text, juce::dontSendNotification);
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> loopAttachment;
+
+
+
+
+
+
+
 
 
 

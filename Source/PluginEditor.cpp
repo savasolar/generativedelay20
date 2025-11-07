@@ -10,6 +10,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     setWantsKeyboardFocus(true);
 
     backgroundImage = juce::ImageCache::getFromMemory(BinaryData::uibody_png, BinaryData::uibody_pngSize);
+    presetImage = juce::ImageCache::getFromMemory(BinaryData::presetmenu_png, BinaryData::presetmenu_pngSize);
 
     // custom font: B612Mono-Regular.ttf
 
@@ -17,7 +18,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
 //    addAndMakeVisible(voiceBuffer_waveform);
 //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
-    
     
     // param setup: i) TITLE, ii) KNOB, iii) VALUE
 
@@ -363,16 +363,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     loopTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     loopTitleLabel.setText("LOOP", juce::dontSendNotification);
 
-    // loop button logic here ... 
-    loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
-    loopButton.setClickingTogglesState(true);
-    loopButton.setBounds(565, 74, 50, 16);
-    // NO BORDER, TRANSPARENT 
-    loopButton.setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-    loopButton.setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
-    loopButton.onClick = [this]() { updateLoopValueLabel(); };
-    addAndMakeVisible(loopButton);
-
     addAndMakeVisible(loopValueLabel);
     loopValueLabel.setBounds(565, 91, 50, 16);
     loopValueLabel.setJustificationType(juce::Justification::centred);
@@ -380,6 +370,12 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     loopValueLabel.setColour(juce::Label::textColourId, foregroundColor);
     updateLoopValueLabel();
 
+    loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
+    loopButton.setClickingTogglesState(true);
+    loopButton.setBounds(565, 74, 50, 33);
+    loopButton.setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    loopButton.onClick = [this]() { updateLoopValueLabel(); };
+    addAndMakeVisible(loopButton);
 
 
 
@@ -426,7 +422,8 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 {
 
     g.drawImage(backgroundImage, getLocalBounds().toFloat());
-    
+    g.drawImage(presetImage, juce::Rectangle<float>(481, 21, 140, 18));
+
 }
 
 void CounterTuneAudioProcessorEditor::resized()
