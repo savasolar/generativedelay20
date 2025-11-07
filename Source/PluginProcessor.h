@@ -59,8 +59,8 @@ public:
     float getDetuneFloat() const { return *parameters.getRawParameterValue("detune"); }
     void setDetuneFloat(float newDetuneFloat) { auto* param = parameters.getParameter("detune"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newDetuneFloat)); }
 
-    float getWetDryFloat() const { return *parameters.getRawParameterValue("wetdry"); }
-    void setWetDryFloat(float newWetDryFloat) { auto* param = parameters.getParameter("wetdry"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newWetDryFloat)); }
+    float getMixFloat() const { return *parameters.getRawParameterValue("mix"); }
+    void setMixFloat(float newMixFloat) { auto* param = parameters.getParameter("mix"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newMixFloat)); }
 
     bool getLoopBool() const { return static_cast<bool>(*parameters.getRawParameterValue("loop")); }
     void setLoopBool(bool newLoopBool) { auto* param = parameters.getParameter("loop"); param->setValueNotifyingHost(newLoopBool ? 1.0f : 0.0f); }

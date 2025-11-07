@@ -5,12 +5,6 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
-
-
-
-
-
-
 class CounterTuneAudioProcessorEditor  : public juce::AudioProcessorEditor, public juce::Timer
 {
 public:
@@ -64,8 +58,8 @@ private:
     // param ui and functionality setup
 
     juce::Label tempoTitleLabel;
-    juce::TextEditor tempoValueLabel;
     juce::Slider tempoKnob;
+    juce::TextEditor tempoValueLabel;
     void updateTempoValueLabel()
     {
         float value = audioProcessor.getTempoFloat();
@@ -74,6 +68,71 @@ private:
     }
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tempoAttachment;
 
+    juce::Label beatsTitleLabel;
+    juce::Slider beatsKnob;
+    juce::TextEditor beatsValueLabel;
+    void updateBeatsValueLabel()
+    {
+        float value = audioProcessor.getBeatsFloat();
+        juce::String text = juce::String(value, 2);
+        beatsValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> beatsAttachment;
+
+    juce::Label notesTitleLabel;
+    juce::Slider notesKnob;
+    juce::TextEditor notesValueLabel;
+    void updateNotesValueLabel()
+    {
+        int value = audioProcessor.getNotesInt();
+        juce::String text = juce::String(value);
+        notesValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> notesAttachment;
+
+    juce::Label octaveTitleLabel;
+    juce::Slider octaveKnob;
+    juce::TextEditor octaveValueLabel;
+    void updateOctaveValueLabel()
+    {
+        int value = audioProcessor.getOctaveInt();
+        juce::String text = value > 0 ? "+ " + juce::String(value) : value < 0 ? "- " + juce::String(std::abs(value)) : "0";
+        octaveValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> octaveAttachment;
+
+    juce::Label detuneTitleLabel;
+    juce::Slider detuneKnob;
+    juce::TextEditor detuneValueLabel;
+    void updateDetuneValueLabel()
+    {
+        float value = audioProcessor.getDetuneFloat();
+        juce::String text = juce::String(value, 2);
+        detuneValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> detuneAttachment;
+
+    juce::Label mixTitleLabel;
+    juce::Slider mixKnob;
+    juce::TextEditor mixValueLabel;
+    void updateMixValueLabel()
+    {
+        float value = audioProcessor.getMixFloat();
+        juce::String text = juce::String(value, 2);
+        mixValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> mixAttachment;
+    
+    juce::Label loopTitleLabel;
+    juce::Slider loopKnob;
+    juce::TextEditor loopValueLabel;
+    void updateLoopValueLabel()
+    {
+        bool value = audioProcessor.getLoopBool();
+        juce::String text = value ? "ON" : "OFF";
+        loopValueLabel.setText(text, juce::dontSendNotification);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> loopAttachment;
 
 
 
