@@ -96,40 +96,12 @@ target_compile_definitions(generativedelay20
 )
 
 target_include_directories(generativedelay20 PRIVATE
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/audio_fft
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/audio_fft/AudioFFT
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/pitch_detector
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/pitch_detector/source
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/signalsmith/stretch
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/
-#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/src
+	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/Inc
 )
 
-# if(APPLE)
-#     target_include_directories(generativedelay20 PRIVATE
-#         /Users/admin/Documents/repos/audio_fft
-#         /Users/admin/Documents/repos/audio_fft/AudioFFT
-#         /Users/admin/Documents/repos/pitch_detector
-#         /Users/admin/Documents/repos/pitch_detector/source
-#         /Users/admin/Documents/repos
-#         /Users/admin/Documents/repos/stretch
-#     )
-# elseif(NOT APPLE)
-#     target_include_directories(generativedelay20 PRIVATE
-#         C:/repos/adamski/audio_fft
-#         C:/repos/adamski/audio_fft/AudioFFT
-#         C:/repos/adamski/pitch_detector
-#         C:/repos/adamski/pitch_detector/source
-#         C:/repos/adamski
-#         C:/repos/stretch
-#     )
-# endif()
-
-
 # Source files
-
 
 target_sources(generativedelay20 PRIVATE
     Source/PluginEditor.cpp
@@ -141,6 +113,10 @@ target_sources(generativedelay20 PRIVATE
 #     Dependencies/adamski/pitch_detector/pitch_detector.cpp
 #     Dependencies/adamski/pitch_detector/pitch_detector.mm
 #     Dependencies/dywapitchtrack/src/dywapitchtrack.c
+    Dependencies/LEAF/leaf/Src/leaf.c          # Global LEAF init and utils
+    Dependencies/LEAF/leaf/Src/leaf-analysis.c # YIN implementation
+    Dependencies/LEAF/leaf/Src/leaf-mempool.c  # Memory pool (required by analysis)
+    Dependencies/LEAF/leaf/Src/leaf-math.c     # Math utils (e.g., clipping)
 )
 
 # set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PROPERTIES LANGUAGE C)
@@ -156,26 +132,6 @@ juce_add_binary_data(BinaryResources SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/preset-menu-hover.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/Graphics/ui-body.png
 )
-
-
-
-
-# # include onnxruntime static
-# if(APPLE)
-#     set(ONNXRUNTIME_DIR "/Users/admin/Documents/repos/onnxruntime-static")
-# elseif(NOT APPLE)
-#     set(ONNXRUNTIME_DIR "C:/repos/onnxruntime-static-debug")
-# #     set(ONNXRUNTIME_DIR "C:/repos/onnxruntime-static")
-# endif()
-
-
-# target_include_directories(generativedelay20 PRIVATE ${ONNXRUNTIME_DIR}/include)
-
-# if(APPLE)
-#     target_link_libraries(generativedelay20 PRIVATE "${ONNXRUNTIME_DIR}/lib/libonnxruntime.a")
-# elseif(NOT APPLE)
-#     target_link_libraries(generativedelay20 PRIVATE "${ONNXRUNTIME_DIR}/lib/onnxruntime.lib")
-# endif()
 
 # Link everything
 target_link_libraries(generativedelay20 PRIVATE
