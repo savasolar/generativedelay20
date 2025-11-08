@@ -96,13 +96,15 @@ target_compile_definitions(generativedelay20
 )
 
 target_include_directories(generativedelay20 PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/audio_fft
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/audio_fft/AudioFFT
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/pitch_detector
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/pitch_detector/source
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/audio_fft
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/audio_fft/AudioFFT
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/pitch_detector
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski/pitch_detector/source
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/signalsmith/stretch
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/
-    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski
+	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/
+	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/src
 )
 
 # if(APPLE)
@@ -134,10 +136,11 @@ target_sources(generativedelay20 PRIVATE
     Source/PluginEditor.h
     Source/PluginProcessor.cpp
     Source/PluginProcessor.h
-    Dependencies/adamski/audio_fft/audio_fft.cpp
-    Dependencies/adamski/audio_fft/audio_fft.mm
-    Dependencies/adamski/pitch_detector/pitch_detector.cpp
-    Dependencies/adamski/pitch_detector/pitch_detector.mm
+#     Dependencies/adamski/audio_fft/audio_fft.cpp
+#     Dependencies/adamski/audio_fft/audio_fft.mm
+#     Dependencies/adamski/pitch_detector/pitch_detector.cpp
+#     Dependencies/adamski/pitch_detector/pitch_detector.mm
+	Dependencies/dywapitchtrack/src/dywapitchtrack.c
 )
 
 
@@ -155,22 +158,22 @@ juce_add_binary_data(BinaryResources SOURCES
 
 
 
-# include onnxruntime static
-if(APPLE)
-    set(ONNXRUNTIME_DIR "/Users/admin/Documents/repos/onnxruntime-static")
-elseif(NOT APPLE)
-    set(ONNXRUNTIME_DIR "C:/repos/onnxruntime-static-debug")
-#     set(ONNXRUNTIME_DIR "C:/repos/onnxruntime-static")
-endif()
+# # include onnxruntime static
+# if(APPLE)
+#     set(ONNXRUNTIME_DIR "/Users/admin/Documents/repos/onnxruntime-static")
+# elseif(NOT APPLE)
+#     set(ONNXRUNTIME_DIR "C:/repos/onnxruntime-static-debug")
+# #     set(ONNXRUNTIME_DIR "C:/repos/onnxruntime-static")
+# endif()
 
 
-target_include_directories(generativedelay20 PRIVATE ${ONNXRUNTIME_DIR}/include)
+# target_include_directories(generativedelay20 PRIVATE ${ONNXRUNTIME_DIR}/include)
 
-if(APPLE)
-    target_link_libraries(generativedelay20 PRIVATE "${ONNXRUNTIME_DIR}/lib/libonnxruntime.a")
-elseif(NOT APPLE)
-    target_link_libraries(generativedelay20 PRIVATE "${ONNXRUNTIME_DIR}/lib/onnxruntime.lib")
-endif()
+# if(APPLE)
+#     target_link_libraries(generativedelay20 PRIVATE "${ONNXRUNTIME_DIR}/lib/libonnxruntime.a")
+# elseif(NOT APPLE)
+#     target_link_libraries(generativedelay20 PRIVATE "${ONNXRUNTIME_DIR}/lib/onnxruntime.lib")
+# endif()
 
 # Link everything
 target_link_libraries(generativedelay20 PRIVATE

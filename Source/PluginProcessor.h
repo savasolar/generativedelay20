@@ -3,8 +3,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include <pitch_detector.h>
-#include <source/PitchMPM.h>
+//#include <pitch_detector.h>
+//#include <source/PitchMPM.h>
 #include "signalsmith-stretch.h"
 //#include "MelodyGenerator.h"
 #include <bitset>
@@ -212,7 +212,7 @@ private:
     void detectSound(const juce::AudioBuffer<float>& buffer);
     
     // Pitch detection utilities
-    PitchMPM pitchDetector;    
+//    PitchMPM pitchDetector;    
     juce::AudioBuffer<float> analysisBuffer {1, 1024};
     int pitchDetectorFillPos = 0;    
 

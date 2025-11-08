@@ -13,7 +13,7 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-    pitchDetector(44100, 1024),
+//    pitchDetector(44100, 1024),
     parameters(*this, nullptr, "Parameters",
         {
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"tempo", 1}, "Tempo", 1, 999, 120),
@@ -114,8 +114,8 @@ void CounterTuneAudioProcessor::changeProgramName (int index, const juce::String
 
 void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {    
-    pitchDetector.setSampleRate(sampleRate);
-    pitchDetector.setBufferSize(1024);  // Fixed power-of-2; or use juce::nextPowerOfTwo(samplesPerBlock) if you want dynamic
+//    pitchDetector.setSampleRate(sampleRate);
+//    pitchDetector.setBufferSize(1024);  // Fixed power-of-2; or use juce::nextPowerOfTwo(samplesPerBlock) if you want dynamic
 
     analysisBuffer.setSize(1, 1024, true);  // Mono, matches bufferSize, keep data
     pitchDetectorFillPos = 0;  // Reset accumulator
@@ -239,16 +239,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         // If full, detect pitch and store MIDI note
         if (pitchDetectorFillPos >= analysisBuffer.getNumSamples())
         {
-            float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
-            int midiNote = frequencyToMidiNote(pitch);
-            detectedNoteNumbers.push_back(midiNote);
+//            float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
+//            int midiNote = frequencyToMidiNote(pitch);
+//            detectedNoteNumbers.push_back(midiNote);
 
-//            DBG(detectedNoteNumbers[0]);
-            //if (detectedNoteNumbers[0] == -1)
-            //{
-            //    resetTiming();
-            //}
-            // this works, and confirms that pitch detector is expecting normalized audio that is loud af
 
             pitchDetectorFillPos = 0;
         }
@@ -275,6 +269,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     if (!detectedNoteNumbers.empty())
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
+						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
                         juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
@@ -344,8 +339,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
 
             // populate voice buffer with latest info 
-            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
+//            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
+//            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
 
             resetTiming();
         }
