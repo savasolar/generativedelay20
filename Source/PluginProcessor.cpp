@@ -243,7 +243,29 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         {
 //            float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
 //            int midiNote = frequencyToMidiNote(pitch);
-//            detectedNoteNumbers.push_back(midiNote);
+
+
+
+
+            // DYWAPitchTrack uses double*, but analysisBuffer is float*. Convert temporarily.
+            std::vector<double> doubleSamples(1024);
+            for (int i = 0; i < 1024; ++i)
+                doubleSamples[i] = analysisBuffer.getSample(0, i);
+
+            // Compute pitch (returns Hz, or 0.0 if no pitch detected).
+            double pitch = dywapitch_computepitch(&pitchTracker, doubleSamples.data(), 0, 1024);
+
+            // Scale for your sample rate (DYWAPitchTrack assumes 44100 Hz).
+            pitch *= (getSampleRate() / 44100.0);
+
+            int midiNote = frequencyToMidiNote(static_cast<float>(pitch));
+
+
+
+
+
+
+            detectedNoteNumbers.push_back(midiNote);
 
 
             pitchDetectorFillPos = 0;
@@ -272,7 +294,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
 						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
-                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
+//                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
