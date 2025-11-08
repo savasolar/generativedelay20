@@ -247,12 +247,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 //            int midiNote = frequencyToMidiNote(pitch);
 
 
-
-            // it needs a noise gate
-
-
-
-
             // DYWAPitchTrack uses double*, but analysisBuffer is float*. Convert temporarily.
             std::vector<double> doubleSamples(1024);
             for (int i = 0; i < 1024; ++i)
@@ -268,12 +262,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
 
 
-
-
-
             detectedNoteNumbers.push_back(midiNote);
-
-
             pitchDetectorFillPos = 0;
         }
 
@@ -299,8 +288,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     if (!detectedNoteNumbers.empty())
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
-//						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
-                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
+						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
+//                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
@@ -438,7 +427,7 @@ bool CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     float rms = std::sqrt(blockEnergy / (numSamples * numChannels));
 
-    const float threshold = 0.0056f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
+    const float threshold = 0.01f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
 
     bool result = false;
 
