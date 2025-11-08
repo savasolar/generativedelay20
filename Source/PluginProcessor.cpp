@@ -28,6 +28,8 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
 
+    dywapitch_inittracking(&pitchTracker);
+
     generatedMelody = lastGeneratedMelody;
 }
 

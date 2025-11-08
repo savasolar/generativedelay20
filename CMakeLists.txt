@@ -143,6 +143,8 @@ target_sources(generativedelay20 PRIVATE
 	Dependencies/dywapitchtrack/src/dywapitchtrack.c
 )
 
+set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PROPERTIES LANGUAGE C)
+
 
 # Binary data
 juce_add_binary_data(BinaryResources SOURCES
