@@ -99,6 +99,8 @@ target_include_directories(generativedelay20 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/signalsmith/stretch
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/
 	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/Inc
+	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/Src
+	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/
 )
 
 # Source files

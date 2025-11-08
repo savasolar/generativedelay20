@@ -6,6 +6,7 @@
 //#include <pitch_detector.h>
 //#include <source/PitchMPM.h>
 //#include "dywapitchtrack.h"
+#include "leaf.h"
 #include "signalsmith-stretch.h"
 //#include "MelodyGenerator.h"
 #include <bitset>
