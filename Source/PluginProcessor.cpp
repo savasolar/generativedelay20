@@ -194,7 +194,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
     if (!isActive.load())
     {
-        detectSound(buffer);
+        bool check = detectSound(buffer);
+        isActive.store(check);
+
         resetTiming();
 //        isActive.store(true);
 
@@ -247,6 +249,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
 
             // it needs a noise gate
+
 
 
 
@@ -366,8 +369,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
 
             // populate voice buffer with latest info 
-//            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-//            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
+            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
+            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
 
             resetTiming();
         }
@@ -417,7 +420,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 //___  '    /  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 //\  \/    |        ~~~ ~~~ ~~~~~ ~~~~~
 
-void CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer)
+bool CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buffer)
 {
     // Compute RMS amplitude of the current block (sum channels for detection)
     float blockEnergy = 0.0f;
@@ -437,11 +440,16 @@ void CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     const float threshold = 0.0056f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
 
+    bool result = false;
+
     if (rms > threshold)
     {
         DBG("sound detected");
-        isActive.store(true);
+//        isActive.store(true);
+        result = true;
     }
+
+    return result;
 }
 
 int CounterTuneAudioProcessor::frequencyToMidiNote(float frequency)
@@ -849,30 +857,33 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
     int key = keys[best_tonic];
     DBG(key);
 
-    if (key == 0)
-        generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
-    if (key == 1)
-        generatedMelody = { 61, -2, -2, -2, 63, -2, -2, -2, 65, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2 };
-    if (key == 2)
-        generatedMelody = { 62, -2, -2, -2, 64, -2, -2, -2, 66, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2 };
-    if (key == 3)
-        generatedMelody = { 63, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2 };
-    if (key == 4)
-        generatedMelody = { 64, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2 };
-    if (key == 5)
-        generatedMelody = { 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 77, -2, -2, -2 };
-    if (key == 6)
-        generatedMelody = { 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 78, -2, -2, -2 };
-    if (key == 7)
-        generatedMelody = { 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 79, -2, -2, -2 };
-    if (key == 8)
-        generatedMelody = { 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 80, -2, -2, -2 };
-    if (key == 9)
-        generatedMelody = { 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 81, -2, -2, -2 };
-    if (key == 10)
-        generatedMelody = { 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 81, -2, -2, -2, 82, -2, -2, -2 };
-    if (key == 11)
-        generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
+    //if (key == 0)
+    //    generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
+    //if (key == 1)
+    //    generatedMelody = { 61, -2, -2, -2, 63, -2, -2, -2, 65, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2 };
+    //if (key == 2)
+    //    generatedMelody = { 62, -2, -2, -2, 64, -2, -2, -2, 66, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2 };
+    //if (key == 3)
+    //    generatedMelody = { 63, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2 };
+    //if (key == 4)
+    //    generatedMelody = { 64, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2 };
+    //if (key == 5)
+    //    generatedMelody = { 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 77, -2, -2, -2 };
+    //if (key == 6)
+    //    generatedMelody = { 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 78, -2, -2, -2 };
+    //if (key == 7)
+    //    generatedMelody = { 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 79, -2, -2, -2 };
+    //if (key == 8)
+    //    generatedMelody = { 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 80, -2, -2, -2 };
+    //if (key == 9)
+    //    generatedMelody = { 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 81, -2, -2, -2 };
+    //if (key == 10)
+    //    generatedMelody = { 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 81, -2, -2, -2, 82, -2, -2, -2 };
+    //if (key == 11)
+    //    generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
+
+
+    generatedMelody = { 60, -2, -2, -2, -2, -2, -2, -2, 60, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
 }
 
 bool CounterTuneAudioProcessor::hasEditor() const

@@ -210,7 +210,7 @@ private:
     std::atomic<bool> exportMode{ false };
 
     // Sound detection utilities
-    void detectSound(const juce::AudioBuffer<float>& buffer);
+    bool detectSound(const juce::AudioBuffer<float>& buffer);
     
     // Pitch detection utilities
 //    PitchMPM pitchDetector;    

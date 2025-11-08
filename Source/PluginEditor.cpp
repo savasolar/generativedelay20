@@ -13,11 +13,9 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     presetMenuDefault = juce::ImageCache::getFromMemory(BinaryData::presetmenu_png, BinaryData::presetmenu_pngSize);
     presetMenuHover = juce::ImageCache::getFromMemory(BinaryData::presetmenuhover_png, BinaryData::presetmenuhover_pngSize);
 
-    // custom font: B612Mono-Regular.ttf
 
-
-//    addAndMakeVisible(voiceBuffer_waveform);
-//    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
+    addAndMakeVisible(voiceBuffer_waveform);
+    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
     // param setup: i) TITLE, ii) KNOB, iii) VALUE
@@ -40,7 +38,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     tempoKnob.setBounds(25, 74, 50, 16);
     tempoKnob.setRange(1, 999, 1);
-//    tempoKnob.setSkewFactorFromMidPoint(150.0);
     tempoKnob.setSkewFactor(0.3);
     tempoKnob.onValueChange = [this]() { updateTempoValueLabel(); };
     addAndMakeVisible(tempoKnob);
@@ -397,7 +394,7 @@ CounterTuneAudioProcessorEditor::~CounterTuneAudioProcessorEditor()
 void CounterTuneAudioProcessorEditor::timerCallback()
 {
 
-//    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
+    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
 
 
     if (firstLoad)
