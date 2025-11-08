@@ -13,7 +13,6 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-//    pitchDetector(44100, 1024),
     parameters(*this, nullptr, "Parameters",
         {
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"tempo", 1}, "Tempo", 1, 999, 120),
@@ -28,7 +27,7 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
 
-    dywapitch_inittracking(&pitchTracker);
+//    dywapitch_inittracking(&pitchTracker);
 
     generatedMelody = lastGeneratedMelody;
 }
@@ -247,23 +246,23 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 //            int midiNote = frequencyToMidiNote(pitch);
 
 
-            // DYWAPitchTrack uses double*, but analysisBuffer is float*. Convert temporarily.
-            std::vector<double> doubleSamples(1024);
-            for (int i = 0; i < 1024; ++i)
-                doubleSamples[i] = analysisBuffer.getSample(0, i);
+//            // DYWAPitchTrack uses double*, but analysisBuffer is float*. Convert temporarily.
+//            std::vector<double> doubleSamples(1024);
+//            for (int i = 0; i < 1024; ++i)
+//                doubleSamples[i] = analysisBuffer.getSample(0, i);
 
-            // Compute pitch (returns Hz, or 0.0 if no pitch detected).
-            double pitch = dywapitch_computepitch(&pitchTracker, doubleSamples.data(), 0, 1024);
+//            // Compute pitch (returns Hz, or 0.0 if no pitch detected).
+//            double pitch = dywapitch_computepitch(&pitchTracker, doubleSamples.data(), 0, 1024);
 
-            // Scale for your sample rate (DYWAPitchTrack assumes 44100 Hz).
-            pitch *= (getSampleRate() / 44100.0);
+//            // Scale for your sample rate (DYWAPitchTrack assumes 44100 Hz).
+//            pitch *= (getSampleRate() / 44100.0);
 
-            int midiNote = frequencyToMidiNote(static_cast<float>(pitch));
+//            int midiNote = frequencyToMidiNote(static_cast<float>(pitch));
 
 
 
-            detectedNoteNumbers.push_back(midiNote);
-            pitchDetectorFillPos = 0;
+//            detectedNoteNumbers.push_back(midiNote);
+//            pitchDetectorFillPos = 0;
         }
 
         // Handle overflow
@@ -353,13 +352,13 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             else
             {
 
-                detectKey(capturedMelody);
+//                detectKey(capturedMelody);
 
             }
 
             // populate voice buffer with latest info 
-            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
+//            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
+//            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
 
             resetTiming();
         }

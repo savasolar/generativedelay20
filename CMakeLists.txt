@@ -103,8 +103,8 @@ target_include_directories(generativedelay20 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/signalsmith/stretch
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/
 #     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/adamski
-	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/
-	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/src
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/
+#     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/src
 )
 
 # if(APPLE)
@@ -140,10 +140,10 @@ target_sources(generativedelay20 PRIVATE
 #     Dependencies/adamski/audio_fft/audio_fft.mm
 #     Dependencies/adamski/pitch_detector/pitch_detector.cpp
 #     Dependencies/adamski/pitch_detector/pitch_detector.mm
-	Dependencies/dywapitchtrack/src/dywapitchtrack.c
+#     Dependencies/dywapitchtrack/src/dywapitchtrack.c
 )
 
-set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PROPERTIES LANGUAGE C)
+# set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PROPERTIES LANGUAGE C)
 
 
 # Binary data

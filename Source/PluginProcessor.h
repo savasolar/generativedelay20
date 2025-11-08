@@ -5,7 +5,7 @@
 #include <JuceHeader.h>
 //#include <pitch_detector.h>
 //#include <source/PitchMPM.h>
-#include "dywapitchtrack.h"
+//#include "dywapitchtrack.h"
 #include "signalsmith-stretch.h"
 //#include "MelodyGenerator.h"
 #include <bitset>
@@ -214,7 +214,7 @@ private:
     
     // Pitch detection utilities
 //    PitchMPM pitchDetector;    
-    dywapitchtracker pitchTracker;
+//    dywapitchtracker pitchTracker;
     juce::AudioBuffer<float> analysisBuffer {1, 1024};
     int pitchDetectorFillPos = 0;    
 
