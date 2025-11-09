@@ -3,11 +3,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-juce::Random CounterTuneAudioProcessor::juceRandom;  // Static init
-float CounterTuneAudioProcessor::leafRandomWrapper() {
-    return juceRandom.nextFloat();
-}
-
 CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
@@ -18,6 +13,7 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
+//    pitchDetector(44100, 1024),
     parameters(*this, nullptr, "Parameters",
         {
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"tempo", 1}, "Tempo", 1, 999, 120),
@@ -32,11 +28,7 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
 
-//    dywapitch_inittracking(&pitchTracker);
-
-//    randomFunc = [this]() { return juceRandom.nextFloat(); };
-
-
+    dywapitch_inittracking(&pitchTracker);
 
     generatedMelody = lastGeneratedMelody;
 }
@@ -127,35 +119,6 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 //    pitchDetector.setSampleRate(sampleRate);
 //    pitchDetector.setBufferSize(1024);  // Fixed power-of-2; or use juce::nextPowerOfTwo(samplesPerBlock) if you want dynamic
 
-
-
-
-
-
-//    LEAF_init(&leaf, static_cast<float>(sampleRate), leafMemory, sizeof(leafMemory), randomFunc);
-
-
-
-
-
-    LEAF_init(&leaf, static_cast<float>(sampleRate), leafMemory, sizeof(leafMemory), &CounterTuneAudioProcessor::leafRandomWrapper);
-
-    // Init detector (evidence: leaf-analysis.h init; bufSize=1024 for your chunks)
-    float lowestFreq = 20.0f;  // Adjust for vocal range (e.g., 80-500Hz for voice; leaf-analysis.h param)
-    float highestFreq = 20000.0f;
-    tDualPitchDetector_init(&pitchDetector, lowestFreq, highestFreq, analysisBuffer.getWritePointer(0), analysisBuffer.getNumSamples(), &leaf);
-
-    // Optional tweaks (evidence: leaf-analysis.c defaults; set for better detection)
-    tDualPitchDetector_setHysteresis(pitchDetector, -40.0f);  // Reduces noise sensitivity
-    tDualPitchDetector_setPeriodicityThreshold(pitchDetector, 0.98f);  // Threshold for pitched signal
-    tDualPitchDetector_setSampleRate(pitchDetector, static_cast<float>(sampleRate));
-
-
-
-
-
-
-
     analysisBuffer.setSize(1, 1024, true);  // Mono, matches bufferSize, keep data
     pitchDetectorFillPos = 0;  // Reset accumulator
 
@@ -171,7 +134,6 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 
     adsr.setSampleRate(sampleRate);
-
 
     resetTiming();
 
@@ -285,44 +247,34 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 //            int midiNote = frequencyToMidiNote(pitch);
 
 
-//            // DYWAPitchTrack uses double*, but analysisBuffer is float*. Convert temporarily.
-//            std::vector<double> doubleSamples(1024);
-//            for (int i = 0; i < 1024; ++i)
-//                doubleSamples[i] = analysisBuffer.getSample(0, i);
 
-//            // Compute pitch (returns Hz, or 0.0 if no pitch detected).
-//            double pitch = dywapitch_computepitch(&pitchTracker, doubleSamples.data(), 0, 1024);
-
-//            // Scale for your sample rate (DYWAPitchTrack assumes 44100 Hz).
-//            pitch *= (getSampleRate() / 44100.0);
-
-//            int midiNote = frequencyToMidiNote(static_cast<float>(pitch));
-
-
-
-//            detectedNoteNumbers.push_back(midiNote);
-//            pitchDetectorFillPos = 0;
-
-
-
-            // Tick per sample (forum: one at a time)
-            for (int i = 0; i < analysisToCopy; ++i) {
-                float sample = analysisBuffer.getSample(0, pitchDetectorFillPos - analysisToCopy + i);
-                int ready = tDualPitchDetector_tick(pitchDetector, sample);
-                if (ready) {
-                    float freq = tDualPitchDetector_getFrequency(pitchDetector);
-                    if (freq > 0.0f) {
-                        int midiNote = frequencyToMidiNote(freq);
-                        detectedNoteNumbers.push_back(midiNote);
-                        DBG("Detected note: " + juce::String(midiNote) + " (freq: " + juce::String(freq) + ")");
-                    }
-                }
-            }
-            pitchDetectorFillPos = 0;  // Reset after process
+            // it needs a noise gate
 
 
 
 
+            // DYWAPitchTrack uses double*, but analysisBuffer is float*. Convert temporarily.
+            std::vector<double> doubleSamples(1024);
+            for (int i = 0; i < 1024; ++i)
+                doubleSamples[i] = analysisBuffer.getSample(0, i);
+
+            // Compute pitch (returns Hz, or 0.0 if no pitch detected).
+            double pitch = dywapitch_computepitch(&pitchTracker, doubleSamples.data(), 0, 1024);
+
+            // Scale for your sample rate (DYWAPitchTrack assumes 44100 Hz).
+            pitch *= (getSampleRate() / 44100.0);
+
+            int midiNote = frequencyToMidiNote(static_cast<float>(pitch));
+
+
+
+
+
+
+            detectedNoteNumbers.push_back(midiNote);
+
+
+            pitchDetectorFillPos = 0;
         }
 
         // Handle overflow
@@ -347,8 +299,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     if (!detectedNoteNumbers.empty())
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
-						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
-//                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
+//						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
+                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
@@ -412,13 +364,13 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             else
             {
 
-//                detectKey(capturedMelody);
+                detectKey(capturedMelody);
 
             }
 
             // populate voice buffer with latest info 
-//            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-//            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
+            juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
+            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
 
             resetTiming();
         }
@@ -486,7 +438,7 @@ bool CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     float rms = std::sqrt(blockEnergy / (numSamples * numChannels));
 
-    const float threshold = 0.01f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
+    const float threshold = 0.0056f;  // Tune this: lower = more sensitive (e.g., 0.0056f for -45 dBFS)
 
     bool result = false;
 

@@ -5,8 +5,7 @@
 #include <JuceHeader.h>
 //#include <pitch_detector.h>
 //#include <source/PitchMPM.h>
-//#include "dywapitchtrack.h"
-#include "leaf.h"
+#include "dywapitchtrack.h"
 #include "signalsmith-stretch.h"
 //#include "MelodyGenerator.h"
 #include <bitset>
@@ -215,22 +214,7 @@ private:
     
     // Pitch detection utilities
 //    PitchMPM pitchDetector;    
-//    dywapitchtracker pitchTracker;
-
-
-
-
-    LEAF leaf;  // Master instance (readme: exists for shared resources)
-    tDualPitchDetector* pitchDetector;  // Combined detector (leaf-analysis.h: "using both Joel de Guzman's Q Audio DSP Library and Katya Vetters algorithms")
-    char leafMemory[500000];  // Mempool (readme: e.g., MEM_SIZE; adjust if allocation errors)
-    std::function<float()> randomFunc;  // For LEAF_init (leaf.h param)
-//    juce::Random juceRandom;  // JUCE RNG for LEAF randomFunc
-    static juce::Random juceRandom;  // Make static
-
-    static float leafRandomWrapper();
-
-
-
+    dywapitchtracker pitchTracker;
     juce::AudioBuffer<float> analysisBuffer {1, 1024};
     int pitchDetectorFillPos = 0;    
 
