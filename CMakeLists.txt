@@ -100,6 +100,7 @@ target_include_directories(generativedelay20 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/
 	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/Inc
 	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/Src
+	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/Externals
 	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/LEAF/leaf/
 )
 
@@ -119,6 +120,9 @@ target_sources(generativedelay20 PRIVATE
     Dependencies/LEAF/leaf/Src/leaf-analysis.c # YIN implementation
     Dependencies/LEAF/leaf/Src/leaf-mempool.c  # Memory pool (required by analysis)
     Dependencies/LEAF/leaf/Src/leaf-math.c     # Math utils (e.g., clipping)
+	Dependencies/LEAF/leaf/Externals/d_fft_mayer.c
+#	Dependencies/LEAF/leaf/Src/leaf-tables.c  # For tables used in math/analysis (evidence: leaf-tables.h included in leaf.h)
+#	Dependencies/LEAF/leaf/leaf.cpp  # Aggregates all; ensures full library
 )
 
 # set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PROPERTIES LANGUAGE C)
