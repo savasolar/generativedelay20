@@ -546,8 +546,9 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
 
 
     // Store the best note number and DBG print it
-    voiceNoteNumber.store(bestNote);
-    DBG("Isolated best note number: " + juce::String(voiceNoteNumber.load()));
+    newVoiceNoteNumber.store(bestNote);
+
+
 
 
 
@@ -637,6 +638,9 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
                 voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
             }
         }
+
+        voiceNoteNumber.store(newVoiceNoteNumber);
+        DBG("Isolated best note number: " + juce::String(voiceNoteNumber.load()));
 
         DBG("new voice buffer ready");
 
