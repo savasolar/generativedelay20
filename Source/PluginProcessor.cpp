@@ -3,6 +3,11 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+juce::Random CounterTuneAudioProcessor::juceRandom;  // Static init
+float CounterTuneAudioProcessor::leafRandomWrapper() {
+    return juceRandom.nextFloat();
+}
+
 CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
@@ -29,7 +34,7 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 
 //    dywapitch_inittracking(&pitchTracker);
 
-    randomFunc = [this]() { return juceRandom.nextFloat(); };
+//    randomFunc = [this]() { return juceRandom.nextFloat(); };
 
 
 
@@ -122,6 +127,35 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 //    pitchDetector.setSampleRate(sampleRate);
 //    pitchDetector.setBufferSize(1024);  // Fixed power-of-2; or use juce::nextPowerOfTwo(samplesPerBlock) if you want dynamic
 
+
+
+
+
+
+//    LEAF_init(&leaf, static_cast<float>(sampleRate), leafMemory, sizeof(leafMemory), randomFunc);
+
+
+
+
+
+    LEAF_init(&leaf, static_cast<float>(sampleRate), leafMemory, sizeof(leafMemory), &CounterTuneAudioProcessor::leafRandomWrapper);
+
+    // Init detector (evidence: leaf-analysis.h init; bufSize=1024 for your chunks)
+    float lowestFreq = 20.0f;  // Adjust for vocal range (e.g., 80-500Hz for voice; leaf-analysis.h param)
+    float highestFreq = 20000.0f;
+    tDualPitchDetector_init(&pitchDetector, lowestFreq, highestFreq, analysisBuffer.getWritePointer(0), analysisBuffer.getNumSamples(), &leaf);
+
+    // Optional tweaks (evidence: leaf-analysis.c defaults; set for better detection)
+    tDualPitchDetector_setHysteresis(pitchDetector, -40.0f);  // Reduces noise sensitivity
+    tDualPitchDetector_setPeriodicityThreshold(pitchDetector, 0.98f);  // Threshold for pitched signal
+    tDualPitchDetector_setSampleRate(pitchDetector, static_cast<float>(sampleRate));
+
+
+
+
+
+
+
     analysisBuffer.setSize(1, 1024, true);  // Mono, matches bufferSize, keep data
     pitchDetectorFillPos = 0;  // Reset accumulator
 
@@ -137,6 +171,7 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 
     adsr.setSampleRate(sampleRate);
+
 
     resetTiming();
 
@@ -267,6 +302,27 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
 //            detectedNoteNumbers.push_back(midiNote);
 //            pitchDetectorFillPos = 0;
+
+
+
+            // Tick per sample (forum: one at a time)
+            for (int i = 0; i < analysisToCopy; ++i) {
+                float sample = analysisBuffer.getSample(0, pitchDetectorFillPos - analysisToCopy + i);
+                int ready = tDualPitchDetector_tick(pitchDetector, sample);
+                if (ready) {
+                    float freq = tDualPitchDetector_getFrequency(pitchDetector);
+                    if (freq > 0.0f) {
+                        int midiNote = frequencyToMidiNote(freq);
+                        detectedNoteNumbers.push_back(midiNote);
+                        DBG("Detected note: " + juce::String(midiNote) + " (freq: " + juce::String(freq) + ")");
+                    }
+                }
+            }
+            pitchDetectorFillPos = 0;  // Reset after process
+
+
+
+
         }
 
         // Handle overflow

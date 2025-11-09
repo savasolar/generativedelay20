@@ -224,8 +224,10 @@ private:
     tDualPitchDetector* pitchDetector;  // Combined detector (leaf-analysis.h: "using both Joel de Guzman's Q Audio DSP Library and Katya Vetters algorithms")
     char leafMemory[500000];  // Mempool (readme: e.g., MEM_SIZE; adjust if allocation errors)
     std::function<float()> randomFunc;  // For LEAF_init (leaf.h param)
-    juce::Random juceRandom;  // JUCE RNG for LEAF randomFunc
+//    juce::Random juceRandom;  // JUCE RNG for LEAF randomFunc
+    static juce::Random juceRandom;  // Make static
 
+    static float leafRandomWrapper();
 
 
 
