@@ -29,6 +29,10 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 
 //    dywapitch_inittracking(&pitchTracker);
 
+    randomFunc = [this]() { return juceRandom.nextFloat(); };
+
+
+
     generatedMelody = lastGeneratedMelody;
 }
 
