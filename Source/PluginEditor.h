@@ -51,7 +51,7 @@ private:
         }
     }
 
-    juce::Colour foregroundColor = juce::Colour(0xff00ffae);
+    juce::Colour foregroundColor = juce::Colour(0xffffffff);
     juce::Colour backgroundColor = juce::Colour(0xff000000);
 
 
