@@ -13,7 +13,6 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-//    pitchDetector(44100, 1024),
     parameters(*this, nullptr, "Parameters",
         {
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"tempo", 1}, "Tempo", 1, 999, 120),
@@ -276,7 +275,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
 //						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
-                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
+//                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);
@@ -340,7 +339,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             else
             {
 
-                // detectKey(capturedMelody); key detection is bad :)
+                // detectKey(capturedMelody); key detection is bad
+
+                produceMelody(capturedMelody, 10/*b-flat*/, placeholderNotes);
 
             }
 
@@ -871,15 +872,123 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 
 void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes)
 {
-    key = 10; // b-flat
-
-
-    // take the pitches in the scale of the b-flat scale
-    // randomly pick a number of them corresponding to the "notes" value
-    // construct a 32-symbol generated melody using MelodyGenerator rhythmic scheme
 
 
 
+
+    std::vector<int> scale{ 46, 48, 50, 51, 53, 55, 57, 58 }; // hardcoded b-flat scale for now
+
+    std::vector<int> processed_input;
+
+    // construct processed_input such that it contains "int notes" # of indices, and each index is a randomly picked value from the scale vector.
+
+    processed_input.reserve(notes);
+    juce::Random rand;
+    for (int i = 0; i < notes; ++i)
+    {
+        int idx = rand.nextInt(static_cast<int>(scale.size()));
+        processed_input.push_back(scale[idx]);
+    }
+
+    // now arrange length distribution logic
+
+    std::random_device rd;
+    std::mt19937 g(rd());
+
+    std::vector<int> post_processed;
+
+    // Generate random lengths
+    if (notes < 1 || notes > 32)
+    {
+        return;
+    }
+    std::vector<int> lengths(notes, 1);
+    int extras = 32 - notes;
+    std::uniform_int_distribution<> dis(0, notes - 1);
+    for (int i = 0; i < extras; ++i)
+    {
+        int idx = dis(g);
+        lengths[idx]++;
+    }
+
+    // Build post_processed
+    for (size_t i = 0; i < static_cast<size_t>(notes); ++i)
+    {
+        post_processed.push_back(processed_input[i]);
+        for (int j = 1; j < lengths[i]; ++j)
+        {
+            post_processed.push_back(-2);
+        }
+    }
+
+    // Magnetize to on-beats 100% of the time
+    magnetize(post_processed, 1.0);
+
+
+    // Debug print post-processed output
+    juce::String debugPostProcessed = "post-processed output: ";
+    for (const int& event : post_processed)
+    {
+        debugPostProcessed += juce::String(event) + " ";
+    }
+    DBG(debugPostProcessed);
+
+    generatedMelody = post_processed;
+
+
+}
+
+void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probability) const
+{
+    if (probability <= 0.0f) return;
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_real_distribution<float> dis(0.0f, 1.0f);
+
+    size_t size = melody.size();
+    for (size_t i = 1; i < size; i += 2)
+    {
+        if (melody[i] >= 0)
+        {
+            if (dis(gen) >= probability) continue;
+
+            ssize_t lower = static_cast<ssize_t>(i) - 1;
+            ssize_t higher = static_cast<ssize_t>(i) + 1;
+
+            bool lower_free = (lower >= 0 && melody[lower] < 0);
+            bool higher_free = (higher < static_cast<ssize_t>(size) && melody[higher] < 0);
+
+            if (!lower_free && !higher_free)
+            {
+                continue;
+            }
+
+            ssize_t target = -1;
+            if (lower_free && higher_free)
+            {
+                if (dis(gen) < 0.5f)
+                {
+                    target = lower;
+                }
+                else
+                {
+                    target = higher;
+                }
+            }
+            else if (lower_free)
+            {
+                target = lower;
+            }
+            else
+            {
+                target = higher;
+            }
+
+            melody[target] = melody[i];
+            melody[i] = -2;
+        }
+    }
 }
 
 

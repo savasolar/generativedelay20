@@ -77,7 +77,7 @@ public:
     // cycle reset-based params should be double-buffered
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
-    int placeholderNotes = 12;
+    int placeholderNotes = 8;
 
     bool placeholderHold = false;
 //    int placeholderOctave = 0;
@@ -233,7 +233,8 @@ private:
 
 
     void produceMelody(const std::vector<int>& melody, int key, int notes);
-
+    // post-process formatting
+    void magnetize(std::vector<int>& melody, float probability) const;
 
 
 
