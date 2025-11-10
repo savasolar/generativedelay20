@@ -232,6 +232,10 @@ private:
     void detectKey(const std::vector<int>& melody);
 
 
+    void produceMelody(const std::vector<int>& melody, int key, int notes);
+
+
+
 
 //     ________________________________         
 //    /                                "-_          

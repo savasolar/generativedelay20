@@ -194,12 +194,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
     if (!isActive.load())
     {
+        resetTiming();
         bool check = detectSound(buffer);
         isActive.store(check);
-
-        resetTiming();
-//        isActive.store(true);
-
     }
     else
     {
@@ -217,11 +214,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         inputAudioBuffer_writePos.store(inputAudioBuffer_writePos.load() + toCopy);
 
-
         // 2/6: PITCH DETECTION====================================================================================
 
-        // if possible, without affecting the recording of input audio, maximize the volume of input audio for pitch detection on as granular a level as possible; maybe on a chunk-by-chunk basis
-
+        // needs a noise gate!
 
         // Mix current block to mono for pitch detection
         juce::AudioBuffer<float> monoBlock(1, numSamples);
@@ -243,16 +238,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         // If full, detect pitch and store MIDI note
         if (pitchDetectorFillPos >= analysisBuffer.getNumSamples())
         {
-//            float pitch = pitchDetector.getPitch(analysisBuffer.getReadPointer(0));
-//            int midiNote = frequencyToMidiNote(pitch);
-
-
-
-            // it needs a noise gate
-
-
-
-
             // DYWAPitchTrack uses double*, but analysisBuffer is float*. Convert temporarily.
             std::vector<double> doubleSamples(1024);
             for (int i = 0; i < 1024; ++i)
@@ -260,19 +245,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             // Compute pitch (returns Hz, or 0.0 if no pitch detected).
             double pitch = dywapitch_computepitch(&pitchTracker, doubleSamples.data(), 0, 1024);
-
-            // Scale for your sample rate (DYWAPitchTrack assumes 44100 Hz).
-            pitch *= (getSampleRate() / 44100.0);
-
+            pitch *= (getSampleRate() / 44100.0); // Scale for DYWAPitchTrack's 44100 assumption
             int midiNote = frequencyToMidiNote(static_cast<float>(pitch));
 
-
-
-
-
-
             detectedNoteNumbers.push_back(midiNote);
-
 
             pitchDetectorFillPos = 0;
         }
@@ -364,7 +340,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             else
             {
 
-                detectKey(capturedMelody);
+                // detectKey(capturedMelody); key detection is bad :)
 
             }
 
@@ -889,6 +865,26 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 
 //    generatedMelody = { 60, -2, -2, -2, -2, -2, -2, -2, 60, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
 }
+
+
+
+
+void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes)
+{
+    key = 10; // b-flat
+
+
+    // take the pitches in the scale of the b-flat scale
+    // randomly pick a number of them corresponding to the "notes" value
+    // construct a 32-symbol generated melody using MelodyGenerator rhythmic scheme
+
+
+
+}
+
+
+
+
 
 bool CounterTuneAudioProcessor::hasEditor() const
 {
