@@ -98,8 +98,8 @@ target_compile_definitions(generativedelay20
 target_include_directories(generativedelay20 PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/signalsmith/stretch
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/
-	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/
-	${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/src
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/
+    ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/src
 )
 
 # Source files
@@ -119,6 +119,7 @@ set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PRO
 # Binary data
 juce_add_binary_data(BinaryResources SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/B612Mono-Regular.ttf
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ChivoMono-Medium.ttf
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/cap-mel-texture.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/gen-mel-texture.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/overlap-mel-texture.png
