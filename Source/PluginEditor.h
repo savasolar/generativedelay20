@@ -75,7 +75,7 @@ private:
     }
     std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> tempoAttachment;
 
-    juce::Label beatsTitleLabel;
+    juce::TextEditor beatsTitleLabel;
     juce::Slider beatsKnob;
     juce::TextEditor beatsValueLabel;
     void updateBeatsValueLabel()

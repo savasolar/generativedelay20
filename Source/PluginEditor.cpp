@@ -3,10 +3,10 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
-CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAudioProcessor& p)
-    : AudioProcessorEditor (&p), audioProcessor (p), parameters(p.parameters)
+CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudioProcessor& p)
+    : AudioProcessorEditor(&p), audioProcessor(p), parameters(p.parameters)
 {
-    setSize (640, 480);
+    setSize(640, 480);
     setWantsKeyboardFocus(true);
 
     backgroundImage = juce::ImageCache::getFromMemory(BinaryData::uibody_png, BinaryData::uibody_pngSize);
@@ -14,13 +14,13 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     presetMenuHover = juce::ImageCache::getFromMemory(BinaryData::presetmenuhover_png, BinaryData::presetmenuhover_pngSize);
 
 
-//    addAndMakeVisible(voiceBuffer_waveform);
-//    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
+    //    addAndMakeVisible(voiceBuffer_waveform);
+    //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
-    
-    // param setup: i) TITLE, ii) KNOB, iii) VALUE
 
-    // TEMPO 
+        // param setup: i) TITLE, ii) KNOB, iii) VALUE
+
+        // TEMPO 
     addAndMakeVisible(tempoTitleLabel);
     tempoTitleLabel.setBounds(1, 60, 60, 20);
     tempoTitleLabel.setJustification(juce::Justification::centred);
@@ -29,12 +29,11 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     tempoTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
     tempoTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
-    tempoTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     tempoTitleLabel.setReadOnly(true);
     tempoTitleLabel.setCaretVisible(false);
     tempoTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     tempoTitleLabel.setText("TEMPO", dontSendNotification);
-
+    
     tempoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "tempo", tempoKnob);
     tempoKnob.setSliderStyle(juce::Slider::LinearBar);
     tempoKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
@@ -48,7 +47,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoKnob.setSkewFactor(0.3);
     tempoKnob.onValueChange = [this]() { updateTempoValueLabel(); };
     addAndMakeVisible(tempoKnob);
-    
+
     addAndMakeVisible(tempoValueLabel);
     tempoValueLabel.setBounds(1, 100, 60, 15);
     tempoValueLabel.setJustification(juce::Justification::centredTop);
@@ -83,10 +82,16 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
 
     // BEATS
     addAndMakeVisible(beatsTitleLabel);
-    beatsTitleLabel.setBounds(115, 75, 50, 16);
-    beatsTitleLabel.setJustificationType(juce::Justification::centred);
-    beatsTitleLabel.setFont(getCustomFont(16.0f));
-    beatsTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    beatsTitleLabel.setBounds(73, 60, 60, 20);
+    beatsTitleLabel.setJustification(juce::Justification::centred);
+    beatsTitleLabel.setFont(getCustomFont(18.0f));
+    beatsTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    beatsTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    beatsTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    beatsTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    beatsTitleLabel.setReadOnly(true);
+    beatsTitleLabel.setCaretVisible(false);
+    beatsTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     beatsTitleLabel.setText("BEATS", dontSendNotification);
 
     beatsAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "beats", beatsKnob);
@@ -94,22 +99,22 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     beatsKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     beatsKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     beatsKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    beatsKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    beatsKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    beatsKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    beatsKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     beatsKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    beatsKnob.setBounds(115, 74, 50, 16);
+    beatsKnob.setBounds(73, 80, 60, 20);
     beatsKnob.setRange(1.0, 16.0, 0.25);
     beatsKnob.onValueChange = [this]() { updateBeatsValueLabel(); };
     addAndMakeVisible(beatsKnob);
 
     addAndMakeVisible(beatsValueLabel);
-    beatsValueLabel.setBounds(115, 90, 50, 16);
+    beatsValueLabel.setBounds(73, 100, 60, 16);
     beatsValueLabel.setJustification(juce::Justification::centredTop);
     beatsValueLabel.setMultiLine(false);
     beatsValueLabel.setReturnKeyStartsNewLine(false);
     beatsValueLabel.setInputRestrictions(10, "0123456789.-+");
     beatsValueLabel.setSelectAllWhenFocused(true);
-    beatsValueLabel.setFont(getCustomFont(16.0f));
+    beatsValueLabel.setFont(getCustomFont(18.0f));
     beatsValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     beatsValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     beatsValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
