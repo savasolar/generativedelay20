@@ -14,18 +14,25 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     presetMenuHover = juce::ImageCache::getFromMemory(BinaryData::presetmenuhover_png, BinaryData::presetmenuhover_pngSize);
 
 
-    addAndMakeVisible(voiceBuffer_waveform);
-    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
+//    addAndMakeVisible(voiceBuffer_waveform);
+//    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
     
     // param setup: i) TITLE, ii) KNOB, iii) VALUE
 
     // TEMPO 
     addAndMakeVisible(tempoTitleLabel);
-    tempoTitleLabel.setBounds(25, 75, 50, 16);
-    tempoTitleLabel.setJustificationType(juce::Justification::centred);
-    tempoTitleLabel.setFont(getCustomFont(16.0f));
+    tempoTitleLabel.setBounds(1, 60, 60, 20);
+    tempoTitleLabel.setJustification(juce::Justification::centred);
+    tempoTitleLabel.setFont(getCustomFont(18.0f));
+    tempoTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    tempoTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    tempoTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    tempoTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     tempoTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    tempoTitleLabel.setReadOnly(true);
+    tempoTitleLabel.setCaretVisible(false);
+    tempoTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     tempoTitleLabel.setText("TEMPO", dontSendNotification);
 
     tempoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "tempo", tempoKnob);
@@ -33,25 +40,25 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor (CounterTuneAud
     tempoKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     tempoKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     tempoKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    tempoKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    tempoKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    tempoKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    tempoKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     tempoKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    tempoKnob.setBounds(25, 74, 50, 16);
+    tempoKnob.setBounds(1, 80, 60, 20);
     tempoKnob.setRange(1, 999, 1);
     tempoKnob.setSkewFactor(0.3);
     tempoKnob.onValueChange = [this]() { updateTempoValueLabel(); };
     addAndMakeVisible(tempoKnob);
     
     addAndMakeVisible(tempoValueLabel);
-    tempoValueLabel.setBounds(25, 90, 50, 16);
+    tempoValueLabel.setBounds(1, 100, 60, 15);
     tempoValueLabel.setJustification(juce::Justification::centredTop);
     tempoValueLabel.setMultiLine(false);
     tempoValueLabel.setReturnKeyStartsNewLine(false);
     tempoValueLabel.setInputRestrictions(10, "0123456789.-+");
     tempoValueLabel.setSelectAllWhenFocused(true);
-    tempoValueLabel.setFont(getCustomFont(16.0f));
+    tempoValueLabel.setFont(getCustomFont(18.0f));
     tempoValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
-    tempoValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+    tempoValueLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     tempoValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
     tempoValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateTempoValueLabel();
@@ -394,7 +401,7 @@ CounterTuneAudioProcessorEditor::~CounterTuneAudioProcessorEditor()
 void CounterTuneAudioProcessorEditor::timerCallback()
 {
 
-    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
+//    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
 
 
     if (firstLoad)

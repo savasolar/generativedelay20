@@ -37,7 +37,7 @@ private:
     {
         if (customTypeface == nullptr)
         {
-            customTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::B612MonoRegular_ttf, BinaryData::B612MonoRegular_ttfSize);
+            customTypeface = juce::Typeface::createSystemTypefaceFor(BinaryData::ChivoMonoMedium_ttf, BinaryData::ChivoMonoMedium_ttfSize);
         }
         if (customTypeface != nullptr)
         {
@@ -64,7 +64,7 @@ private:
 
     // param ui and functionality setup
 
-    juce::Label tempoTitleLabel;
+    juce::TextEditor tempoTitleLabel;
     juce::Slider tempoKnob;
     juce::TextEditor tempoValueLabel;
     void updateTempoValueLabel()
