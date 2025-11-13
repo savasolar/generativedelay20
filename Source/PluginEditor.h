@@ -155,12 +155,44 @@ private:
     
     juce::TextEditor loopTitleLabel;
     TransparentButton loopButton;
-    juce::Label loopValueLabel;
+//    juce::Label loopValueLabel;
+
+    juce::TextEditor loopOnLabel;
+    juce::TextEditor loopOffLabel;
+
     void updateLoopValueLabel()
     {
         bool value = audioProcessor.getLoopBool();
-        juce::String text = value ? "ON" : "OFF";
-        loopValueLabel.setText(text, juce::dontSendNotification);
+//        juce::String text = value ? "ON" : "OFF";
+//        loopValueLabel.setText(text, juce::dontSendNotification);
+
+        if (value)
+        {
+            loopOnLabel.setText("", dontSendNotification);
+            loopOnLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
+            loopOnLabel.setText("ON", dontSendNotification);
+            loopOnLabel.setColour(juce::TextEditor::backgroundColourId, foregroundColor);
+
+            loopOffLabel.setText("", dontSendNotification);
+            loopOffLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+            loopOffLabel.setText("OFF", dontSendNotification);
+            loopOffLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+        }
+        else
+        {
+            loopOnLabel.setText("", dontSendNotification);
+            loopOnLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+            loopOnLabel.setText("ON", dontSendNotification);
+            loopOnLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+
+            loopOffLabel.setText("", dontSendNotification);
+            loopOffLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
+            loopOffLabel.setText("OFF", dontSendNotification);
+            loopOffLabel.setColour(juce::TextEditor::backgroundColourId, foregroundColor);
+        }
+
+
+
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> loopAttachment;
 
