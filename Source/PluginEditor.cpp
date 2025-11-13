@@ -20,7 +20,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
         // param setup: i) TITLE, ii) KNOB, iii) VALUE
 
-        // TEMPO 
+    // TEMPO 
     addAndMakeVisible(tempoTitleLabel);
     tempoTitleLabel.setBounds(1, 60, 60, 20);
     tempoTitleLabel.setJustification(juce::Justification::centred);
@@ -49,7 +49,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     addAndMakeVisible(tempoKnob);
 
     addAndMakeVisible(tempoValueLabel);
-    tempoValueLabel.setBounds(1, 100, 60, 15);
+    tempoValueLabel.setBounds(1, 100, 60, 16);
     tempoValueLabel.setJustification(juce::Justification::centredTop);
     tempoValueLabel.setMultiLine(false);
     tempoValueLabel.setReturnKeyStartsNewLine(false);
@@ -142,6 +142,58 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
     // KEY
     addAndMakeVisible(keyTitleLabel);
+    keyTitleLabel.setBounds(145, 60, 60, 20);
+    keyTitleLabel.setJustification(juce::Justification::centred);
+    keyTitleLabel.setFont(getCustomFont(18.0f));
+    keyTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    keyTitleLabel.setText("KEY", dontSendNotification);
+
+    keyAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "key", keyKnob);
+    keyKnob.setSliderStyle(juce::Slider::LinearBar);
+    keyKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+    keyKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    keyKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
+    keyKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
+    keyKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    keyKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    keyKnob.setBounds(145, 80, 60, 20);
+    keyKnob.setRange(0, 12, 1);
+    keyKnob.onValueChange = [this]() { updateKeyValueLabel(); };
+    addAndMakeVisible(keyKnob);
+
+    addAndMakeVisible(keyValueLabel);
+    keyValueLabel.setBounds(145, 100, 60, 16);
+    keyValueLabel.setJustification(juce::Justification::centredTop);
+    keyValueLabel.setMultiLine(false);
+    keyValueLabel.setReturnKeyStartsNewLine(false);
+    keyValueLabel.setInputRestrictions(10, "0123456789.-+");
+    keyValueLabel.setSelectAllWhenFocused(true);
+    keyValueLabel.setFont(getCustomFont(16.0f));
+    keyValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    keyValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+    keyValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    keyValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    updateKeyValueLabel();
+    auto commitKey = [this]()
+        {
+            keyValueLabel.moveCaretToEnd(false);
+
+            juce::String text = keyValueLabel.getText().trim();
+            int value = text.getIntValue();
+            if (text.isEmpty())
+            {
+                updateKeyValueLabel();
+                return;
+            }
+            value = juce::jlimit(0, 12, value);
+            keyKnob.setValue(value);
+            updateKeyValueLabel();
+
+            grabKeyboardFocus();
+        };
+    keyValueLabel.onReturnKey = commitKey;
+    keyValueLabel.onFocusLost = commitKey;
+
 
     // NOTES
     addAndMakeVisible(notesTitleLabel);
