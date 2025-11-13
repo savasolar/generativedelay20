@@ -18,12 +18,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
 
-
-    addAndMakeVisible(presetTitleButton);
-    presetTitleButton.setBounds(481, 21, 140, 18);
-//    presetTitleButton.onMouse = [this]() {};
-
-
         // param setup: i) TITLE, ii) KNOB, iii) VALUE
 
     // TEMPO 
@@ -470,13 +464,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     loopTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     loopTitleLabel.setText("LOOP", dontSendNotification);
 
-    //addAndMakeVisible(loopValueLabel);
-    //loopValueLabel.setBounds(505, 80, 60, 20);
-    //loopValueLabel.setJustificationType(juce::Justification::centred);
-    //loopValueLabel.setFont(getCustomFont(18.0f));
-    //loopValueLabel.setColour(juce::Label::textColourId, foregroundColor);
-
-
     addAndMakeVisible(loopOnLabel);
     loopOnLabel.setBounds(505, 80, 60, 20);
     loopOnLabel.setJustification(juce::Justification::centred);
@@ -582,6 +569,40 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
 
 
+    presetTitleButton.onClick = [this]()
+        { 
+            presetBackgroundBox.setVisible(true); 
+            presetBackgroundBox.grabKeyboardFocus();
+            // make all the menu option text boxes and buttons visible here too
+        };
+
+    // unanimated preset menu settings
+    addAndMakeVisible(presetTitleLabel);
+    presetTitleLabel.setBounds(481, 22, 120, 14);
+    presetTitleLabel.setJustification(juce::Justification::centredLeft);
+    presetTitleLabel.setFont(getCustomFont(18.0f));
+    presetTitleLabel.setReadOnly(true);
+    presetTitleLabel.setCaretVisible(false);
+    presetTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
+
+
+
+    addAndMakeVisible(presetBackgroundBox);
+    presetBackgroundBox.setVisible(false);
+    presetBackgroundBox.setBounds(481, 38, 140, 62);
+    presetBackgroundBox.setColour(juce::TextEditor::textColourId, foregroundColor);
+    presetBackgroundBox.setColour(juce::TextEditor::backgroundColourId, juce::Colours::greenyellow);
+    presetBackgroundBox.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    presetBackgroundBox.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    presetBackgroundBox.onFocusLost = [this]()
+        {
+            presetBackgroundBox.setVisible(false);
+            // make all the menu option text boxes and buttons invisible here too
+        };
+
+
+
+
 
     startTimer(30);
 }
@@ -623,16 +644,38 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 
     g.drawImage(backgroundImage, getLocalBounds().toFloat());
     
-    if (presetTitleButton.isMouseButtonDown())
+
+    if (!presetTitleButton.isMouseButtonDown())
     {
-        g.drawImage(presetMenuHover, juce::Rectangle<float>(481, 21, 140, 18));
+        g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 21, 140, 18));
+        // clear text, then set color, then set text
+        presetTitleLabel.setText("", dontSendNotification);
+        presetTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+        presetTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+        presetTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+        presetTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+        presetTitleLabel.setText(presetTitleText, dontSendNotification);
     }
     else
     {
-        g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 21, 140, 18));
+        g.drawImage(presetMenuHover, juce::Rectangle<float>(481, 21, 140, 18));
+
+        presetTitleLabel.setText("", dontSendNotification);
+        presetTitleLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
+        presetTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+        presetTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+        presetTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+        presetTitleLabel.setText(presetTitleText, dontSendNotification);
     }
 
 
+    // button needs to be in front of the text
+    addAndMakeVisible(presetTitleButton);
+    presetTitleButton.setBounds(481, 21, 140, 18);
+
+
+//    g.setColour(juce::Colours::green);
+//    g.fillRect(481, 38, 140, 62);
 }
 
 void CounterTuneAudioProcessorEditor::resized()

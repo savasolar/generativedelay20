@@ -59,6 +59,8 @@ private:
     //  - dropdown menu
 
     juce::TextEditor presetTitleLabel;
+    juce::String presetTitleText{ "DEFAULT PRESET" };
+    juce::TextEditor presetBackgroundBox;
     TransparentButton presetTitleButton;
     juce::TextEditor presetOption1;
     juce::TextEditor presetOption2;
