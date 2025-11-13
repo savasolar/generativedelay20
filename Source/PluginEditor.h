@@ -57,7 +57,18 @@ private:
 
     // add: 
     //  - dropdown menu
-    //  
+
+    juce::TextEditor presetTitleLabel;
+    TransparentButton presetTitleButton;
+    juce::TextEditor presetOption1;
+    juce::TextEditor presetOption2;
+    juce::TextEditor presetOption3;
+    juce::TextEditor presetOption4;
+    juce::TextEditor presetOption5;
+    juce::Slider hiddenPresetKnob;
+
+
+
 
     juce::Image presetMenuDefault;
     juce::Image presetMenuHover;

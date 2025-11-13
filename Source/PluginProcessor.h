@@ -72,6 +72,10 @@ public:
     bool getLoopBool() const { return static_cast<bool>(*parameters.getRawParameterValue("loop")); }
     void setLoopBool(bool newLoopBool) { auto* param = parameters.getParameter("loop"); param->setValueNotifyingHost(newLoopBool ? 1.0f : 0.0f); }
 
+    int getPresetInt() const { return *parameters.getRawParameterValue("preset"); }
+    void setPresetInt(int newPresetInt) { auto* param = parameters.getParameter("preset"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newPresetInt)); }
+
+
 
 
     juce::AudioProcessorValueTreeState parameters;
