@@ -51,8 +51,14 @@ public:
     float getBeatsFloat() const { return *parameters.getRawParameterValue("beats"); }
     void setBeatsFloat(float newBeatsFloat) { auto* param = parameters.getParameter("beats"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newBeatsFloat)); }
 
+    int getKeyInt() const { return *parameters.getRawParameterValue("key"); }
+    void setKeyInt(int newKeyInt) { auto* param = parameters.getParameter("key"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newKeyInt)); }
+
     int getNotesInt() const { return *parameters.getRawParameterValue("notes"); }
     void setNotesInt(int newNotesInt) { auto* param = parameters.getParameter("notes"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newNotesInt)); }
+
+    float getChaosFloat() const { return *parameters.getRawParameterValue("chaos"); }
+    void setChaosFloat(float newChaosFloat) { auto* param = parameters.getParameter("chaos"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newChaosFloat)); }
 
     int getOctaveInt() const { return *parameters.getRawParameterValue("octave"); }
     void setOctaveInt(int newOctaveInt) { auto* param = parameters.getParameter("octave"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newOctaveInt)); }

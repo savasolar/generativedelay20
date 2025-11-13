@@ -140,10 +140,13 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     beatsValueLabel.onReturnKey = commitBeats;
     beatsValueLabel.onFocusLost = commitBeats;
 
+    // KEY
+    addAndMakeVisible(keyTitleLabel);
+
     // NOTES
     addAndMakeVisible(notesTitleLabel);
     notesTitleLabel.setBounds(205, 75, 50, 16);
-    notesTitleLabel.setJustificationType(juce::Justification::centred);
+    notesTitleLabel.setJustification(juce::Justification::centred);
     notesTitleLabel.setFont(getCustomFont(16.0f));
     notesTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     notesTitleLabel.setText("NOTES", dontSendNotification);
@@ -194,11 +197,17 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     notesValueLabel.onReturnKey = commitBeats;
     notesValueLabel.onFocusLost = commitBeats;
 
+
+    // CHAOS
+
+
+
+
     // OCTAVE
 
     addAndMakeVisible(octaveTitleLabel);
     octaveTitleLabel.setBounds(295, 75, 50, 16);
-    octaveTitleLabel.setJustificationType(juce::Justification::centred);
+    octaveTitleLabel.setJustification(juce::Justification::centred);
     octaveTitleLabel.setFont(getCustomFont(16.0f));
     octaveTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     octaveTitleLabel.setText("OCTAVE", dontSendNotification);
@@ -258,7 +267,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
     addAndMakeVisible(detuneTitleLabel);
     detuneTitleLabel.setBounds(385, 75, 50, 16);
-    detuneTitleLabel.setJustificationType(juce::Justification::centred);
+    detuneTitleLabel.setJustification(juce::Justification::centred);
     detuneTitleLabel.setFont(getCustomFont(16.0f));
     detuneTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     detuneTitleLabel.setText("DETUNE", dontSendNotification);
@@ -309,11 +318,35 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     detuneValueLabel.onReturnKey = commitDetune;
     detuneValueLabel.onFocusLost = commitDetune;
 
+    // LOOP
+
+    addAndMakeVisible(loopTitleLabel);
+    loopTitleLabel.setBounds(565, 75, 50, 16);
+    loopTitleLabel.setJustification(juce::Justification::centred);
+    loopTitleLabel.setFont(getCustomFont(16.0f));
+    loopTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    loopTitleLabel.setText("LOOP", juce::dontSendNotification);
+
+    addAndMakeVisible(loopValueLabel);
+    loopValueLabel.setBounds(565, 91, 50, 16);
+    loopValueLabel.setJustificationType(juce::Justification::centred);
+    loopValueLabel.setFont(getCustomFont(16.0f));
+    loopValueLabel.setColour(juce::Label::textColourId, foregroundColor);
+    updateLoopValueLabel();
+
+    loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
+    loopButton.setClickingTogglesState(true);
+    loopButton.setBounds(565, 74, 50, 33);
+    loopButton.setMouseCursor(juce::MouseCursor::PointingHandCursor);
+    loopButton.onClick = [this]() { updateLoopValueLabel(); };
+    addAndMakeVisible(loopButton);
+
+
     // MIX
 
     addAndMakeVisible(mixTitleLabel);
     mixTitleLabel.setBounds(475, 75, 50, 16);
-    mixTitleLabel.setJustificationType(juce::Justification::centred);
+    mixTitleLabel.setJustification(juce::Justification::centred);
     mixTitleLabel.setFont(getCustomFont(16.0f));
     mixTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
     mixTitleLabel.setText("MIX", dontSendNotification);
@@ -364,29 +397,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     mixValueLabel.onReturnKey = commitMix;
     mixValueLabel.onFocusLost = commitMix;
 
-    // LOOP
-
-    addAndMakeVisible(loopTitleLabel);
-    loopTitleLabel.setBounds(565, 75, 50, 16);
-    loopTitleLabel.setJustificationType(juce::Justification::centred);
-    loopTitleLabel.setFont(getCustomFont(16.0f));
-    loopTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
-    loopTitleLabel.setText("LOOP", juce::dontSendNotification);
-
-    addAndMakeVisible(loopValueLabel);
-    loopValueLabel.setBounds(565, 91, 50, 16);
-    loopValueLabel.setJustificationType(juce::Justification::centred);
-    loopValueLabel.setFont(getCustomFont(16.0f));
-    loopValueLabel.setColour(juce::Label::textColourId, foregroundColor);
-    updateLoopValueLabel();
-
-    loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
-    loopButton.setClickingTogglesState(true);
-    loopButton.setBounds(565, 74, 50, 33);
-    loopButton.setMouseCursor(juce::MouseCursor::PointingHandCursor);
-    loopButton.onClick = [this]() { updateLoopValueLabel(); };
-    addAndMakeVisible(loopButton);
-
+    
 
 
 

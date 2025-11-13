@@ -17,7 +17,9 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
         {
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"tempo", 1}, "Tempo", 1, 999, 120),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"beats", 1}, "Beats", 1.0f, 16.0f, 8.0f),
+            std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"key", 1}, "Key", 0, 12, 0),//0=auto, 1=c, ... 12=b
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"notes", 1}, "Notes", 1, 16, 8),
+            std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"chaos", 1}, "Chaos", 0.0f, 1.0f, 0.5f),
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"octave", 1}, "Octave", -4, 4, 0),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"detune", 1}, "Detune", -1.0f, 1.0f, 0.0f),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"mix", 1}, "Mix", 0.0f, 1.0f, 0.5f),

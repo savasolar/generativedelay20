@@ -86,7 +86,22 @@ private:
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> beatsAttachment;
 
-    juce::Label notesTitleLabel;
+
+
+    juce::TextEditor keyTitleLabel;
+    juce::Slider keyKnob;
+    juce::TextEditor keyValueLabel;
+    void updateKeyValueLabel()
+    {
+        int value = audioProcessor.getKeyInt();
+        juce::String text = juce::String(value);
+        keyValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> keyAttachment;
+
+
+
+    juce::TextEditor notesTitleLabel;
     juce::Slider notesKnob;
     juce::TextEditor notesValueLabel;
     void updateNotesValueLabel()
@@ -97,7 +112,24 @@ private:
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> notesAttachment;
 
-    juce::Label octaveTitleLabel;
+
+
+    juce::TextEditor chaosTitleLabel;
+    juce::Slider chaosKnob;
+    juce::TextEditor chaosValueLabel;
+    void updateChaosValueLabel()
+    {
+        float value = audioProcessor.getChaosFloat();
+        juce::String text = juce::String(value, 2);
+        chaosValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> chaosAttachment;
+    
+
+
+
+
+    juce::TextEditor octaveTitleLabel;
     juce::Slider octaveKnob;
     juce::TextEditor octaveValueLabel;
     void updateOctaveValueLabel()
@@ -108,7 +140,7 @@ private:
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> octaveAttachment;
 
-    juce::Label detuneTitleLabel;
+    juce::TextEditor detuneTitleLabel;
     juce::Slider detuneKnob;
     juce::TextEditor detuneValueLabel;
     void updateDetuneValueLabel()
@@ -119,18 +151,9 @@ private:
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> detuneAttachment;
 
-    juce::Label mixTitleLabel;
-    juce::Slider mixKnob;
-    juce::TextEditor mixValueLabel;
-    void updateMixValueLabel()
-    {
-        float value = audioProcessor.getMixFloat();
-        juce::String text = juce::String(value, 2);
-        mixValueLabel.setText(text, false);
-    }
-    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> mixAttachment;
     
-    juce::Label loopTitleLabel;
+    
+    juce::TextEditor loopTitleLabel;
     TransparentButton loopButton;
     juce::Label loopValueLabel;
     void updateLoopValueLabel()
@@ -142,7 +165,16 @@ private:
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> loopAttachment;
 
 
-
+    juce::TextEditor mixTitleLabel;
+    juce::Slider mixKnob;
+    juce::TextEditor mixValueLabel;
+    void updateMixValueLabel()
+    {
+        float value = audioProcessor.getMixFloat();
+        juce::String text = juce::String(value, 2);
+        mixValueLabel.setText(text, false);
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> mixAttachment;
 
 
 
