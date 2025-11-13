@@ -56,19 +56,30 @@ private:
 
 
     // add: 
-    //  - dropdown menu
+    //  - dropdown menu /////////////////////////////////////////////////////////////////////////
 
     juce::TextEditor presetTitleLabel;
     juce::String presetTitleText{ "DEFAULT PRESET" };
-    juce::TextEditor presetBackgroundBox;
     TransparentButton presetTitleButton;
+    juce::TextEditor presetBackgroundBox;
     juce::TextEditor presetOption1;
+    TransparentButton presetOption1Button;
     juce::TextEditor presetOption2;
+    TransparentButton presetOption2Button;
     juce::TextEditor presetOption3;
+    TransparentButton presetOption3Button;
     juce::TextEditor presetOption4;
+    TransparentButton presetOption4Button;
     juce::TextEditor presetOption5;
+    TransparentButton presetOption5Button;
     juce::Slider hiddenPresetKnob;
-
+    void updatePresetLabel()
+    {
+        int value = audioProcessor.getPresetInt();
+        juce::String text = juce::String(value);
+        presetTitleText = text;
+    }
+    std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> presetAttachment;
 
 
 

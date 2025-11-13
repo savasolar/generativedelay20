@@ -566,6 +566,18 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
 
     // a good dropdown menu can be created simply with a rectangle and buttons
+    keyAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "key", keyKnob);
+    keyKnob.setSliderStyle(juce::Slider::LinearBar);
+    keyKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+    keyKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    keyKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
+    keyKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    keyKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
+    keyKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    keyKnob.setBounds(145, 80, 60, 20);
+    keyKnob.setRange(0, 12, 1);
+    keyKnob.onValueChange = [this]() { updateKeyValueLabel(); };
+    addAndMakeVisible(keyKnob);
 
 
 
