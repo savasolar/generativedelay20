@@ -145,7 +145,13 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     keyTitleLabel.setBounds(145, 60, 60, 20);
     keyTitleLabel.setJustification(juce::Justification::centred);
     keyTitleLabel.setFont(getCustomFont(18.0f));
-    keyTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    keyTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    keyTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    keyTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    keyTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    keyTitleLabel.setReadOnly(true);
+    keyTitleLabel.setCaretVisible(false);
+    keyTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     keyTitleLabel.setText("KEY", dontSendNotification);
 
     keyAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "key", keyKnob);
@@ -153,8 +159,8 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     keyKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     keyKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     keyKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    keyKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    keyKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    keyKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    keyKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     keyKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     keyKnob.setBounds(145, 80, 60, 20);
     keyKnob.setRange(0, 12, 1);
@@ -168,7 +174,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     keyValueLabel.setReturnKeyStartsNewLine(false);
     keyValueLabel.setInputRestrictions(10, "0123456789.-+");
     keyValueLabel.setSelectAllWhenFocused(true);
-    keyValueLabel.setFont(getCustomFont(16.0f));
+    keyValueLabel.setFont(getCustomFont(18.0f));
     keyValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     keyValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     keyValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -197,10 +203,16 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
     // NOTES
     addAndMakeVisible(notesTitleLabel);
-    notesTitleLabel.setBounds(205, 75, 50, 16);
+    notesTitleLabel.setBounds(217, 60, 60, 20);
     notesTitleLabel.setJustification(juce::Justification::centred);
-    notesTitleLabel.setFont(getCustomFont(16.0f));
-    notesTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    notesTitleLabel.setFont(getCustomFont(18.0f));
+    notesTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    notesTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    notesTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    notesTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    notesTitleLabel.setReadOnly(true);
+    notesTitleLabel.setCaretVisible(false);
+    notesTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     notesTitleLabel.setText("NOTES", dontSendNotification);
 
     notesAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "notes", notesKnob);
@@ -208,22 +220,22 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     notesKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     notesKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     notesKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    notesKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    notesKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    notesKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    notesKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     notesKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    notesKnob.setBounds(205, 74, 50, 16);
+    notesKnob.setBounds(217, 80, 60, 20);
     notesKnob.setRange(1, 16, 1);
     notesKnob.onValueChange = [this]() { updateNotesValueLabel(); };
     addAndMakeVisible(notesKnob);
 
     addAndMakeVisible(notesValueLabel);
-    notesValueLabel.setBounds(205, 90, 50, 16);
+    notesValueLabel.setBounds(217, 100, 60, 16);
     notesValueLabel.setJustification(juce::Justification::centredTop);
     notesValueLabel.setMultiLine(false);
     notesValueLabel.setReturnKeyStartsNewLine(false);
     notesValueLabel.setInputRestrictions(10, "0123456789.-+");
     notesValueLabel.setSelectAllWhenFocused(true);
-    notesValueLabel.setFont(getCustomFont(16.0f));
+    notesValueLabel.setFont(getCustomFont(18.0f));
     notesValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     notesValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     notesValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -251,17 +263,78 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
 
     // CHAOS
+    addAndMakeVisible(chaosTitleLabel);
+    chaosTitleLabel.setBounds(289, 60, 60, 20);
+    chaosTitleLabel.setJustification(juce::Justification::centred);
+    chaosTitleLabel.setFont(getCustomFont(18.0f));
+    chaosTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    chaosTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    chaosTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    chaosTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    chaosTitleLabel.setReadOnly(true);
+    chaosTitleLabel.setCaretVisible(false);
+    chaosTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
+    chaosTitleLabel.setText("CHAOS", dontSendNotification);
 
+    chaosAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "chaos", chaosKnob);
+    chaosKnob.setSliderStyle(juce::Slider::LinearBar);
+    chaosKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+    chaosKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
+    chaosKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
+    chaosKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    chaosKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
+    chaosKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
+    chaosKnob.setBounds(289, 80, 60, 20);
+    chaosKnob.setRange(0.0, 1.0, 0.01);
+    chaosKnob.onValueChange = [this]() { updateChaosValueLabel(); };
+    addAndMakeVisible(chaosKnob);
 
+    addAndMakeVisible(chaosValueLabel);
+    chaosValueLabel.setBounds(289, 100, 60, 16);
+    chaosValueLabel.setJustification(juce::Justification::centredTop);
+    chaosValueLabel.setMultiLine(false);
+    chaosValueLabel.setReturnKeyStartsNewLine(false);
+    chaosValueLabel.setInputRestrictions(10, "0123456789.-+");
+    chaosValueLabel.setSelectAllWhenFocused(true);
+    chaosValueLabel.setFont(getCustomFont(18.0f));
+    chaosValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    chaosValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+    chaosValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    chaosValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    updateChaosValueLabel();
+    auto commitChaos = [this]()
+        {
+            chaosValueLabel.moveCaretToEnd(false);
 
+            juce::String text = chaosValueLabel.getText().trim();
+            float value = text.getFloatValue();
+            if (text.isEmpty() || !std::isfinite(value))
+            {
+                updateChaosValueLabel();
+                return;
+            }
+            value = juce::jlimit(0.0f, 1.0f, value);
+            chaosKnob.setValue(value);
+            updateChaosValueLabel();
+
+            grabKeyboardFocus();
+        };
+    chaosValueLabel.onReturnKey = commitChaos;
+    chaosValueLabel.onFocusLost = commitChaos;
 
     // OCTAVE
 
     addAndMakeVisible(octaveTitleLabel);
-    octaveTitleLabel.setBounds(295, 75, 50, 16);
+    octaveTitleLabel.setBounds(361, 60, 60, 20);
     octaveTitleLabel.setJustification(juce::Justification::centred);
-    octaveTitleLabel.setFont(getCustomFont(16.0f));
-    octaveTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    octaveTitleLabel.setFont(getCustomFont(18.0f));
+    octaveTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    octaveTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    octaveTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    octaveTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    octaveTitleLabel.setReadOnly(true);
+    octaveTitleLabel.setCaretVisible(false);
+    octaveTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     octaveTitleLabel.setText("OCTAVE", dontSendNotification);
 
     octaveAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "octave", octaveKnob);
@@ -269,22 +342,22 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     octaveKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     octaveKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     octaveKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    octaveKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    octaveKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    octaveKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    octaveKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     octaveKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    octaveKnob.setBounds(295, 74, 50, 16);
+    octaveKnob.setBounds(361, 80, 60, 20);
     octaveKnob.setRange(-4, 4, 1);
     octaveKnob.onValueChange = [this]() { updateOctaveValueLabel(); };
     addAndMakeVisible(octaveKnob);
 
     addAndMakeVisible(octaveValueLabel);
-    octaveValueLabel.setBounds(295, 90, 50, 16);
+    octaveValueLabel.setBounds(361, 100, 60, 16);
     octaveValueLabel.setJustification(juce::Justification::centredTop);
     octaveValueLabel.setMultiLine(false);
     octaveValueLabel.setReturnKeyStartsNewLine(false);
     octaveValueLabel.setInputRestrictions(10, "0123456789.-+");
     octaveValueLabel.setSelectAllWhenFocused(true);
-    octaveValueLabel.setFont(getCustomFont(16.0f));
+    octaveValueLabel.setFont(getCustomFont(18.0f));
     octaveValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     octaveValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     octaveValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -318,10 +391,16 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     // DETUNE
 
     addAndMakeVisible(detuneTitleLabel);
-    detuneTitleLabel.setBounds(385, 75, 50, 16);
+    detuneTitleLabel.setBounds(433, 60, 60, 20);
     detuneTitleLabel.setJustification(juce::Justification::centred);
-    detuneTitleLabel.setFont(getCustomFont(16.0f));
-    detuneTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    detuneTitleLabel.setFont(getCustomFont(18.0f));
+    detuneTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    detuneTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    detuneTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    detuneTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    detuneTitleLabel.setReadOnly(true);
+    detuneTitleLabel.setCaretVisible(false);
+    detuneTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     detuneTitleLabel.setText("DETUNE", dontSendNotification);
 
     detuneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "detune", detuneKnob);
@@ -329,22 +408,22 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     detuneKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     detuneKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     detuneKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    detuneKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    detuneKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    detuneKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    detuneKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     detuneKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    detuneKnob.setBounds(385, 74, 50, 16);
+    detuneKnob.setBounds(433, 80, 60, 20);
     detuneKnob.setRange(-1.0, 1.0, 0.01);
     detuneKnob.onValueChange = [this]() { updateDetuneValueLabel(); };
     addAndMakeVisible(detuneKnob);
 
     addAndMakeVisible(detuneValueLabel);
-    detuneValueLabel.setBounds(385, 90, 50, 16);
+    detuneValueLabel.setBounds(433, 100, 60, 16);
     detuneValueLabel.setJustification(juce::Justification::centredTop);
     detuneValueLabel.setMultiLine(false);
     detuneValueLabel.setReturnKeyStartsNewLine(false);
     detuneValueLabel.setInputRestrictions(10, "0123456789.-+");
     detuneValueLabel.setSelectAllWhenFocused(true);
-    detuneValueLabel.setFont(getCustomFont(16.0f));
+    detuneValueLabel.setFont(getCustomFont(18.0f));
     detuneValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     detuneValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     detuneValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -373,34 +452,45 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     // LOOP
 
     addAndMakeVisible(loopTitleLabel);
-    loopTitleLabel.setBounds(565, 75, 50, 16);
+    loopTitleLabel.setBounds(505, 60, 60, 20);
     loopTitleLabel.setJustification(juce::Justification::centred);
-    loopTitleLabel.setFont(getCustomFont(16.0f));
-    loopTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
-    loopTitleLabel.setText("LOOP", juce::dontSendNotification);
+    loopTitleLabel.setFont(getCustomFont(18.0f));
+    loopTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    loopTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    loopTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    loopTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    loopTitleLabel.setReadOnly(true);
+    loopTitleLabel.setCaretVisible(false);
+    loopTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
+    loopTitleLabel.setText("LOOP", dontSendNotification);
 
     addAndMakeVisible(loopValueLabel);
-    loopValueLabel.setBounds(565, 91, 50, 16);
+    loopValueLabel.setBounds(505, 80, 60, 20);
     loopValueLabel.setJustificationType(juce::Justification::centred);
-    loopValueLabel.setFont(getCustomFont(16.0f));
+    loopValueLabel.setFont(getCustomFont(18.0f));
     loopValueLabel.setColour(juce::Label::textColourId, foregroundColor);
     updateLoopValueLabel();
 
     loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
     loopButton.setClickingTogglesState(true);
-    loopButton.setBounds(565, 74, 50, 33);
+    loopButton.setBounds(505, 60, 60, 60);
     loopButton.setMouseCursor(juce::MouseCursor::PointingHandCursor);
     loopButton.onClick = [this]() { updateLoopValueLabel(); };
     addAndMakeVisible(loopButton);
 
-
     // MIX
 
     addAndMakeVisible(mixTitleLabel);
-    mixTitleLabel.setBounds(475, 75, 50, 16);
+    mixTitleLabel.setBounds(579, 60, 60, 20);
     mixTitleLabel.setJustification(juce::Justification::centred);
-    mixTitleLabel.setFont(getCustomFont(16.0f));
-    mixTitleLabel.setColour(juce::Label::textColourId, foregroundColor);
+    mixTitleLabel.setFont(getCustomFont(18.0f));
+    mixTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    mixTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
+    mixTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    mixTitleLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    mixTitleLabel.setReadOnly(true);
+    mixTitleLabel.setCaretVisible(false);
+    mixTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     mixTitleLabel.setText("MIX", dontSendNotification);
 
     mixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "mix", mixKnob);
@@ -408,22 +498,22 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     mixKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     mixKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     mixKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
-    mixKnob.setColour(juce::Slider::trackColourId, juce::Colours::transparentBlack);
-    mixKnob.setColour(juce::Slider::thumbColourId, juce::Colours::transparentBlack);
+    mixKnob.setColour(juce::Slider::trackColourId, foregroundColor);
+    mixKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     mixKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    mixKnob.setBounds(475, 74, 50, 16);
+    mixKnob.setBounds(579, 80, 60, 20);
     mixKnob.setRange(0.0, 1.0, 0.01);
     mixKnob.onValueChange = [this]() { updateMixValueLabel(); };
     addAndMakeVisible(mixKnob);
 
     addAndMakeVisible(mixValueLabel);
-    mixValueLabel.setBounds(475, 90, 50, 16);
+    mixValueLabel.setBounds(579, 100, 60, 16);
     mixValueLabel.setJustification(juce::Justification::centredTop);
     mixValueLabel.setMultiLine(false);
     mixValueLabel.setReturnKeyStartsNewLine(false);
     mixValueLabel.setInputRestrictions(10, "0123456789.-+");
     mixValueLabel.setSelectAllWhenFocused(true);
-    mixValueLabel.setFont(getCustomFont(16.0f));
+    mixValueLabel.setFont(getCustomFont(18.0f));
     mixValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     mixValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     mixValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
