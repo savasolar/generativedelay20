@@ -233,6 +233,7 @@ private:
 
 
     void setupParams();
+    void drawDottedLine(juce::Graphics& g, int x, int y, int width, int height);
 
 
     // visual 

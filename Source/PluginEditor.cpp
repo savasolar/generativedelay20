@@ -72,9 +72,19 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 
     // draw a 1px dotted line
 
+    drawDottedLine(g, 25, 121, 1, 358);
 
-
-
+    drawDottedLine(g, 25, 149, 614, 1);
+    drawDottedLine(g, 25, 179, 614, 1);
+    drawDottedLine(g, 25, 209, 614, 1);
+    drawDottedLine(g, 25, 239, 614, 1);
+    drawDottedLine(g, 25, 269, 614, 1);
+    drawDottedLine(g, 25, 299, 614, 1);
+    drawDottedLine(g, 25, 329, 614, 1);
+    drawDottedLine(g, 25, 359, 614, 1);
+    drawDottedLine(g, 25, 389, 614, 1);
+    drawDottedLine(g, 25, 419, 614, 1);
+    drawDottedLine(g, 25, 449, 614, 1);
 
 }
 
@@ -84,7 +94,23 @@ void CounterTuneAudioProcessorEditor::resized()
 }
 
 
+void CounterTuneAudioProcessorEditor::drawDottedLine(juce::Graphics& g, int x, int y, int width, int height)
+{
+    g.setColour(foregroundColor);
 
+    float dashes[] = { 1.0f, 1.0f };
+
+    if (width > 1 && height == 1) // horizontal
+    {
+        juce::Line<float> line(static_cast<float>(x), static_cast<float>(y) + 0.5f, static_cast<float>(x + width), static_cast<float>(y) + 0.5f);
+        g.drawDashedLine(line, dashes, 2, 1.0f);
+    }
+    else if (height > 1 && width == 1) // vertical
+    {
+        juce::Line<float> line(static_cast<float>(x) + 0.5f, static_cast<float>(y), static_cast<float>(x) + 0.5f, static_cast<float>(y + height));
+        g.drawDashedLine(line, dashes, 2, 1.0f);
+    }
+}
 
 
 void CounterTuneAudioProcessorEditor::setupPresetMenu()
