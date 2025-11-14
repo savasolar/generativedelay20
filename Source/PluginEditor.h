@@ -22,8 +22,6 @@ private:
     CounterTuneAudioProcessor& audioProcessor;
 
     bool firstLoad = true;
-
-
     
     juce::Image backgroundImage;
 
@@ -59,7 +57,7 @@ private:
     //  - dropdown menu /////////////////////////////////////////////////////////////////////////
 
     juce::TextEditor presetTitleLabel;
-    juce::String presetTitleText{ "DEFAULT PRESET" };
+    juce::String presetTitleText{ "loading" };
     TransparentButton presetTitleButton;
     juce::TextEditor presetBackgroundBox;
     juce::TextEditor presetOption1;
@@ -70,21 +68,40 @@ private:
     TransparentButton presetOption3Button;
     juce::TextEditor presetOption4;
     TransparentButton presetOption4Button;
-    juce::TextEditor presetOption5;
-    TransparentButton presetOption5Button;
     juce::Slider hiddenPresetKnob;
+
     void updatePresetLabel()
     {
         int value = audioProcessor.getPresetInt();
-        juce::String text = juce::String(value);
+        juce::String text;
+        
+        
+        if (value == 1)
+        {
+            text = "DEFAULT PRESET";
+        }
+        if (value == 2)
+        {
+            text = "MINIMAL";
+        }
+        if (value == 3)
+        {
+            text = "MODERATE";
+        }
+        if (value == 4)
+        {
+            text = "MAXIMAL";
+        }
+                
         presetTitleText = text;
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> presetAttachment;
 
-
-
     juce::Image presetMenuDefault;
     juce::Image presetMenuHover;
+
+    void setupPresetMenu();
+    void paintPresetMenu(juce::Graphics& g);
 
     // param ui and functionality setup
 
@@ -110,8 +127,6 @@ private:
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> beatsAttachment;
 
-
-
     juce::TextEditor keyTitleLabel;
     juce::Slider keyKnob;
     juce::TextEditor keyValueLabel;
@@ -122,8 +137,6 @@ private:
         keyValueLabel.setText(text, false);
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> keyAttachment;
-
-
 
     juce::TextEditor notesTitleLabel;
     juce::Slider notesKnob;
@@ -136,8 +149,6 @@ private:
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> notesAttachment;
 
-
-
     juce::TextEditor chaosTitleLabel;
     juce::Slider chaosKnob;
     juce::TextEditor chaosValueLabel;
@@ -149,10 +160,6 @@ private:
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> chaosAttachment;
     
-
-
-
-
     juce::TextEditor octaveTitleLabel;
     juce::Slider octaveKnob;
     juce::TextEditor octaveValueLabel;
@@ -174,21 +181,15 @@ private:
         detuneValueLabel.setText(text, false);
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> detuneAttachment;
-
-    
     
     juce::TextEditor loopTitleLabel;
     TransparentButton loopButton;
-//    juce::Label loopValueLabel;
-
     juce::TextEditor loopOnLabel;
     juce::TextEditor loopOffLabel;
 
     void updateLoopValueLabel()
     {
         bool value = audioProcessor.getLoopBool();
-//        juce::String text = value ? "ON" : "OFF";
-//        loopValueLabel.setText(text, juce::dontSendNotification);
 
         if (value)
         {
@@ -214,9 +215,6 @@ private:
             loopOffLabel.setText("OFF", dontSendNotification);
             loopOffLabel.setColour(juce::TextEditor::backgroundColourId, foregroundColor);
         }
-
-
-
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::ButtonAttachment> loopAttachment;
 
@@ -234,10 +232,7 @@ private:
 
 
 
-
-
-
-
+    void setupParams();
 
 
     // visual 
