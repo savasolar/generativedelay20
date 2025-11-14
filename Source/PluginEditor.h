@@ -49,12 +49,9 @@ private:
         }
     }
 
-    juce::Colour foregroundColor = juce::Colour(0xffffffff);
+    juce::Colour foregroundColor = juce::Colours::lightsalmon;//juce::Colour(0xffffffff);
     juce::Colour backgroundColor = juce::Colour(0xff000000);
 
-
-    // add: 
-    //  - dropdown menu /////////////////////////////////////////////////////////////////////////
 
     juce::TextEditor presetTitleLabel;
     juce::String presetTitleText{ "loading" };

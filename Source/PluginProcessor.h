@@ -225,10 +225,9 @@ private:
     bool detectSound(const juce::AudioBuffer<float>& buffer);
     
     // Pitch detection utilities
-//    PitchMPM pitchDetector;    
     dywapitchtracker pitchTracker;
     juce::AudioBuffer<float> analysisBuffer {1, 1024};
-    int pitchDetectorFillPos = 0;    
+    int pitchDetectorFillPos = 0;
 
     // Time stretch utilities
     signalsmith::stretch::SignalsmithStretch<float> stretcher;
@@ -237,7 +236,6 @@ private:
     int melodyCaptureFillPos = 0;
 
     std::vector<int> formatMelody(const std::vector<int>& melody, bool isGeneratedMelody) const;
-
 
     void detectKey(const std::vector<int>& melody);
 
