@@ -295,7 +295,9 @@ private:
 
 
 
-    juce::Image textureImage;
+    juce::Image capturedTextureImage;
+    juce::Image overlapTextureImage;
+    juce::Image genTextureImage;
 
     // Add member variables for melodies, after other members like WaveformViewer
     std::vector<int> capturedMelody;

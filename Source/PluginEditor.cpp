@@ -19,7 +19,9 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
     // In PluginEditor.cpp constructor, after loading other images like presetMenuHover
 
-    textureImage = juce::ImageCache::getFromMemory(BinaryData::overlapmeltexture_png, BinaryData::overlapmeltexture_pngSize);
+    capturedTextureImage = juce::ImageCache::getFromMemory(BinaryData::capmeltexture_png, BinaryData::capmeltexture_pngSize);
+    overlapTextureImage = juce::ImageCache::getFromMemory(BinaryData::overlapmeltexture_png, BinaryData::overlapmeltexture_pngSize);
+    genTextureImage = juce::ImageCache::getFromMemory(BinaryData::genmeltexture_png, BinaryData::genmeltexture_pngSize);
 
 
     setupParams();
@@ -108,15 +110,42 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 
 
     // Paint capturedMelody
+    //if (!capturedMelody.empty() && capturedMelody.size() == 32)
+    //{
+    //    float gridX = 25.0f;
+    //    float gridY = 120.0f;
+    //    float gridW = 614.0f;
+    //    float gridH = 360.0f;
+
+    //    float cellW = gridW / 32.0f;
+    //    float cellH = gridH / 12.0f;
+
+    //    for (int i = 0; i < 32; ++i)
+    //    {
+    //        int note = capturedMelody[i];
+    //        if (note == -1) continue;
+
+    //        int normNote = note % 12;
+    //        if (normNote < 0 || normNote > 11) continue; // Safety check
+
+    //        float x = gridX + i * cellW;
+    //        float y = gridY + cellH * (11 - normNote); // Higher notes at top
+
+    //        juce::Rectangle<float> rect(x, y, cellW, cellH);
+
+    //        g.setTiledImageFill(textureImage, 0, 0, 1.0f);
+    //        g.fillRect(rect);
+    //    }
+    //}
+
     if (!capturedMelody.empty() && capturedMelody.size() == 32)
     {
-        float gridX = 25.0f;
-        float gridY = 120.0f;
-        float gridW = 614.0f;
-        float gridH = 360.0f;
+        int gridX = 26;
+        int gridY = 120;
+        int gridW = 614;
+        int gridH = 360;
 
-        float cellW = gridW / 32.0f;
-        float cellH = gridH / 12.0f;
+        int cellH = gridH / 12; // Should be 30
 
         for (int i = 0; i < 32; ++i)
         {
@@ -126,15 +155,82 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
             int normNote = note % 12;
             if (normNote < 0 || normNote > 11) continue; // Safety check
 
-            float x = gridX + i * cellW;
-            float y = gridY + cellH * (11 - normNote); // Higher notes at top
+            int x = gridX + (i * gridW) / 32;
+            int next_x = gridX + ((i + 1) * gridW) / 32;
+            int cellW = next_x - x;
 
-            juce::Rectangle<float> rect(x, y, cellW, cellH);
+            int y = gridY + cellH * (11 - normNote); // Higher notes at top
 
-            g.setTiledImageFill(textureImage, 0, 0, 1.0f);
+            juce::Rectangle<int> rect(x, y, cellW, cellH);
+
+            g.setTiledImageFill(capturedTextureImage, 0, 0, 1.0f);
             g.fillRect(rect);
         }
     }
+
+
+
+
+    if (!generatedMelody.empty() && generatedMelody.size() == 32)
+    {
+        std::vector<int> processedMelody = generatedMelody;
+        int lastNote = -1;
+        for (auto& n : processedMelody)
+        {
+            if (n == -2)
+            {
+                if (lastNote != -1)
+                {
+                    n = lastNote;
+                }
+                else
+                {
+                    n = -1; // Skip if no previous note
+                }
+            }
+            else if (n >= 0) // Assuming valid MIDI notes are non-negative
+            {
+                lastNote = n;
+            }
+            else
+            {
+                n = -1; // Invalid, skip
+            }
+        }
+
+        int gridX = 26;
+        int gridY = 120;
+        int gridW = 614;
+        int gridH = 360;
+
+        int cellH = gridH / 12; // Should be 30
+
+        for (int i = 0; i < 32; ++i)
+        {
+            int note = processedMelody[i];
+            if (note == -1) continue;
+
+            int normNote = note % 12;
+            if (normNote < 0 || normNote > 11) continue; // Safety check
+
+            int x = gridX + (i * gridW) / 32;
+            int next_x = gridX + ((i + 1) * gridW) / 32;
+            int cellW = next_x - x;
+
+            int y = gridY + cellH * (11 - normNote); // Higher notes at top
+
+            juce::Rectangle<int> rect(x, y, cellW, cellH);
+
+            g.setTiledImageFill(genTextureImage, 0, 0, 1.0f);
+            g.fillRect(rect);
+        }
+    }
+
+
+
+
+
+
 
 }
 
