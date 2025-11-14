@@ -991,6 +991,20 @@ void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probab
         }
     }
 }
+
+
+
+
+void CounterTuneAudioProcessor::copyMelodiesTo(std::vector<int>& outCaptured, std::vector<int>& outGenerated) const
+{
+    juce::ScopedLock sl(melodyLock);
+    outCaptured = capturedMelody;
+    outGenerated = generatedMelody;
+}
+
+
+
+
 bool CounterTuneAudioProcessor::hasEditor() const
 {
     return true;
