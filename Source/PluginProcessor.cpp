@@ -877,8 +877,6 @@ void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, in
 {
 
 
-
-
     std::vector<int> scale{ 46, 48, 50, 51, 53, 55, 57, 58 }; // hardcoded b-flat scale for now
 
     std::vector<int> processed_input;
@@ -993,11 +991,6 @@ void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probab
         }
     }
 }
-
-
-
-
-
 bool CounterTuneAudioProcessor::hasEditor() const
 {
     return true;

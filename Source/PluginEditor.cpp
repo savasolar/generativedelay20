@@ -86,6 +86,21 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
     drawDottedLine(g, 25, 419, 614, 1);
     drawDottedLine(g, 25, 449, 614, 1);
 
+
+
+    // Dynamic vertical dotted lines based on beats
+    int numBeats = static_cast<int>(std::round(audioProcessor.getBeatsFloat() * 4));
+    if (numBeats > 1)
+    {
+        int numLines = numBeats - 1;
+        double sectionWidth = 614.0 / numBeats;
+        for (int i = 1; i <= numLines; ++i)
+        {
+            int x = 25 + static_cast<int>(std::round(i * sectionWidth));
+            drawDottedLine(g, x, 121, 1, 358);
+        }
+    }
+
 }
 
 void CounterTuneAudioProcessorEditor::resized()
@@ -124,7 +139,7 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     hiddenPresetKnob.setColour(juce::Slider::trackColourId, foregroundColor);
     hiddenPresetKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     hiddenPresetKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
-    hiddenPresetKnob.setBounds(0, 0, 10, 10);
+    hiddenPresetKnob.setBounds(-10, -10, 10, 10);
     hiddenPresetKnob.setRange(1, 5, 1);
     hiddenPresetKnob.onValueChange = [this]() { updatePresetLabel(); };
     hiddenPresetKnob.setVisible(false);
