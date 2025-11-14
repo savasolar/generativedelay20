@@ -199,6 +199,9 @@ public:
     std::atomic<bool> useADSR{ false };
 
 
+    void copyMelodiesTo(std::vector<int>& outCaptured, std::vector<int>& outGenerated) const;
+
+
 
 
 //                         `. ___

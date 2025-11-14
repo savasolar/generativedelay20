@@ -54,6 +54,9 @@ void CounterTuneAudioProcessorEditor::timerCallback()
     // paint melodies
 
 
+    std::vector<int> cap, gen;
+//    audioProcessor.copyMelodiesTo(cap, gen);
+
 
 
     repaint();
