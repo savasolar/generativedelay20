@@ -278,7 +278,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
 //						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
-//                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
+                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
                     symbolExecuted.set(n);

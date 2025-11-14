@@ -295,5 +295,14 @@ private:
 
 
 
+    juce::Image textureImage;
+
+    // Add member variables for melodies, after other members like WaveformViewer
+    std::vector<int> capturedMelody;
+    std::vector<int> generatedMelody;
+
+
+
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CounterTuneAudioProcessorEditor)
 };

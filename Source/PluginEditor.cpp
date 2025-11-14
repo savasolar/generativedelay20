@@ -17,6 +17,9 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     //    addAndMakeVisible(voiceBuffer_waveform);
     //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
 
+    // In PluginEditor.cpp constructor, after loading other images like presetMenuHover
+
+    textureImage = juce::ImageCache::getFromMemory(BinaryData::overlapmeltexture_png, BinaryData::overlapmeltexture_pngSize);
 
 
     setupParams();
@@ -54,9 +57,7 @@ void CounterTuneAudioProcessorEditor::timerCallback()
     // paint melodies
 
 
-    std::vector<int> cap, gen;
-    audioProcessor.copyMelodiesTo(cap, gen);
-
+    audioProcessor.copyMelodiesTo(capturedMelody, generatedMelody);
 
 
     repaint();
@@ -104,6 +105,37 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
         }
     }
 
+
+
+    // Paint capturedMelody
+    if (!capturedMelody.empty() && capturedMelody.size() == 32)
+    {
+        float gridX = 25.0f;
+        float gridY = 120.0f;
+        float gridW = 614.0f;
+        float gridH = 360.0f;
+
+        float cellW = gridW / 32.0f;
+        float cellH = gridH / 12.0f;
+
+        for (int i = 0; i < 32; ++i)
+        {
+            int note = capturedMelody[i];
+            if (note == -1) continue;
+
+            int normNote = note % 12;
+            if (normNote < 0 || normNote > 11) continue; // Safety check
+
+            float x = gridX + i * cellW;
+            float y = gridY + cellH * (11 - normNote); // Higher notes at top
+
+            juce::Rectangle<float> rect(x, y, cellW, cellH);
+
+            g.setTiledImageFill(textureImage, 0, 0, 1.0f);
+            g.fillRect(rect);
+        }
+    }
+
 }
 
 void CounterTuneAudioProcessorEditor::resized()
@@ -129,7 +161,6 @@ void CounterTuneAudioProcessorEditor::drawDottedLine(juce::Graphics& g, int x, i
         g.drawDashedLine(line, dashes, 2, 1.0f);
     }
 }
-
 
 void CounterTuneAudioProcessorEditor::setupPresetMenu()
 {
@@ -427,21 +458,21 @@ void CounterTuneAudioProcessorEditor::setupParams()
     tempoValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateTempoValueLabel();
     auto commitTempo = [this]()
-        {
-            tempoValueLabel.moveCaretToEnd(false);
+    {
+        tempoValueLabel.moveCaretToEnd(false);
 
-            juce::String text = tempoValueLabel.getText().trim();
-            float value = text.getFloatValue();
-            if (text.isEmpty() || !std::isfinite(value))
-            {
-                updateTempoValueLabel();
-                return;
-            }
-            value = juce::jlimit(1.0f, 999.0f, value);
-            tempoKnob.setValue(value);
+        juce::String text = tempoValueLabel.getText().trim();
+        float value = text.getFloatValue();
+        if (text.isEmpty() || !std::isfinite(value))
+        {
             updateTempoValueLabel();
-            grabKeyboardFocus();
-        };
+            return;
+        }
+        value = juce::jlimit(1.0f, 999.0f, value);
+        tempoKnob.setValue(value);
+        updateTempoValueLabel();
+        grabKeyboardFocus();
+    };
     tempoValueLabel.onReturnKey = commitTempo;
     tempoValueLabel.onFocusLost = commitTempo;
 
@@ -486,22 +517,22 @@ void CounterTuneAudioProcessorEditor::setupParams()
     beatsValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateBeatsValueLabel();
     auto commitBeats = [this]()
+    {
+        beatsValueLabel.moveCaretToEnd(false);
+
+        juce::String text = beatsValueLabel.getText().trim();
+        float value = text.getFloatValue();
+        if (text.isEmpty() || !std::isfinite(value))
         {
-            beatsValueLabel.moveCaretToEnd(false);
-
-            juce::String text = beatsValueLabel.getText().trim();
-            float value = text.getFloatValue();
-            if (text.isEmpty() || !std::isfinite(value))
-            {
-                updateBeatsValueLabel();
-                return;
-            }
-            value = juce::jlimit(1.0f, 16.0f, value);
-            beatsKnob.setValue(value);
             updateBeatsValueLabel();
+            return;
+        }
+        value = juce::jlimit(1.0f, 16.0f, value);
+        beatsKnob.setValue(value);
+        updateBeatsValueLabel();
 
-            grabKeyboardFocus();
-        };
+        grabKeyboardFocus();
+    };
     beatsValueLabel.onReturnKey = commitBeats;
     beatsValueLabel.onFocusLost = commitBeats;
 
@@ -546,22 +577,22 @@ void CounterTuneAudioProcessorEditor::setupParams()
     keyValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateKeyValueLabel();
     auto commitKey = [this]()
+    {
+        keyValueLabel.moveCaretToEnd(false);
+
+        juce::String text = keyValueLabel.getText().trim();
+        int value = text.getIntValue();
+        if (text.isEmpty())
         {
-            keyValueLabel.moveCaretToEnd(false);
-
-            juce::String text = keyValueLabel.getText().trim();
-            int value = text.getIntValue();
-            if (text.isEmpty())
-            {
-                updateKeyValueLabel();
-                return;
-            }
-            value = juce::jlimit(0, 12, value);
-            keyKnob.setValue(value);
             updateKeyValueLabel();
+            return;
+        }
+        value = juce::jlimit(0, 12, value);
+        keyKnob.setValue(value);
+        updateKeyValueLabel();
 
-            grabKeyboardFocus();
-        };
+        grabKeyboardFocus();
+    };
     keyValueLabel.onReturnKey = commitKey;
     keyValueLabel.onFocusLost = commitKey;
 
@@ -607,22 +638,22 @@ void CounterTuneAudioProcessorEditor::setupParams()
     notesValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateNotesValueLabel();
     auto commitNotes = [this]()
+    {
+        notesValueLabel.moveCaretToEnd(false);
+
+        juce::String text = notesValueLabel.getText().trim();
+        int value = text.getIntValue();
+        if (text.isEmpty())
         {
-            notesValueLabel.moveCaretToEnd(false);
-
-            juce::String text = notesValueLabel.getText().trim();
-            int value = text.getIntValue();
-            if (text.isEmpty())
-            {
-                updateNotesValueLabel();
-                return;
-            }
-            value = juce::jlimit(1, 16, value);
-            notesKnob.setValue(value);
             updateNotesValueLabel();
+            return;
+        }
+        value = juce::jlimit(1, 16, value);
+        notesKnob.setValue(value);
+        updateNotesValueLabel();
 
-            grabKeyboardFocus();
-        };
+        grabKeyboardFocus();
+    };
     notesValueLabel.onReturnKey = commitBeats;
     notesValueLabel.onFocusLost = commitBeats;
 
@@ -668,22 +699,22 @@ void CounterTuneAudioProcessorEditor::setupParams()
     chaosValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateChaosValueLabel();
     auto commitChaos = [this]()
+    {
+        chaosValueLabel.moveCaretToEnd(false);
+
+        juce::String text = chaosValueLabel.getText().trim();
+        float value = text.getFloatValue();
+        if (text.isEmpty() || !std::isfinite(value))
         {
-            chaosValueLabel.moveCaretToEnd(false);
-
-            juce::String text = chaosValueLabel.getText().trim();
-            float value = text.getFloatValue();
-            if (text.isEmpty() || !std::isfinite(value))
-            {
-                updateChaosValueLabel();
-                return;
-            }
-            value = juce::jlimit(0.0f, 1.0f, value);
-            chaosKnob.setValue(value);
             updateChaosValueLabel();
+            return;
+        }
+        value = juce::jlimit(0.0f, 1.0f, value);
+        chaosKnob.setValue(value);
+        updateChaosValueLabel();
 
-            grabKeyboardFocus();
-        };
+        grabKeyboardFocus();
+    };
     chaosValueLabel.onReturnKey = commitChaos;
     chaosValueLabel.onFocusLost = commitChaos;
 
@@ -729,27 +760,27 @@ void CounterTuneAudioProcessorEditor::setupParams()
     octaveValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateOctaveValueLabel();
     auto commitOctave = [this]()
+    {
+        octaveValueLabel.moveCaretToEnd(false);
+
+        juce::String text = octaveValueLabel.getText().trim();
+
+        if (text.isEmpty())
         {
-            octaveValueLabel.moveCaretToEnd(false);
-
-            juce::String text = octaveValueLabel.getText().trim();
-
-            if (text.isEmpty())
-            {
-                updateOctaveValueLabel();
-                return;
-            }
-
-            // Remove spaces from the formatted display text (e.g., "- 2" becomes "-2")
-            text = text.removeCharacters(" ");
-
-            int value = text.getIntValue();
-            value = juce::jlimit(-4, 4, value);
-            octaveKnob.setValue(value);
             updateOctaveValueLabel();
+            return;
+        }
 
-            grabKeyboardFocus();
-        };
+        // Remove spaces from the formatted display text (e.g., "- 2" becomes "-2")
+        text = text.removeCharacters(" ");
+
+        int value = text.getIntValue();
+        value = juce::jlimit(-4, 4, value);
+        octaveKnob.setValue(value);
+        updateOctaveValueLabel();
+
+        grabKeyboardFocus();
+    };
     octaveValueLabel.onReturnKey = commitOctave;
     octaveValueLabel.onFocusLost = commitOctave;
 
@@ -795,22 +826,22 @@ void CounterTuneAudioProcessorEditor::setupParams()
     detuneValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateDetuneValueLabel();
     auto commitDetune = [this]()
+    {
+        detuneValueLabel.moveCaretToEnd(false);
+
+        juce::String text = detuneValueLabel.getText().trim();
+        float value = text.getFloatValue();
+        if (text.isEmpty() || !std::isfinite(value))
         {
-            detuneValueLabel.moveCaretToEnd(false);
-
-            juce::String text = detuneValueLabel.getText().trim();
-            float value = text.getFloatValue();
-            if (text.isEmpty() || !std::isfinite(value))
-            {
-                updateDetuneValueLabel();
-                return;
-            }
-            value = juce::jlimit(-1.0f, 1.0f, value);
-            detuneKnob.setValue(value);
             updateDetuneValueLabel();
+            return;
+        }
+        value = juce::jlimit(-1.0f, 1.0f, value);
+        detuneKnob.setValue(value);
+        updateDetuneValueLabel();
 
-            grabKeyboardFocus();
-        };
+        grabKeyboardFocus();
+    };
     detuneValueLabel.onReturnKey = commitDetune;
     detuneValueLabel.onFocusLost = commitDetune;
 
@@ -907,22 +938,22 @@ void CounterTuneAudioProcessorEditor::setupParams()
     mixValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateMixValueLabel();
     auto commitMix = [this]()
+    {
+        mixValueLabel.moveCaretToEnd(false);
+
+        juce::String text = mixValueLabel.getText().trim();
+        float value = text.getFloatValue();
+        if (text.isEmpty() || !std::isfinite(value))
         {
-            mixValueLabel.moveCaretToEnd(false);
-
-            juce::String text = mixValueLabel.getText().trim();
-            float value = text.getFloatValue();
-            if (text.isEmpty() || !std::isfinite(value))
-            {
-                updateMixValueLabel();
-                return;
-            }
-            value = juce::jlimit(0.0f, 1.0f, value);
-            mixKnob.setValue(value);
             updateMixValueLabel();
+            return;
+        }
+        value = juce::jlimit(0.0f, 1.0f, value);
+        mixKnob.setValue(value);
+        updateMixValueLabel();
 
-            grabKeyboardFocus();
-        };
+        grabKeyboardFocus();
+    };
     mixValueLabel.onReturnKey = commitMix;
     mixValueLabel.onFocusLost = commitMix;
 }
