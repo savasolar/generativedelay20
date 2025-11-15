@@ -75,7 +75,7 @@ private:
         
         if (value == 1)
         {
-            text = "DEFAULT PRESET";
+            text = "NO PRESET";
         }
         if (value == 2)
         {

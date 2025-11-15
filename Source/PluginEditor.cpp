@@ -201,8 +201,12 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 
 
 
+    // draw 1px solid white line at x: 25, y: 479, w: 614, h: 1
+    // draw 1px solid white line at x: 639, y: 120, w: 1, h: 360
 
-
+    g.setColour(foregroundColor);
+    g.fillRect(25, 479, 614, 1);
+    g.fillRect(639, 120, 1, 360);
 
 
 }
@@ -249,19 +253,19 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     addAndMakeVisible(hiddenPresetKnob);
 
     presetTitleButton.onClick = [this]()
-        {
-            presetBackgroundBox.setVisible(true);
-            presetBackgroundBox.grabKeyboardFocus();
-            // make all the menu option text boxes and buttons visible here too
-            presetOption1.setVisible(true);
-            presetOption1Button.setVisible(true);
-            presetOption2.setVisible(true);
-            presetOption2Button.setVisible(true);
-            presetOption3.setVisible(true);
-            presetOption3Button.setVisible(true);
-            presetOption4.setVisible(true);
-            presetOption4Button.setVisible(true);
-        };
+    {
+        presetBackgroundBox.setVisible(true);
+        presetBackgroundBox.grabKeyboardFocus();
+        // make all the menu option text boxes and buttons visible here too
+        presetOption1.setVisible(true);
+        presetOption1Button.setVisible(true);
+        presetOption2.setVisible(true);
+        presetOption2Button.setVisible(true);
+        presetOption3.setVisible(true);
+        presetOption3Button.setVisible(true);
+        presetOption4.setVisible(true);
+        presetOption4Button.setVisible(true);
+    };
 
     // unanimated preset menu settings
     addAndMakeVisible(presetTitleLabel);
@@ -272,11 +276,9 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     presetTitleLabel.setCaretVisible(false);
     presetTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
 
-
-
     addAndMakeVisible(presetBackgroundBox);
     presetBackgroundBox.setVisible(false);
-    presetBackgroundBox.setBounds(481, 38, 140, 80);
+    presetBackgroundBox.setBounds(481, 40, 140, 80);
     presetBackgroundBox.setColour(juce::TextEditor::textColourId, foregroundColor);
     presetBackgroundBox.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     presetBackgroundBox.setColour(juce::TextEditor::outlineColourId, foregroundColor);
@@ -301,7 +303,7 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     addAndMakeVisible(presetOption1);
     presetOption1.setVisible(false);
-    presetOption1.setBounds(481, 38, 140, 20);
+    presetOption1.setBounds(481, 40, 140, 20);
     presetOption1.setJustification(juce::Justification::centredLeft);
     presetOption1.setFont(getCustomFont(18.0f));
     presetOption1.setColour(juce::TextEditor::textColourId, foregroundColor);
@@ -314,11 +316,11 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     presetOption1.setText("-", dontSendNotification);
     addAndMakeVisible(presetOption1Button);
     presetOption1Button.setVisible(false);
-    presetOption1Button.setBounds(481, 38, 140, 20);
+    presetOption1Button.setBounds(481, 40, 140, 20);
 
     addAndMakeVisible(presetOption2);
     presetOption2.setVisible(false);
-    presetOption2.setBounds(481, 58, 140, 20);
+    presetOption2.setBounds(481, 60, 140, 20);
     presetOption2.setJustification(juce::Justification::centredLeft);
     presetOption2.setFont(getCustomFont(18.0f));
     presetOption2.setColour(juce::TextEditor::textColourId, foregroundColor);
@@ -331,11 +333,11 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     presetOption2.setText("MINIMAL", dontSendNotification);
     addAndMakeVisible(presetOption2Button);
     presetOption2Button.setVisible(false);
-    presetOption2Button.setBounds(481, 58, 140, 20);
+    presetOption2Button.setBounds(481, 60, 140, 20);
 
     addAndMakeVisible(presetOption3);
     presetOption3.setVisible(false);
-    presetOption3.setBounds(481, 78, 140, 20);
+    presetOption3.setBounds(481, 80, 140, 20);
     presetOption3.setJustification(juce::Justification::centredLeft);
     presetOption3.setFont(getCustomFont(18.0f));
     presetOption3.setColour(juce::TextEditor::textColourId, foregroundColor);
@@ -348,11 +350,11 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     presetOption3.setText("MODERATE", dontSendNotification);
     addAndMakeVisible(presetOption3Button);
     presetOption3Button.setVisible(false);
-    presetOption3Button.setBounds(481, 78, 140, 20);
+    presetOption3Button.setBounds(481, 80, 140, 20);
 
     addAndMakeVisible(presetOption4);
     presetOption4.setVisible(false);
-    presetOption4.setBounds(481, 98, 140, 20);
+    presetOption4.setBounds(481, 100, 140, 20);
     presetOption4.setJustification(juce::Justification::centredLeft);
     presetOption4.setFont(getCustomFont(18.0f));
     presetOption4.setColour(juce::TextEditor::textColourId, foregroundColor);
@@ -365,14 +367,15 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     presetOption4.setText("MAXIMAL", dontSendNotification);
     addAndMakeVisible(presetOption4Button);
     presetOption4Button.setVisible(false);
-    presetOption4Button.setBounds(481, 98, 140, 20);
+    presetOption4Button.setBounds(481, 100, 140, 20);
 }
 
 void CounterTuneAudioProcessorEditor::paintPresetMenu(juce::Graphics& g)
 {
     if (!presetTitleButton.isMouseButtonDown())
     {
-        g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 21, 140, 18));
+//        g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 21, 140, 18));
+        g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 20, 140, 20));
         // clear text, then set color, then set text
         presetTitleLabel.setText("", dontSendNotification);
         presetTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
@@ -383,8 +386,8 @@ void CounterTuneAudioProcessorEditor::paintPresetMenu(juce::Graphics& g)
     }
     else
     {
-        g.drawImage(presetMenuHover, juce::Rectangle<float>(481, 21, 140, 18));
-
+//        g.drawImage(presetMenuHover, juce::Rectangle<float>(481, 21, 140, 18));
+        g.drawImage(presetMenuHover, juce::Rectangle<float>(481, 20, 140, 20));
         presetTitleLabel.setText("", dontSendNotification);
         presetTitleLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
         presetTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
@@ -395,7 +398,8 @@ void CounterTuneAudioProcessorEditor::paintPresetMenu(juce::Graphics& g)
 
     // button needs to be in front of the text
     addAndMakeVisible(presetTitleButton);
-    presetTitleButton.setBounds(481, 21, 140, 18);
+//    presetTitleButton.setBounds(481, 21, 140, 18);
+    presetTitleButton.setBounds(481, 20, 140, 20);
 
     if (presetOption1Button.isMouseButtonDown())
         hiddenPresetKnob.setValue(1);

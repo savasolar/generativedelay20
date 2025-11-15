@@ -338,6 +338,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 isActive.store(false);
                 voiceBuffer.clear();
                 finalVoiceBuffer.clear();
+                std::fill(generatedMelody.begin(), generatedMelody.end(), -1);
             }
             else
             {
