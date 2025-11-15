@@ -108,72 +108,12 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
     }
 
 
+    // paint melodies
 
-    // Paint capturedMelody
-    //if (!capturedMelody.empty() && capturedMelody.size() == 32)
-    //{
-    //    float gridX = 25.0f;
-    //    float gridY = 120.0f;
-    //    float gridW = 614.0f;
-    //    float gridH = 360.0f;
-
-    //    float cellW = gridW / 32.0f;
-    //    float cellH = gridH / 12.0f;
-
-    //    for (int i = 0; i < 32; ++i)
-    //    {
-    //        int note = capturedMelody[i];
-    //        if (note == -1) continue;
-
-    //        int normNote = note % 12;
-    //        if (normNote < 0 || normNote > 11) continue; // Safety check
-
-    //        float x = gridX + i * cellW;
-    //        float y = gridY + cellH * (11 - normNote); // Higher notes at top
-
-    //        juce::Rectangle<float> rect(x, y, cellW, cellH);
-
-    //        g.setTiledImageFill(textureImage, 0, 0, 1.0f);
-    //        g.fillRect(rect);
-    //    }
-    //}
-
-    if (!capturedMelody.empty() && capturedMelody.size() == 32)
-    {
-        int gridX = 26;
-        int gridY = 120;
-        int gridW = 614;
-        int gridH = 360;
-
-        int cellH = gridH / 12; // Should be 30
-
-        for (int i = 0; i < 32; ++i)
-        {
-            int note = capturedMelody[i];
-            if (note == -1) continue;
-
-            int normNote = note % 12;
-            if (normNote < 0 || normNote > 11) continue; // Safety check
-
-            int x = gridX + (i * gridW) / 32;
-            int next_x = gridX + ((i + 1) * gridW) / 32;
-            int cellW = next_x - x;
-
-            int y = gridY + cellH * (11 - normNote); // Higher notes at top
-
-            juce::Rectangle<int> rect(x, y, cellW, cellH);
-
-            g.setTiledImageFill(capturedTextureImage, 0, 0, 1.0f);
-            g.fillRect(rect);
-        }
-    }
-
-
-
-
+    std::vector<int> processedMelody;
     if (!generatedMelody.empty() && generatedMelody.size() == 32)
     {
-        std::vector<int> processedMelody = generatedMelody;
+        processedMelody = generatedMelody;
         int lastNote = -1;
         for (auto& n : processedMelody)
         {
@@ -222,6 +162,47 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
             juce::Rectangle<int> rect(x, y, cellW, cellH);
 
             g.setTiledImageFill(genTextureImage, 0, 0, 1.0f);
+            g.fillRect(rect);
+        }
+    }
+
+    if (!capturedMelody.empty() && capturedMelody.size() == 32)
+    {
+        int gridX = 26;
+        int gridY = 120;
+        int gridW = 614;
+        int gridH = 360;
+
+        int cellH = gridH / 12; // Should be 30
+
+        for (int i = 0; i < 32; ++i)
+        {
+            int note = capturedMelody[i];
+            if (note == -1) continue;
+
+            int normNote = note % 12;
+            if (normNote < 0 || normNote > 11) continue; // Safety check
+
+            int x = gridX + (i * gridW) / 32;
+            int next_x = gridX + ((i + 1) * gridW) / 32;
+            int cellW = next_x - x;
+
+            int y = gridY + cellH * (11 - normNote); // Higher notes at top
+
+            juce::Rectangle<int> rect(x, y, cellW, cellH);
+
+            // Detect overlap: same i and same normNote in processed generated melody
+            bool isOverlap = false;
+            if (i < processedMelody.size())
+            {
+                int genNote = processedMelody[i];
+                if (genNote != -1 && (genNote % 12) == normNote)
+                {
+                    isOverlap = true;
+                }
+            }
+
+            g.setTiledImageFill(isOverlap ? overlapTextureImage : capturedTextureImage, 0, 0, 1.0f);
             g.fillRect(rect);
         }
     }
