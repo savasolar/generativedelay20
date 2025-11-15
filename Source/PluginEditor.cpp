@@ -13,10 +13,6 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     presetMenuDefault = juce::ImageCache::getFromMemory(BinaryData::presetmenu_png, BinaryData::presetmenu_pngSize);
     presetMenuHover = juce::ImageCache::getFromMemory(BinaryData::presetmenuhover_png, BinaryData::presetmenuhover_pngSize);
 
-
-    //    addAndMakeVisible(voiceBuffer_waveform);
-    //    voiceBuffer_waveform.setBounds(1, 121, 638, 358);
-
     // In PluginEditor.cpp constructor, after loading other images like presetMenuHover
 
     capturedTextureImage = juce::ImageCache::getFromMemory(BinaryData::capmeltexture_png, BinaryData::capmeltexture_pngSize);
@@ -39,10 +35,6 @@ CounterTuneAudioProcessorEditor::~CounterTuneAudioProcessorEditor()
 
 void CounterTuneAudioProcessorEditor::timerCallback()
 {
-
-//    voiceBuffer_waveform.setAudioBuffer(&audioProcessor.voiceBuffer, audioProcessor.voiceBuffer.getNumSamples());
-
-
     if (firstLoad)
     {
         updateTempoValueLabel();
