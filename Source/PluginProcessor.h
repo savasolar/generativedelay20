@@ -109,24 +109,20 @@ public:
         pitchDetectorFillPos = 0;
         detectedNoteNumbers.clear();
         melodyCaptureFillPos = 0;
-
         std::fill(capturedMelody.begin(), capturedMelody.end(), -1);
-
         positionMarkerX = 0;
 
         placeholderBpm = getTempoFloat();
+        DBG("updated bpm: " + juce::String(placeholderBpm));
         placeholderBeats = getBeatsFloat();
-
-        DBG(getTempoFloat());
-
-
+        DBG("updated bts: " + juce::String(placeholderBeats));
 
         float currentBpm = placeholderBpm;
         float currentBeats = placeholderBeats;
 
-        sPs = static_cast<int>(std::round(
-            60.0 / currentBpm * getSampleRate() / 4.0 * currentBeats / 8.0
-        ));
+        sPs = static_cast<int>(std::round(60.0 / currentBpm * getSampleRate() / 4.0 * currentBeats / 8.0));
+
+        DBG("sPs: " + juce::String(sPs));
 
         int requiredSize = 32 * sPs + 4096;
         inputAudioBuffer.setSize(2, requiredSize, false, true);

@@ -117,10 +117,7 @@ void CounterTuneAudioProcessor::changeProgramName (int index, const juce::String
 //YwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYwYw
 
 void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
-{    
-//    pitchDetector.setSampleRate(sampleRate);
-//    pitchDetector.setBufferSize(1024);  // Fixed power-of-2; or use juce::nextPowerOfTwo(samplesPerBlock) if you want dynamic
-
+{
     analysisBuffer.setSize(1, 1024, true);  // Mono, matches bufferSize, keep data
     pitchDetectorFillPos = 0;  // Reset accumulator
 
@@ -130,10 +127,7 @@ void CounterTuneAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
 
 
     dryWetMixer.prepare(juce::dsp::ProcessSpec{ sampleRate, static_cast<std::uint32_t> (samplesPerBlock), static_cast<std::uint32_t> (getTotalNumOutputChannels()) });
-    dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::linear);
-    dryWetMixer.setWetMixProportion(0.5f);
-
-
+    dryWetMixer.setMixingRule(juce::dsp::DryWetMixingRule::balanced);
 
     adsr.setSampleRate(sampleRate);
 
@@ -264,7 +258,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         // 3/6: CAPTURED MELODY TRANSCRIPTION====================================================================================
 
-        int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
+//        int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
+
+
+        int captureSpaceLeft = (sPs * 32 + std::max(sampleDrift, 0)) - melodyCaptureFillPos;
+
         int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
 
         for (int n = 0; n < 32; ++n)
@@ -274,13 +272,19 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             {
                 if (!symbolExecuted.test(n))
                 {
+                    //placeholderBpm = getTempoFloat();
+                    //DBG("updated bpm: " + juce::String(placeholderBpm));
+                    //placeholderBeats = getBeatsFloat();
+                    //DBG("updated bts: " + juce::String(placeholderBeats));
+
                     if (!detectedNoteNumbers.empty())
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
 //						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
-                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
+//                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
+                    DBG("sampleDrift: " + juce::String(sampleDrift));
                     symbolExecuted.set(n);
                 }
             }
@@ -328,6 +332,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         if (melodyCaptureFillPos >= sPs * 32 + sampleDrift)
         {
+            DBG("CYCLE END");
+
             symbolExecuted.reset();
             playbackSymbolExecuted.reset();
             fractionalSymbolExecuted.reset();
@@ -352,6 +358,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
+
+
 
             resetTiming();
         }
@@ -386,6 +394,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         finalVoiceBuffer_readPos.store(readPos + numSamples);
     }
+
+
+    dryWetMixer.setWetMixProportion(getMixFloat());
 
     dryWetMixer.mixWetSamples(block);
 
@@ -432,7 +443,6 @@ bool CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     return result;
 }
-
 int CounterTuneAudioProcessor::frequencyToMidiNote(float frequency)
 {
     if (frequency <= 0.0f)
@@ -442,7 +452,6 @@ int CounterTuneAudioProcessor::frequencyToMidiNote(float frequency)
 
     return static_cast<int>(std::round(12.0f * std::log2(frequency / 440.0f) + 69.0f));
 }
-
 juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
 {
     if (detectedNoteNumbers.empty())
@@ -560,7 +569,6 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
     return result;
 
 }
-
 void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
 {
     std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
@@ -628,7 +636,6 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
     });
     t.detach();
 }
-
 juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const juce::AudioBuffer<float>& input, int baseNote, int targetNote)
 {
     if (input.getNumSamples() == 0 || baseNote < 0 || targetNote < 0)
@@ -767,7 +774,6 @@ std::vector<int> CounterTuneAudioProcessor::formatMelody(const std::vector<int>&
 
     return formattedMelody; // Return the new vector
 }
-
 void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 {
     std::array<double, 12> hist{};
@@ -870,10 +876,6 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 
 //    generatedMelody = { 60, -2, -2, -2, -2, -2, -2, -2, 60, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
 }
-
-
-
-
 void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes)
 {
 
@@ -939,7 +941,6 @@ void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, in
 
 
 }
-
 void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probability) const
 {
     if (probability <= 0.0f) return;
@@ -992,19 +993,12 @@ void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probab
         }
     }
 }
-
-
-
-
 void CounterTuneAudioProcessor::copyMelodiesTo(std::vector<int>& outCaptured, std::vector<int>& outGenerated) const
 {
     juce::ScopedLock sl(melodyLock);
     outCaptured = capturedMelody;
     outGenerated = generatedMelody;
 }
-
-
-
 
 bool CounterTuneAudioProcessor::hasEditor() const
 {
