@@ -345,7 +345,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
                 // detectKey(capturedMelody); key detection is bad
 
-                produceMelody(capturedMelody, 10/*b-flat*/, placeholderNotes);
+                produceMelody(capturedMelody, getKeyInt(), getNotesInt());
 
             }
 

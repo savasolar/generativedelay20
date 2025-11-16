@@ -114,6 +114,13 @@ public:
 
         positionMarkerX = 0;
 
+        placeholderBpm = getTempoFloat();
+        placeholderBeats = getBeatsFloat();
+
+        DBG(getTempoFloat());
+
+
+
         float currentBpm = placeholderBpm;
         float currentBeats = placeholderBeats;
 
@@ -167,10 +174,6 @@ public:
     juce::AudioBuffer<float> voiceBuffer;
     std::atomic<int> newVoiceNoteNumber{ -1 };
     std::atomic<int> voiceNoteNumber{ -1 };
-
-//    std::atomic<int> voiceBuffer_readPos{ 0 };
-//    std::atomic<bool> voiceBuffer_isPlaying{ false };
-//    float playbackInc{ 1.0f };
 
     juce::AudioBuffer<float> finalVoiceBuffer;
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
