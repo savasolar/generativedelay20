@@ -43,51 +43,32 @@ public:
 //  | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | | |
 //  |_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|_|hjw
 
-
-
     float getTempoFloat() const { return *parameters.getRawParameterValue("tempo"); }
     void setTempoFloat(float newTempoFloat) { auto* param = parameters.getParameter("tempo"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newTempoFloat)); }
-
     float getBeatsFloat() const { return *parameters.getRawParameterValue("beats"); }
     void setBeatsFloat(float newBeatsFloat) { auto* param = parameters.getParameter("beats"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newBeatsFloat)); }
-
     int getKeyInt() const { return *parameters.getRawParameterValue("key"); }
     void setKeyInt(int newKeyInt) { auto* param = parameters.getParameter("key"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newKeyInt)); }
-
     int getNotesInt() const { return *parameters.getRawParameterValue("notes"); }
     void setNotesInt(int newNotesInt) { auto* param = parameters.getParameter("notes"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newNotesInt)); }
-
     float getChaosFloat() const { return *parameters.getRawParameterValue("chaos"); }
     void setChaosFloat(float newChaosFloat) { auto* param = parameters.getParameter("chaos"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newChaosFloat)); }
-
     int getOctaveInt() const { return *parameters.getRawParameterValue("octave"); }
     void setOctaveInt(int newOctaveInt) { auto* param = parameters.getParameter("octave"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newOctaveInt)); }
-
     float getDetuneFloat() const { return *parameters.getRawParameterValue("detune"); }
     void setDetuneFloat(float newDetuneFloat) { auto* param = parameters.getParameter("detune"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newDetuneFloat)); }
-
     float getMixFloat() const { return *parameters.getRawParameterValue("mix"); }
     void setMixFloat(float newMixFloat) { auto* param = parameters.getParameter("mix"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newMixFloat)); }
-
     bool getLoopBool() const { return static_cast<bool>(*parameters.getRawParameterValue("loop")); }
     void setLoopBool(bool newLoopBool) { auto* param = parameters.getParameter("loop"); param->setValueNotifyingHost(newLoopBool ? 1.0f : 0.0f); }
-
     int getPresetInt() const { return *parameters.getRawParameterValue("preset"); }
     void setPresetInt(int newPresetInt) { auto* param = parameters.getParameter("preset"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newPresetInt)); }
 
-
-
-
     juce::AudioProcessorValueTreeState parameters;
-
-
-
-
 
     // cycle reset-based params should be double-buffered
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
-    int placeholderNotes = 8;
 
     bool placeholderHold = false;
 //    int placeholderOctave = 0;
@@ -113,9 +94,9 @@ public:
         positionMarkerX = 0;
 
         placeholderBpm = getTempoFloat();
-        DBG("updated bpm: " + juce::String(placeholderBpm));
+//        DBG("updated bpm: " + juce::String(placeholderBpm));
         placeholderBeats = getBeatsFloat();
-        DBG("updated bts: " + juce::String(placeholderBeats));
+//        DBG("updated bts: " + juce::String(placeholderBeats));
 
         float currentBpm = placeholderBpm;
         float currentBeats = placeholderBeats;

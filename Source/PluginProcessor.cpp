@@ -185,9 +185,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 {
     juce::ScopedNoDenormals noDenormals;
 
-    // FIGURE OUT THE MOST USEFUL OF DBG VISUAL OUTPUT
-
-
     if (!isActive.load())
     {
         resetTiming();
@@ -211,8 +208,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         inputAudioBuffer_writePos.store(inputAudioBuffer_writePos.load() + toCopy);
 
         // 2/6: PITCH DETECTION====================================================================================
-
-        // needs a noise gate!
 
         // Mix current block to mono for pitch detection
         juce::AudioBuffer<float> monoBlock(1, numSamples);
@@ -258,9 +253,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
         // 3/6: CAPTURED MELODY TRANSCRIPTION====================================================================================
 
-//        int captureSpaceLeft = (sPs * 32) - melodyCaptureFillPos;
-
-
         int captureSpaceLeft = (sPs * 32 + std::max(sampleDrift, 0)) - melodyCaptureFillPos;
 
         int captureToCopy = juce::jmin(captureSpaceLeft, numSamples);
@@ -272,19 +264,12 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             {
                 if (!symbolExecuted.test(n))
                 {
-                    //placeholderBpm = getTempoFloat();
-                    //DBG("updated bpm: " + juce::String(placeholderBpm));
-                    //placeholderBeats = getBeatsFloat();
-                    //DBG("updated bts: " + juce::String(placeholderBeats));
-
                     if (!detectedNoteNumbers.empty())
                     {
                         capturedMelody[n] = detectedNoteNumbers.back();
-//						juce::String noteStrA = "Dnn: "; for (int note : detectedNoteNumbers) { noteStrA += juce::String(note) + ", "; } DBG(noteStrA);
 //                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
-//                    DBG("sampleDrift: " + juce::String(sampleDrift));
                     symbolExecuted.set(n);
                 }
             }
@@ -348,18 +333,12 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-
-                // detectKey(capturedMelody); key detection is bad
-
                 produceMelody(capturedMelody, getKeyInt(), getNotesInt());
-
             }
 
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-//            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
-
 
             resetTiming();
         }
@@ -378,8 +357,6 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         int voiceBufferSize = finalVoiceBuffer.getNumSamples();
         int readPos = finalVoiceBuffer_readPos.load();
 
-//        DBG("processBlock playback: entering copy loop - voiceBufferSize=" + juce::String(voiceBufferSize) + ", readPos=" + juce::String(readPos) + ", ADSR release=" + juce::String(adsrParams.release));
-
         for (int i = 0; i < numSamples; ++i)
         {
             int currentPos = readPos + i;
@@ -388,16 +365,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             float gain = useADSR.load() ? adsr.getNextSample() : 1.0f;
 
-  //          if (i == 0) DBG("processBlock playback: sample gain (first)=" + juce::String(gain) + ", finalVoiceBuffer sample at " + juce::String(currentPos) + "=" + juce::String(finalVoiceBuffer.getSample(0, currentPos)));
-
-
             for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
             {
                 buffer.addSample(ch, i, finalVoiceBuffer.getSample(ch, currentPos) * gain);
             }
         }
-
-//        DBG("processBlock playback: after copy - buffer maxMagnitude=" + juce::String(buffer.findMinMax(0, 0, numSamples).getEnd()) + ", finalVoiceBuffer_readPos now=" + juce::String(finalVoiceBuffer_readPos.load()));
 
         finalVoiceBuffer_readPos.store(readPos + numSamples);
     }
@@ -443,8 +415,6 @@ bool CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     if (rms > threshold)
     {
-//        DBG("sound detected");
-//        isActive.store(true);
         result = true;
     }
 
@@ -541,13 +511,7 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
         }
     }
 
-
-    // Store the best note number and DBG print it
     newVoiceNoteNumber.store(bestNote);
-
-
-
-
 
     const int chunkSize = 1024;
     int startSample = (bestStart + 1) * chunkSize;
@@ -555,8 +519,6 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
 
     // Ensure we don't exceed buffer bounds
     numSamples = juce::jmin(numSamples, inputAudioBuffer.getNumSamples() - startSample);
-
-//    DBG("Isolated note: bestNote=" + juce::String(bestNote) + ", startSample=" + juce::String(startSample) + ", numSamples=" + juce::String(numSamples) + ", inputAudioBuffer samples=" + juce::String(inputAudioBuffer.getNumSamples()));
 
     if (numSamples <= 0)
     {
@@ -570,18 +532,10 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
         result.copyFrom(ch, 0, inputAudioBuffer, ch, startSample, numSamples);
     }
 
-
-
-
-
-
     return result;
-
 }
-//void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
 void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, float lengthSeconds)
 {
-//    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
     std::thread t([this, inputAudio = std::move(inputAudio), lengthSeconds]() mutable
     {
         using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
@@ -594,7 +548,6 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
         stretcher.presetDefault(channels, sampleRateFloat);
 
         int inputSamples = inputAudio.getNumSamples();
-//        int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
         int outputSamples = static_cast<int>(lengthSeconds * getSampleRate() + 0.5f);
 
         juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
@@ -620,15 +573,11 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
             }
             this->voiceBuffer = std::move(trimmedAudio);
 
-//            DBG("voiceBuffer after trim: channels=" + juce::String(voiceBuffer.getNumChannels()) + ", samples=" + juce::String(voiceBuffer.getNumSamples()) + ", requested length=" + juce::String(length));
-
         }
         else
         {
             // Fallback: Use full buffer if trimLength is invalid (rare).
             this->voiceBuffer = std::move(timeStretchedAudio);
-
-
         }
 
         // Apply 50ms linear fade-in and fade-out
@@ -642,11 +591,8 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
                 voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
             }
         }
-//        DBG("timeStretch: after fade - samples=" + juce::String(voiceBuffer.getNumSamples()) + ", maxMagnitude=" + juce::String(voiceBuffer.findMinMax(0, 0, voiceBuffer.getNumSamples()).getEnd()));
-//        DBG("voiceBuffer after fade: maxMagnitude=" + juce::String(voiceBuffer.findMinMax(0, 0, voiceBuffer.getNumSamples()).getEnd()));
 
         voiceNoteNumber.store(newVoiceNoteNumber);
-//        DBG("Isolated best note number: " + juce::String(voiceNoteNumber.load()));
 
         DBG("new voice buffer ready");
 
@@ -667,8 +613,6 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const
     int numChannels = input.getNumChannels();
     int inputSamples = input.getNumSamples();
     int outputSamples = static_cast<int>(inputSamples / pitchRatio + 0.5f);
-
-//    DBG("pitchShift: baseNote=" + juce::String(baseNote) + ", targetNote=" + juce::String(targetNote) + ", pitchRatio=" + juce::String(pitchRatio) + ", inputSamples=" + juce::String(inputSamples) + ", outputSamples=" + juce::String(outputSamples));
 
     if (outputSamples <= 0)
     {
@@ -692,8 +636,7 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const
             if (readIndex < inputSamples - 1)
             {
                 // Linear interpolation between samples
-                outputData[i] = inputData[readIndex] * (1.0f - frac) +
-                    inputData[readIndex + 1] * frac;
+                outputData[i] = inputData[readIndex] * (1.0f - frac) + inputData[readIndex + 1] * frac;
             }
             else if (readIndex < inputSamples)
             {
@@ -705,24 +648,6 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const
             }
         }
     }
-
-    //// Apply short fade-in/out to eliminate clicks (5ms each)
-    //int fadeSamples = static_cast<int>(0.005 * getSampleRate() + 0.5f);
-    //fadeSamples = juce::jmin(fadeSamples, outputSamples / 4); // Max 25% of buffer
-
-    //if (fadeSamples > 0)
-    //{
-    //    for (int ch = 0; ch < numChannels; ++ch)
-    //    {
-    //        output.applyGainRamp(ch, 0, fadeSamples, 0.0f, 1.0f);
-    //        output.applyGainRamp(ch, outputSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
-    //    }
-    //}
-
-
-
-//    DBG("pitchShift output: channels=" + juce::String(output.getNumChannels()) + ", samples=" + juce::String(output.getNumSamples()) + ", maxMagnitude=" + juce::String(output.findMinMax(0, 0, output.getNumSamples()).getEnd()));
-
 
     return output;
 }
@@ -904,7 +829,11 @@ void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, in
 {
 
 
-    std::vector<int> scale{ 46, 48, 50, 51, 53, 55, 57, 58 }; // hardcoded b-flat scale for now
+//    std::vector<int> scale{ 46, 48, 50, 51, 53, 55, 57, 58 }; // hardcoded b-flat scale for now
+
+    std::vector<int> scale{ 2, 4, 6, 7, 9, 11, 13, 14 }; // hardcoded d major scale for now
+    for (int& note : scale) { note += 60; }
+    DBG(scale[0]);
 
     std::vector<int> processed_input;
 
