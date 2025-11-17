@@ -122,7 +122,7 @@ public:
 
         sPs = static_cast<int>(std::round(60.0 / currentBpm * getSampleRate() / 4.0 * currentBeats / 8.0));
 
-        DBG("sPs: " + juce::String(sPs));
+//        DBG("sPs: " + juce::String(sPs));
 
         int requiredSize = 32 * sPs + 4096;
         inputAudioBuffer.setSize(2, requiredSize, false, true);
@@ -162,7 +162,9 @@ public:
 
     int frequencyToMidiNote(float frequency);
     juce::AudioBuffer<float> isolateBestNote();
-    void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
+//    void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
+    void timeStretch(juce::AudioBuffer<float> inputAudio, float lengthSeconds);
+
 
     juce::AudioBuffer<float> pitchShiftByResampling(const juce::AudioBuffer<float>& input, int baseNote, int targetNote);
 

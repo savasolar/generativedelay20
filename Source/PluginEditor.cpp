@@ -727,8 +727,8 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
         grabKeyboardFocus();
     };
-    notesValueLabel.onReturnKey = commitBeats;
-    notesValueLabel.onFocusLost = commitBeats;
+    notesValueLabel.onReturnKey = commitNotes;
+    notesValueLabel.onFocusLost = commitNotes;
 
 
     // CHAOS

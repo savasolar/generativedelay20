@@ -284,7 +284,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 //                        juce::String noteStrB = "cM: "; for (int note : capturedMelody) { noteStrB += juce::String(note) + ", "; } DBG(noteStrB);
                     }
                     sampleDrift = static_cast<int>(std::round(32.0 * (60.0 / placeholderBpm * getSampleRate() / 4.0 * placeholderBeats / 8.0 - sPs)));
-                    DBG("sampleDrift: " + juce::String(sampleDrift));
+//                    DBG("sampleDrift: " + juce::String(sampleDrift));
                     symbolExecuted.set(n);
                 }
             }
@@ -357,8 +357,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
-
+//            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate()); // this is async btw
+            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
 
             resetTiming();
@@ -378,6 +378,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         int voiceBufferSize = finalVoiceBuffer.getNumSamples();
         int readPos = finalVoiceBuffer_readPos.load();
 
+//        DBG("processBlock playback: entering copy loop - voiceBufferSize=" + juce::String(voiceBufferSize) + ", readPos=" + juce::String(readPos) + ", ADSR release=" + juce::String(adsrParams.release));
+
         for (int i = 0; i < numSamples; ++i)
         {
             int currentPos = readPos + i;
@@ -386,11 +388,16 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             float gain = useADSR.load() ? adsr.getNextSample() : 1.0f;
 
+  //          if (i == 0) DBG("processBlock playback: sample gain (first)=" + juce::String(gain) + ", finalVoiceBuffer sample at " + juce::String(currentPos) + "=" + juce::String(finalVoiceBuffer.getSample(0, currentPos)));
+
+
             for (int ch = 0; ch < juce::jmin(buffer.getNumChannels(), finalVoiceBuffer.getNumChannels()); ++ch)
             {
                 buffer.addSample(ch, i, finalVoiceBuffer.getSample(ch, currentPos) * gain);
             }
         }
+
+//        DBG("processBlock playback: after copy - buffer maxMagnitude=" + juce::String(buffer.findMinMax(0, 0, numSamples).getEnd()) + ", finalVoiceBuffer_readPos now=" + juce::String(finalVoiceBuffer_readPos.load()));
 
         finalVoiceBuffer_readPos.store(readPos + numSamples);
     }
@@ -436,7 +443,7 @@ bool CounterTuneAudioProcessor::detectSound(const juce::AudioBuffer<float>& buff
 
     if (rms > threshold)
     {
-        DBG("sound detected");
+//        DBG("sound detected");
 //        isActive.store(true);
         result = true;
     }
@@ -549,6 +556,8 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
     // Ensure we don't exceed buffer bounds
     numSamples = juce::jmin(numSamples, inputAudioBuffer.getNumSamples() - startSample);
 
+//    DBG("Isolated note: bestNote=" + juce::String(bestNote) + ", startSample=" + juce::String(startSample) + ", numSamples=" + juce::String(numSamples) + ", inputAudioBuffer samples=" + juce::String(inputAudioBuffer.getNumSamples()));
+
     if (numSamples <= 0)
     {
         return juce::AudioBuffer<float>(inputAudioBuffer.getNumChannels(), 0);
@@ -569,9 +578,11 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::isolateBestNote()
     return result;
 
 }
-void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
+//void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, int length)
+void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio, float lengthSeconds)
 {
-    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
+//    std::thread t([this, inputAudio = std::move(inputAudio), length]() mutable
+    std::thread t([this, inputAudio = std::move(inputAudio), lengthSeconds]() mutable
     {
         using Stretch = signalsmith::stretch::SignalsmithStretch<float>;
 
@@ -583,7 +594,8 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
         stretcher.presetDefault(channels, sampleRateFloat);
 
         int inputSamples = inputAudio.getNumSamples();
-        int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
+//        int outputSamples = static_cast<int>(length * getSampleRate() + 0.5);
+        int outputSamples = static_cast<int>(lengthSeconds * getSampleRate() + 0.5f);
 
         juce::AudioBuffer<float> timeStretchedAudio(channels, outputSamples);
 
@@ -608,6 +620,8 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
             }
             this->voiceBuffer = std::move(trimmedAudio);
 
+//            DBG("voiceBuffer after trim: channels=" + juce::String(voiceBuffer.getNumChannels()) + ", samples=" + juce::String(voiceBuffer.getNumSamples()) + ", requested length=" + juce::String(length));
+
         }
         else
         {
@@ -619,7 +633,8 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
 
         // Apply 50ms linear fade-in and fade-out
         int numSamples = voiceBuffer.getNumSamples();
-        if (numSamples > 0) {
+        if (numSamples > 0)
+        {
             int fadeSamples = static_cast<int>(0.01 * getSampleRate() + 0.5f);
             fadeSamples = juce::jmin(fadeSamples, numSamples / 2);
             for (int ch = 0; ch < voiceBuffer.getNumChannels(); ++ch) {
@@ -627,9 +642,11 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
                 voiceBuffer.applyGainRamp(ch, numSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
             }
         }
+//        DBG("timeStretch: after fade - samples=" + juce::String(voiceBuffer.getNumSamples()) + ", maxMagnitude=" + juce::String(voiceBuffer.findMinMax(0, 0, voiceBuffer.getNumSamples()).getEnd()));
+//        DBG("voiceBuffer after fade: maxMagnitude=" + juce::String(voiceBuffer.findMinMax(0, 0, voiceBuffer.getNumSamples()).getEnd()));
 
         voiceNoteNumber.store(newVoiceNoteNumber);
-        DBG("Isolated best note number: " + juce::String(voiceNoteNumber.load()));
+//        DBG("Isolated best note number: " + juce::String(voiceNoteNumber.load()));
 
         DBG("new voice buffer ready");
 
@@ -650,6 +667,8 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const
     int numChannels = input.getNumChannels();
     int inputSamples = input.getNumSamples();
     int outputSamples = static_cast<int>(inputSamples / pitchRatio + 0.5f);
+
+//    DBG("pitchShift: baseNote=" + juce::String(baseNote) + ", targetNote=" + juce::String(targetNote) + ", pitchRatio=" + juce::String(pitchRatio) + ", inputSamples=" + juce::String(inputSamples) + ", outputSamples=" + juce::String(outputSamples));
 
     if (outputSamples <= 0)
     {
@@ -699,6 +718,11 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const
     //        output.applyGainRamp(ch, outputSamples - fadeSamples, fadeSamples, 1.0f, 0.0f);
     //    }
     //}
+
+
+
+//    DBG("pitchShift output: channels=" + juce::String(output.getNumChannels()) + ", samples=" + juce::String(output.getNumSamples()) + ", maxMagnitude=" + juce::String(output.findMinMax(0, 0, output.getNumSamples()).getEnd()));
+
 
     return output;
 }
@@ -930,12 +954,12 @@ void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, in
 
 
     // Debug print post-processed output
-    juce::String debugPostProcessed = "post-processed output: ";
-    for (const int& event : post_processed)
-    {
-        debugPostProcessed += juce::String(event) + " ";
-    }
-    DBG(debugPostProcessed);
+    //juce::String debugPostProcessed = "post-processed output: ";
+    //for (const int& event : post_processed)
+    //{
+    //    debugPostProcessed += juce::String(event) + " ";
+    //}
+    //DBG(debugPostProcessed);
 
     generatedMelody = post_processed;
 
