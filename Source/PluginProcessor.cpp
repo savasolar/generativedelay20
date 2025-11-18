@@ -827,13 +827,12 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 }
 void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes)
 {
+//    std::vector<int> scale{ 2, 4, 6, 7, 9, 11, 13, 14 }; // hardcoded d major scale for now
 
 
-//    std::vector<int> scale{ 46, 48, 50, 51, 53, 55, 57, 58 }; // hardcoded b-flat scale for now
+    std::vector<int> scale{ 4, 6, 9, 11, 13 }; // hardcoded d major scale for now
 
-    std::vector<int> scale{ 2, 4, 6, 7, 9, 11, 13, 14 }; // hardcoded d major scale for now
     for (int& note : scale) { note += 60; }
-    DBG(scale[0]);
 
     std::vector<int> processed_input;
 
@@ -849,38 +848,61 @@ void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, in
 
     // now arrange length distribution logic
 
-    std::random_device rd;
-    std::mt19937 g(rd());
+    //std::random_device rd;
+    //std::mt19937 g(rd());
 
-    std::vector<int> post_processed;
+    //std::vector<int> post_processed;
 
-    // Generate random lengths
-    if (notes < 1 || notes > 32)
-    {
-        return;
-    }
-    std::vector<int> lengths(notes, 1);
-    int extras = 32 - notes;
-    std::uniform_int_distribution<> dis(0, notes - 1);
-    for (int i = 0; i < extras; ++i)
-    {
-        int idx = dis(g);
-        lengths[idx]++;
-    }
+    //// Generate random lengths
+    //if (notes < 1 || notes > 32)
+    //{
+    //    return;
+    //}
+    //std::vector<int> lengths(notes, 1);
+    //int extras = 32 - notes;
+    //std::uniform_int_distribution<> dis(0, notes - 1);
+    //for (int i = 0; i < extras; ++i)
+    //{
+    //    int idx = dis(g);
+    //    lengths[idx]++;
+    //}
 
-    // Build post_processed
-    for (size_t i = 0; i < static_cast<size_t>(notes); ++i)
-    {
-        post_processed.push_back(processed_input[i]);
-        for (int j = 1; j < lengths[i]; ++j)
-        {
-            post_processed.push_back(-2);
+    //// Build post_processed
+    //for (size_t i = 0; i < static_cast<size_t>(notes); ++i)
+    //{
+    //    post_processed.push_back(processed_input[i]);
+    //    for (int j = 1; j < lengths[i]; ++j)
+    //    {
+    //        post_processed.push_back(-2);
+    //    }
+    //}
+
+    //// Magnetize to on-beats 100% of the time
+    //magnetize(post_processed, 1.0);
+
+    // ADDED: Straight eighth notes arrangement
+    std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
+    const int num_slots = 16;  // 16 note positions (even indices 0,2,...,30)
+
+    if (notes > 0) {  // Avoid division by zero
+        int repeats = num_slots / notes;
+        int remainder = num_slots % notes;
+        int slot_idx = 0;
+
+        // Tile the full sequence 'repeats' times
+        for (int r = 0; r < repeats; ++r) {
+            for (int i = 0; i < notes; ++i) {
+                post_processed[slot_idx * 2] = processed_input[i];
+                ++slot_idx;
+            }
+        }
+
+        // Add the remainder from the start of the sequence
+        for (int i = 0; i < remainder; ++i) {
+            post_processed[slot_idx * 2] = processed_input[i];
+            ++slot_idx;
         }
     }
-
-    // Magnetize to on-beats 100% of the time
-    magnetize(post_processed, 1.0);
-
 
     // Debug print post-processed output
     //juce::String debugPostProcessed = "post-processed output: ";
