@@ -256,22 +256,17 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     presetTitleButton.onClick = [this]()
     {
-//        if (!isMenuDown)
-//        {
-            presetBackgroundBox.setVisible(true);
-            presetBackgroundBox.grabKeyboardFocus();
-            // make all the menu option text boxes and buttons visible here too
-            presetOption1.setVisible(true);
-            presetOption1Button.setVisible(true);
-            presetOption2.setVisible(true);
-            presetOption2Button.setVisible(true);
-            presetOption3.setVisible(true);
-            presetOption3Button.setVisible(true);
-            presetOption4.setVisible(true);
-            presetOption4Button.setVisible(true);
-//            isMenuDown = true;
-//            presetTitleButton.setEnabled(false);
-//        }
+        presetBackgroundBox.setVisible(true);
+        presetBackgroundBox.grabKeyboardFocus();
+        // make all the menu option text boxes and buttons visible here too
+        presetOption1.setVisible(true);
+        presetOption1Button.setVisible(true);
+        presetOption2.setVisible(true);
+        presetOption2Button.setVisible(true);
+        presetOption3.setVisible(true);
+        presetOption3Button.setVisible(true);
+        presetOption4.setVisible(true);
+        presetOption4Button.setVisible(true);
     };
 
     // unanimated preset menu settings

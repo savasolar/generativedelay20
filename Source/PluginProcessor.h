@@ -64,6 +64,59 @@ public:
     int getPresetInt() const { return *parameters.getRawParameterValue("preset"); }
     void setPresetInt(int newPresetInt) { auto* param = parameters.getParameter("preset"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newPresetInt)); }
 
+
+
+    float getDefaultBpmFromHost()
+    {
+        // Default value in case we can't get BPM from host
+        float defaultBpm = 120.0f;
+        if (auto* playHead = getPlayHead())
+        {
+            if (auto position = playHead->getPosition())
+            {
+                if (position->getBpm().hasValue())
+                    return static_cast<float>(*position->getBpm());
+            }
+        }
+        return defaultBpm;
+    }
+    void synchronizeBpm()
+    {
+        float hostBpm = getDefaultBpmFromHost();
+        if (firstSync)
+        {
+            if (!stateLoaded)
+            {
+                // No saved state: initialize BPM to DAW's BPM
+                if (hostBpm > 0)
+                {
+                    setTempoFloat(hostBpm);
+                    oldHostBpm = hostBpm;
+                }
+                stateLoaded = true; // Prevent repeated initialization
+            }
+            else
+            {
+                // Saved state exists: align oldHostBpm to current hostBpm without changing BPM
+                oldHostBpm = hostBpm;
+            }
+            firstSync = false;
+        }
+        else
+        {
+            // Subsequent calls: update only if DAW BPM changes
+            if (hostBpm != oldHostBpm && hostBpm > 0)
+            {
+                setTempoFloat(hostBpm);
+                oldHostBpm = hostBpm;
+            }
+        }
+    }
+    bool stateLoaded = false;
+    bool isDemoExpired = false;
+    float oldHostBpm = 120;
+    bool firstSync = true;
+
     juce::AudioProcessorValueTreeState parameters;
 
     // cycle reset-based params should be double-buffered
