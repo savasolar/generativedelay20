@@ -30,6 +30,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
 
 CounterTuneAudioProcessorEditor::~CounterTuneAudioProcessorEditor()
 {
+    loopButton.setLookAndFeel(nullptr);
     setLookAndFeel(nullptr);
 }
 
@@ -44,6 +45,7 @@ void CounterTuneAudioProcessorEditor::timerCallback()
         updateDetuneValueLabel();
         updateMixValueLabel();
         updateLoopValueLabel();
+        updateLoopButtonTheme();
         updatePresetLabel();
         firstLoad = false;
     }
@@ -933,40 +935,55 @@ void CounterTuneAudioProcessorEditor::setupParams()
     loopTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     loopTitleLabel.setText("LOOP", dontSendNotification);
 
-    addAndMakeVisible(loopOnLabel);
-    loopOnLabel.setBounds(505, 80, 60, 20);
-    loopOnLabel.setJustification(juce::Justification::centred);
-    loopOnLabel.setFont(getCustomFont(18.0f));
-    loopOnLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
-    loopOnLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
-    loopOnLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
-    loopOnLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
-    loopOnLabel.setReadOnly(true);
-    loopOnLabel.setCaretVisible(false);
-    loopOnLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
-    loopOnLabel.setText("ON", dontSendNotification);
+    //addAndMakeVisible(loopOnLabel);
+    //loopOnLabel.setBounds(505, 80, 60, 20);
+    //loopOnLabel.setJustification(juce::Justification::centred);
+    //loopOnLabel.setFont(getCustomFont(18.0f));
+    //loopOnLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    //loopOnLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+    //loopOnLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    //loopOnLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    //loopOnLabel.setReadOnly(true);
+    //loopOnLabel.setCaretVisible(false);
+    //loopOnLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
+    //loopOnLabel.setText("ON", dontSendNotification);
 
-    addAndMakeVisible(loopOffLabel);
-    loopOffLabel.setBounds(505, 100, 60, 20);
-    loopOffLabel.setJustification(juce::Justification::centred);
-    loopOffLabel.setFont(getCustomFont(18.0f));
-    loopOffLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
-    loopOffLabel.setColour(juce::TextEditor::backgroundColourId, foregroundColor);
-    loopOffLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
-    loopOffLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
-    loopOffLabel.setReadOnly(true);
-    loopOffLabel.setCaretVisible(false);
-    loopOffLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
-    loopOffLabel.setText("OFF", dontSendNotification);
+    //addAndMakeVisible(loopOffLabel);
+    //loopOffLabel.setBounds(505, 100, 60, 20);
+    //loopOffLabel.setJustification(juce::Justification::centred);
+    //loopOffLabel.setFont(getCustomFont(18.0f));
+    //loopOffLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
+    //loopOffLabel.setColour(juce::TextEditor::backgroundColourId, foregroundColor);
+    //loopOffLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    //loopOffLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    //loopOffLabel.setReadOnly(true);
+    //loopOffLabel.setCaretVisible(false);
+    //loopOffLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
+    //loopOffLabel.setText("OFF", dontSendNotification);
 
-
+    addAndMakeVisible(loopValueLabel);
+    loopValueLabel.setBounds(505, 100, 60, 20);
+    loopValueLabel.setJustification(juce::Justification::centred);
+    loopValueLabel.setFont(getCustomFont(18.0f));
+    loopValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
+    loopValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
+    loopValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
+    loopValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
+    loopValueLabel.setReadOnly(true);
+    loopValueLabel.setCaretVisible(false);
+    loopValueLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
     updateLoopValueLabel();
 
     loopAttachment = std::make_unique<juce::AudioProcessorValueTreeState::ButtonAttachment>(parameters, "loop", loopButton);
     loopButton.setClickingTogglesState(true);
-    loopButton.setBounds(505, 60, 60, 60);
+    updateLoopButtonTheme();
+    loopButton.setBounds(505, 79, 60, 21);
     loopButton.setMouseCursor(juce::MouseCursor::PointingHandCursor);
-    loopButton.onClick = [this]() { updateLoopValueLabel(); };
+    loopButton.onClick = [this]()
+    { 
+        updateLoopValueLabel();
+        updateLoopButtonTheme();
+    };
     addAndMakeVisible(loopButton);
 
     // MIX
