@@ -110,7 +110,7 @@ target_sources(generativedelay20 PRIVATE
     Source/PluginEditor.h
     Source/PluginProcessor.cpp
     Source/PluginProcessor.h
-	Dependencies/dywapitchtrack/src/dywapitchtrack.c
+    Dependencies/dywapitchtrack/src/dywapitchtrack.c
 )
 
 set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PROPERTIES LANGUAGE C)
