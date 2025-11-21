@@ -54,6 +54,7 @@ private:
 
 
     juce::TextEditor presetTitleLabel;
+//    bool isMenuDown = false;
     juce::String presetTitleText{ "" };
     TransparentButton presetTitleButton;
     juce::TextEditor presetBackgroundBox;
@@ -180,43 +181,12 @@ private:
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> detuneAttachment;
     
     juce::TextEditor loopTitleLabel;
-//    TransparentButton loopButton;
-//    juce::TextEditor loopOnLabel;
-//    juce::TextEditor loopOffLabel;
     juce::TextEditor loopValueLabel;
     juce::ImageButton loopButton;
 
     void updateLoopValueLabel()
     {
         bool value = audioProcessor.getLoopBool();
-
-        //if (value)
-        //{
-        //    loopOnLabel.setText("", dontSendNotification);
-        //    loopOnLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
-        //    loopOnLabel.setText("ON", dontSendNotification);
-        //    loopOnLabel.setColour(juce::TextEditor::backgroundColourId, foregroundColor);
-
-        //    loopOffLabel.setText("", dontSendNotification);
-        //    loopOffLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
-        //    loopOffLabel.setText("OFF", dontSendNotification);
-        //    loopOffLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
-        //}
-        //else
-        //{
-        //    loopOnLabel.setText("", dontSendNotification);
-        //    loopOnLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
-        //    loopOnLabel.setText("ON", dontSendNotification);
-        //    loopOnLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
-
-        //    loopOffLabel.setText("", dontSendNotification);
-        //    loopOffLabel.setColour(juce::TextEditor::textColourId, backgroundColor);
-        //    loopOffLabel.setText("OFF", dontSendNotification);
-        //    loopOffLabel.setColour(juce::TextEditor::backgroundColourId, foregroundColor);
-        //}
-
-
-
         juce::String text = value ? "ON" : "OFF";
         loopValueLabel.setText(text, dontSendNotification);
 

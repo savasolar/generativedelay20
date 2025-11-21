@@ -256,17 +256,22 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     presetTitleButton.onClick = [this]()
     {
-        presetBackgroundBox.setVisible(true);
-        presetBackgroundBox.grabKeyboardFocus();
-        // make all the menu option text boxes and buttons visible here too
-        presetOption1.setVisible(true);
-        presetOption1Button.setVisible(true);
-        presetOption2.setVisible(true);
-        presetOption2Button.setVisible(true);
-        presetOption3.setVisible(true);
-        presetOption3Button.setVisible(true);
-        presetOption4.setVisible(true);
-        presetOption4Button.setVisible(true);
+//        if (!isMenuDown)
+//        {
+            presetBackgroundBox.setVisible(true);
+            presetBackgroundBox.grabKeyboardFocus();
+            // make all the menu option text boxes and buttons visible here too
+            presetOption1.setVisible(true);
+            presetOption1Button.setVisible(true);
+            presetOption2.setVisible(true);
+            presetOption2Button.setVisible(true);
+            presetOption3.setVisible(true);
+            presetOption3Button.setVisible(true);
+            presetOption4.setVisible(true);
+            presetOption4Button.setVisible(true);
+//            isMenuDown = true;
+//            presetTitleButton.setEnabled(false);
+//        }
     };
 
     // unanimated preset menu settings
@@ -300,7 +305,8 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
         presetOption3Button.setVisible(false);
         presetOption4.setVisible(false);
         presetOption4Button.setVisible(false);
-
+//        isMenuDown = false;
+//        presetTitleButton.setEnabled(true);
     };
 
     addAndMakeVisible(presetOption1);
@@ -374,7 +380,7 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
 void CounterTuneAudioProcessorEditor::paintPresetMenu(juce::Graphics& g)
 {
-    if (!presetTitleButton.isMouseButtonDown())
+    if (!presetTitleButton.isMouseOver())
     {
 //        g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 21, 140, 18));
         g.drawImage(presetMenuDefault, juce::Rectangle<float>(481, 20, 140, 20));
