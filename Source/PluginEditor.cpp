@@ -644,7 +644,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
     keyValueLabel.setJustification(juce::Justification::centredTop);
     keyValueLabel.setMultiLine(false);
     keyValueLabel.setReturnKeyStartsNewLine(false);
-    keyValueLabel.setInputRestrictions(10, "0123456789.-+");
+//    keyValueLabel.setInputRestrictions(10, "0123456789.-+");
     keyValueLabel.setSelectAllWhenFocused(true);
     keyValueLabel.setFont(getCustomFont(18.0f));
     keyValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
@@ -652,25 +652,75 @@ void CounterTuneAudioProcessorEditor::setupParams()
     keyValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
     keyValueLabel.setColour(juce::TextEditor::focusedOutlineColourId, juce::Colours::transparentBlack);
     updateKeyValueLabel();
+    //auto commitKey = [this]()
+    //{
+    //    keyValueLabel.moveCaretToEnd(false);
+
+    //    juce::String text = keyValueLabel.getText().trim();
+    //    int value = text.getIntValue();
+    //    if (text.isEmpty())
+    //    {
+    //        updateKeyValueLabel();
+    //        return;
+    //    }
+    //    value = juce::jlimit(0, 12, value);
+    //    keyKnob.setValue(value);
+    //    updateKeyValueLabel();
+
+    //    grabKeyboardFocus();
+    //};
+    //keyValueLabel.onReturnKey = commitKey;
+    //keyValueLabel.onFocusLost = commitKey;
+
     auto commitKey = [this]()
-    {
-        keyValueLabel.moveCaretToEnd(false);
-
-        juce::String text = keyValueLabel.getText().trim();
-        int value = text.getIntValue();
-        if (text.isEmpty())
         {
-            updateKeyValueLabel();
-            return;
-        }
-        value = juce::jlimit(0, 12, value);
-        keyKnob.setValue(value);
-        updateKeyValueLabel();
+            keyValueLabel.moveCaretToEnd(false);
 
-        grabKeyboardFocus();
-    };
+            juce::String text = keyValueLabel.getText().trim().toUpperCase();
+
+            if (text.isEmpty())
+            {
+                updateKeyValueLabel();
+                return;
+            }
+
+            // Try parsing as integer first (backward compat)
+            bool isNum = true;
+            for (auto c : text) { if (!juce::CharacterFunctions::isDigit(c)) { isNum = false; break; } }
+            if (isNum)
+            {
+                int value = text.getIntValue();
+                if (value >= 0 && value <= 12)
+                {
+                    keyKnob.setValue(value);
+                    updateKeyValueLabel();
+                    grabKeyboardFocus();
+                    return;
+                }
+            }
+
+            // Then try sharp/flat names
+            int value = keyNames.indexOf(text);
+            if (value == -1)
+                value = altKeyNames.indexOf(text);
+
+            if (value >= 0 && value <= 12)
+            {
+                keyKnob.setValue(value);
+                updateKeyValueLabel();
+            }
+            else
+            {
+                updateKeyValueLabel(); // Revert if invalid
+            }
+
+            grabKeyboardFocus();
+        };
     keyValueLabel.onReturnKey = commitKey;
     keyValueLabel.onFocusLost = commitKey;
+
+
+
 
 
     // NOTES
