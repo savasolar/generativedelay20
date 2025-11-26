@@ -807,7 +807,8 @@ void CounterTuneAudioProcessorEditor::setupParams()
     chaosKnob.setColour(juce::Slider::thumbColourId, foregroundColor);
     chaosKnob.setTextBoxStyle(juce::Slider::NoTextBox, false, 0, 0);
     chaosKnob.setBounds(289, 80, 60, 20);
-    chaosKnob.setRange(0.1, 1.0, 0.1);
+//    chaosKnob.setRange(0.1, 1.0, 0.1);
+    chaosKnob.setRange(1, 10, 1);
     chaosKnob.onValueChange = [this]() { updateChaosValueLabel(); };
     addAndMakeVisible(chaosKnob);
 
@@ -829,13 +830,16 @@ void CounterTuneAudioProcessorEditor::setupParams()
         chaosValueLabel.moveCaretToEnd(false);
 
         juce::String text = chaosValueLabel.getText().trim();
-        float value = text.getFloatValue();
-        if (text.isEmpty() || !std::isfinite(value))
+        //float value = text.getFloatValue();
+        int value = text.getIntValue();
+//        if (text.isEmpty() || !std::isfinite(value))
+        if (text.isEmpty())
         {
             updateChaosValueLabel();
             return;
         }
-        value = juce::jlimit(0.1f, 1.0f, value);
+//        value = juce::jlimit(0.1f, 1.0f, value);
+        value = juce::jlimit(1, 10, value);
         chaosKnob.setValue(value);
         updateChaosValueLabel();
 

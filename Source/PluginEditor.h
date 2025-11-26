@@ -167,8 +167,9 @@ private:
     juce::TextEditor chaosValueLabel;
     void updateChaosValueLabel()
     {
-        float value = audioProcessor.getChaosFloat();
-        juce::String text = juce::String(value, 2);
+//        float value = audioProcessor.getChaosFloat();
+        int value = audioProcessor.getChaosInt();
+        juce::String text = juce::String(value);
         chaosValueLabel.setText(text, false);
     }
     std::unique_ptr <juce::AudioProcessorValueTreeState::SliderAttachment> chaosAttachment;

@@ -19,7 +19,8 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"beats", 1}, "Beats", 1.0f, 16.0f, 8.0f),
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"key", 1}, "Key", 0, 12, 12),//12=auto, 0=c, ... 11=b
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"notes", 1}, "Notes", 1, 16, 8),
-            std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"chaos", 1}, "Chaos", 0.1f, 1.0f, 0.5f),
+            //std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"chaos", 1}, "Chaos", 0.1f, 1.0f, 0.5f),
+            std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"chaos", 1}, "Chaos", 1, 10, 5),
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"octave", 1}, "Octave", -4, 4, 0),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"detune", 1}, "Detune", -1.0f, 1.0f, 0.0f),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"mix", 1}, "Mix", 0.0f, 1.0f, 0.5f),
@@ -340,7 +341,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-                produceMelody(capturedMelody, getKeyInt(), getNotesInt(), getChaosFloat());
+//                produceMelody(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
             }
 
             // populate voice buffer with latest info 
@@ -981,6 +982,25 @@ void CounterTuneAudioProcessor::copyMelodiesTo(std::vector<int>& outCaptured, st
     outCaptured = capturedMelody;
     outGenerated = generatedMelody;
 }
+
+
+
+void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, int key, int notes, int chaos)
+{
+    std::vector<int> result;
+
+
+    // GIVEN AN INPUT MELODY, PRODUCE AN OUTPUT MELODY
+
+    std::vector<int> scale{ 4, 6, 9, 11, 13 }; // hardcoded d major scale for now
+    for (int& note : scale) { note += 60; } // transpose to a regular range
+
+
+
+    generatedMelody = result;
+}
+
+
 
 bool CounterTuneAudioProcessor::hasEditor() const
 {

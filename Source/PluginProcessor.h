@@ -51,8 +51,13 @@ public:
     void setKeyInt(int newKeyInt) { auto* param = parameters.getParameter("key"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newKeyInt)); }
     int getNotesInt() const { return *parameters.getRawParameterValue("notes"); }
     void setNotesInt(int newNotesInt) { auto* param = parameters.getParameter("notes"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newNotesInt)); }
-    float getChaosFloat() const { return *parameters.getRawParameterValue("chaos"); }
-    void setChaosFloat(float newChaosFloat) { auto* param = parameters.getParameter("chaos"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newChaosFloat)); }
+    //float getChaosFloat() const { return *parameters.getRawParameterValue("chaos"); }
+    //void setChaosFloat(float newChaosFloat) { auto* param = parameters.getParameter("chaos"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newChaosFloat)); }
+
+
+    int getChaosInt() const { return *parameters.getRawParameterValue("chaos"); }
+    void setChaosInt(float newChaosInt) { auto* param = parameters.getParameter("chaos"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newChaosInt)); }
+
     int getOctaveInt() const { return *parameters.getRawParameterValue("octave"); }
     void setOctaveInt(int newOctaveInt) { auto* param = parameters.getParameter("octave"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newOctaveInt)); }
     float getDetuneFloat() const { return *parameters.getRawParameterValue("detune"); }
@@ -279,6 +284,7 @@ private:
 
 
     void produceMelody(const std::vector<int>& melody, int key, int notes, float chaos);
+    void produceMelody2(const std::vector<int>& melody, int key, int notes, int chaos);
     // post-process formatting
     void magnetize(std::vector<int>& melody, float probability) const;
 
