@@ -278,7 +278,7 @@ private:
     void detectKey(const std::vector<int>& melody);
 
 
-    void produceMelody(const std::vector<int>& melody, int key, int notes);
+    void produceMelody(const std::vector<int>& melody, int key, int notes, float chaos);
     // post-process formatting
     void magnetize(std::vector<int>& melody, float probability) const;
 

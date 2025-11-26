@@ -340,7 +340,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-                produceMelody(capturedMelody, getKeyInt(), getNotesInt());
+                produceMelody(capturedMelody, getKeyInt(), getNotesInt(), getChaosFloat());
             }
 
             // populate voice buffer with latest info 
@@ -832,7 +832,7 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 
 //    generatedMelody = { 60, -2, -2, -2, -2, -2, -2, -2, 60, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
 }
-void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes)
+void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes, float chaos)
 {
 //    std::vector<int> scale{ 2, 4, 6, 7, 9, 11, 13, 14 }; // hardcoded d major scale for now
 
