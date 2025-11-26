@@ -341,7 +341,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-//                produceMelody(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
+                produceMelody2(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
             }
 
             // populate voice buffer with latest info 
