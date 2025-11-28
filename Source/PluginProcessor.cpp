@@ -1001,6 +1001,12 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
 
 
 
+/*    result = melodySequence(std::vector<int> acceptableIntervals, rhythmicArrangement); */
+
+    // rhythmicArrangement is a data type that if you give it a set of acceptable intervals, it'll sort them into a 32-symbol array given rhythmic characteristics i.e. straight quarter notes, straight 8th notes, or intelligent rhythmic determinism
+    // rhythmicArrangement = 0 -> "straight quarter notes"
+    // rhythmicArrangement = 1 -> "straight eighth notes"
+    // rhythmicArrangement = 2 -> "intelligent rhythmic determinism"
 
     generatedMelody = result;
 }
