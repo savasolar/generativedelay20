@@ -341,7 +341,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-//                produceMelody2(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
+
+                produceMelody2(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
             }
 
             // populate voice buffer with latest info 
@@ -803,32 +804,32 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 
     std::array<int, 12> keys{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
     int key = keys[best_tonic];
-    DBG(key);
+    DBG("Detected key: " + key);
 
-    if (key == 0)
-        generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
-    if (key == 1)
-        generatedMelody = { 61, -2, -2, -2, 63, -2, -2, -2, 65, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2 };
-    if (key == 2)
-        generatedMelody = { 62, -2, -2, -2, 64, -2, -2, -2, 66, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2 };
-    if (key == 3)
-        generatedMelody = { 63, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2 };
-    if (key == 4)
-        generatedMelody = { 64, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2 };
-    if (key == 5)
-        generatedMelody = { 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 77, -2, -2, -2 };
-    if (key == 6)
-        generatedMelody = { 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 78, -2, -2, -2 };
-    if (key == 7)
-        generatedMelody = { 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 79, -2, -2, -2 };
-    if (key == 8)
-        generatedMelody = { 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 80, -2, -2, -2 };
-    if (key == 9)
-        generatedMelody = { 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 81, -2, -2, -2 };
-    if (key == 10)
-        generatedMelody = { 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 81, -2, -2, -2, 82, -2, -2, -2 };
-    if (key == 11)
-        generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
+    //if (key == 0)
+    //    generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
+    //if (key == 1)
+    //    generatedMelody = { 61, -2, -2, -2, 63, -2, -2, -2, 65, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2 };
+    //if (key == 2)
+    //    generatedMelody = { 62, -2, -2, -2, 64, -2, -2, -2, 66, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2 };
+    //if (key == 3)
+    //    generatedMelody = { 63, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2 };
+    //if (key == 4)
+    //    generatedMelody = { 64, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2 };
+    //if (key == 5)
+    //    generatedMelody = { 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 77, -2, -2, -2 };
+    //if (key == 6)
+    //    generatedMelody = { 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 78, -2, -2, -2 };
+    //if (key == 7)
+    //    generatedMelody = { 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 79, -2, -2, -2 };
+    //if (key == 8)
+    //    generatedMelody = { 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 80, -2, -2, -2 };
+    //if (key == 9)
+    //    generatedMelody = { 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 81, -2, -2, -2 };
+    //if (key == 10)
+    //    generatedMelody = { 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 81, -2, -2, -2, 82, -2, -2, -2 };
+    //if (key == 11)
+    //    generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
 
 
 //    generatedMelody = { 60, -2, -2, -2, -2, -2, -2, -2, 60, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
@@ -995,18 +996,74 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
 //    std::vector<int> scale{ 4, 6, 9, 11, 13 }; // hardcoded d major scale for now
 
 
-    std::vector<int> scale{ 0, 2, 4, 5, 7, 9, 11, 12 }; // i am still here
+    std::vector<int> scale{}; // i am still here
+    int rhythmicArrangement = 0;
+
+    // determine acceptable scale and rhythmic arrangement based on chaos value
+
+    if (chaos == 1)
+    {
+
+        rhythmicArrangement = 1; // straight quater notes
+    }
+    if (chaos == 2)
+    {
+
+        rhythmicArrangement = 1; // straight quater notes
+    }
+    if (chaos == 3)
+    {
+
+        rhythmicArrangement = 1; // straight quater notes
+    }
+    if (chaos == 4)
+    {
+
+        rhythmicArrangement = 1; // straight quater notes
+    }
+    if (chaos == 5)
+    {
+
+        rhythmicArrangement = 2; // straight eighth notes
+    }
+    if (chaos == 6)
+    {
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12 };
+        rhythmicArrangement = 2; // straight eighth notes        
+    }
+    if (chaos == 7)
+    {
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12 };
+        rhythmicArrangement = 3; // intelligent rhytmic determinism
+    }
+    if (chaos == 8)
+    {
+
+        rhythmicArrangement = 3; // intelligent rhytmic determinism
+    }
+    if (chaos == 9)
+    {
+
+        rhythmicArrangement = 3; // intelligent rhytmic determinism
+    }
+    if (chaos == 10)
+    {
+
+        rhythmicArrangement = 3; // intelligent rhytmic determinism
+    }
+
+
     for (int& note : scale) { note += 60; } // transpose to a regular range
+    // and also transpose to the correct key
 
 
 
-
-/*    result = melodySequence(std::vector<int> acceptableIntervals, rhythmicArrangement); */
+/*    result = melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement); */
 
     // rhythmicArrangement is a data type that if you give it a set of acceptable intervals, it'll sort them into a 32-symbol array given rhythmic characteristics i.e. straight quarter notes, straight 8th notes, or intelligent rhythmic determinism
-    // rhythmicArrangement = 0 -> "straight quarter notes"
-    // rhythmicArrangement = 1 -> "straight eighth notes"
-    // rhythmicArrangement = 2 -> "intelligent rhythmic determinism"
+    // rhythmicArrangement = 1 -> "straight quarter notes"
+    // rhythmicArrangement = 2 -> "straight eighth notes"
+    // rhythmicArrangement = 3 -> "intelligent rhythmic determinism"
 
     generatedMelody = result;
 }
