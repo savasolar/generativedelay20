@@ -990,13 +990,9 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
 {
     std::vector<int> result;
 
-
     // GIVEN AN INPUT MELODY, PRODUCE AN OUTPUT MELODY
 
-//    std::vector<int> scale{ 4, 6, 9, 11, 13 }; // hardcoded d major scale for now
-
-
-    std::vector<int> scale{}; // i am still here
+    std::vector<int> scale{};
     int rhythmicArrangement = 0;
 
     // determine acceptable scale and rhythmic arrangement based on chaos value
@@ -1053,9 +1049,9 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
         rhythmicArrangement = 3;
     }
 
-
+    for (int& note : scale) { note += key; } // transpose to the correct key
     for (int& note : scale) { note += 60; } // transpose to a regular range
-    // and also transpose to the correct key
+    
 
 
 
