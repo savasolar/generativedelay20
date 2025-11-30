@@ -1003,27 +1003,27 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
 
     if (chaos == 1)
     {
-
+        scale = { 7 };
         rhythmicArrangement = 1; // straight quater notes
     }
     if (chaos == 2)
     {
-
+        scale = { 4, 7 };
         rhythmicArrangement = 1; // straight quater notes
     }
     if (chaos == 3)
     {
-
+        scale = { 2, 4, 7 };
         rhythmicArrangement = 1; // straight quater notes
     }
     if (chaos == 4)
     {
-
+        scale = { 2, 4, 7, 9, 11 };
         rhythmicArrangement = 1; // straight quater notes
     }
     if (chaos == 5)
     {
-
+        scale = { 2, 4, 7, 9, 11 };
         rhythmicArrangement = 2; // straight eighth notes
     }
     if (chaos == 6)
@@ -1039,17 +1039,18 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     if (chaos == 8)
     {
 
-        rhythmicArrangement = 3; // intelligent rhytmic determinism
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 6 };
+        rhythmicArrangement = 3;
     }
     if (chaos == 9)
     {
-
-        rhythmicArrangement = 3; // intelligent rhytmic determinism
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 1, 6, 10 };
+        rhythmicArrangement = 3;
     }
     if (chaos == 10)
     {
-
-        rhythmicArrangement = 3; // intelligent rhytmic determinism
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 1, 3, 6, 8, 10 };
+        rhythmicArrangement = 3;
     }
 
 
