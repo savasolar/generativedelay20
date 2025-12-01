@@ -1072,16 +1072,96 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
 
     if (rhythm == 1) // straight quarter notes
     {
+        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
+        const int num_slots = 8;  // 8 note positions (even indices 0,4,...,28)
 
+        if (notes > 0) {  // Avoid division by zero
+            int repeats = num_slots / notes;
+            int remainder = num_slots % notes;
+            int slot_idx = 0;
+
+            // Tile the full sequence 'repeats' times
+            for (int r = 0; r < repeats; ++r) {
+                for (int i = 0; i < notes; ++i) {
+                    post_processed[slot_idx * 2] = processed_input[i];
+                    ++slot_idx;
+                }
+            }
+
+            // Add the remainder from the start of the sequence
+            for (int i = 0; i < remainder; ++i) {
+                post_processed[slot_idx * 2] = processed_input[i];
+                ++slot_idx;
+            }
+        }
     }
     if (rhythm == 2) // straight eighth notes
     {
+        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
+        const int num_slots = 16;  // 16 note positions (even indices 0,2,...,30)
 
+        if (notes > 0) {  // Avoid division by zero
+            int repeats = num_slots / notes;
+            int remainder = num_slots % notes;
+            int slot_idx = 0;
+
+            // Tile the full sequence 'repeats' times
+            for (int r = 0; r < repeats; ++r) {
+                for (int i = 0; i < notes; ++i) {
+                    post_processed[slot_idx * 2] = processed_input[i];
+                    ++slot_idx;
+                }
+            }
+
+            // Add the remainder from the start of the sequence
+            for (int i = 0; i < remainder; ++i) {
+                post_processed[slot_idx * 2] = processed_input[i];
+                ++slot_idx;
+            }
+        }
     }
     if (rhythm == 3) // intelligent rhythmic determinism
     {
+        std::random_device rd;
+        std::mt19937 g(rd());
 
+        std::vector<int> post_processed;
+
+        // Generate random lengths
+        if (notes < 1 || notes > 32)
+        {
+            return;
+        }
+        std::vector<int> lengths(notes, 1);
+        int extras = 32 - notes;
+        std::uniform_int_distribution<> dis(0, notes - 1);
+        for (int i = 0; i < extras; ++i)
+        {
+            int idx = dis(g);
+            lengths[idx]++;
+        }
+
+        // Build post_processed
+        for (size_t i = 0; i < static_cast<size_t>(notes); ++i)
+        {
+            post_processed.push_back(processed_input[i]);
+            for (int j = 1; j < lengths[i]; ++j)
+            {
+                post_processed.push_back(-2);
+            }
+        }
+
+        // Magnetize to on-beats 100% of the time
+        magnetize(post_processed, 1.0);
     }
+
+    // Debug print post-processed output
+    juce::String debugPostProcessed = "post-processed output: ";
+    for (const int& event : post_processed)
+    {
+        debugPostProcessed += juce::String(event) + " ";
+    }
+    DBG(debugPostProcessed);
 
 
     generatedMelody = post_processed;
