@@ -993,74 +993,66 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     // GIVEN AN INPUT MELODY, PRODUCE AN OUTPUT MELODY
 
     std::vector<int> scale{};
-    int rhythmicArrangement = 0;
+    int rhythm = 0;
 
     // determine acceptable scale and rhythmic arrangement based on chaos value
 
     if (chaos == 1)
     {
         scale = { 7 };
-        rhythmicArrangement = 1; // straight quater notes
+        rhythm = 1; // straight quater notes
     }
     if (chaos == 2)
     {
         scale = { 4, 7 };
-        rhythmicArrangement = 1; // straight quater notes
+        rhythm = 1; // straight quater notes
     }
     if (chaos == 3)
     {
         scale = { 2, 4, 7 };
-        rhythmicArrangement = 1; // straight quater notes
+        rhythm = 1; // straight quater notes
     }
     if (chaos == 4)
     {
         scale = { 2, 4, 7, 9, 11 };
-        rhythmicArrangement = 1; // straight quater notes
+        rhythm = 1; // straight quater notes
     }
     if (chaos == 5)
     {
         scale = { 2, 4, 7, 9, 11 };
-        rhythmicArrangement = 2; // straight eighth notes
+        rhythm = 2; // straight eighth notes
     }
     if (chaos == 6)
     {
         scale = { 0, 2, 4, 5, 7, 9, 11, 12 };
-        rhythmicArrangement = 2; // straight eighth notes        
+        rhythm = 2; // straight eighth notes        
     }
     if (chaos == 7)
     {
         scale = { 0, 2, 4, 5, 7, 9, 11, 12 };
-        rhythmicArrangement = 3; // intelligent rhytmic determinism
+        rhythm = 3; // intelligent rhytmic determinism
     }
     if (chaos == 8)
     {
 
         scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 6 };
-        rhythmicArrangement = 3;
+        rhythm = 3;
     }
     if (chaos == 9)
     {
         scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 1, 6, 10 };
-        rhythmicArrangement = 3;
+        rhythm = 3;
     }
     if (chaos == 10)
     {
         scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 1, 3, 6, 8, 10 };
-        rhythmicArrangement = 3;
+        rhythm = 3;
     }
 
     for (int& note : scale) { note += key; } // transpose to the correct key
     for (int& note : scale) { note += 60; } // transpose to a regular range
     
-
-
-
-/*    result = melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement); */
-
-    // rhythmicArrangement is a data type that if you give it a set of acceptable intervals, it'll sort them into a 32-symbol array given rhythmic characteristics i.e. straight quarter notes, straight 8th notes, or intelligent rhythmic determinism
-    // rhythmicArrangement = 1 -> "straight quarter notes"
-    // rhythmicArrangement = 2 -> "straight eighth notes"
-    // rhythmicArrangement = 3 -> "intelligent rhythmic determinism"
+    result = melodySequence(scale, rhythm);
 
     generatedMelody = result;
 }

@@ -51,13 +51,8 @@ public:
     void setKeyInt(int newKeyInt) { auto* param = parameters.getParameter("key"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newKeyInt)); }
     int getNotesInt() const { return *parameters.getRawParameterValue("notes"); }
     void setNotesInt(int newNotesInt) { auto* param = parameters.getParameter("notes"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newNotesInt)); }
-    //float getChaosFloat() const { return *parameters.getRawParameterValue("chaos"); }
-    //void setChaosFloat(float newChaosFloat) { auto* param = parameters.getParameter("chaos"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newChaosFloat)); }
-
-
     int getChaosInt() const { return *parameters.getRawParameterValue("chaos"); }
     void setChaosInt(float newChaosInt) { auto* param = parameters.getParameter("chaos"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newChaosInt)); }
-
     int getOctaveInt() const { return *parameters.getRawParameterValue("octave"); }
     void setOctaveInt(int newOctaveInt) { auto* param = parameters.getParameter("octave"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newOctaveInt)); }
     float getDetuneFloat() const { return *parameters.getRawParameterValue("detune"); }
@@ -68,8 +63,6 @@ public:
     void setLoopBool(bool newLoopBool) { auto* param = parameters.getParameter("loop"); param->setValueNotifyingHost(newLoopBool ? 1.0f : 0.0f); }
     int getPresetInt() const { return *parameters.getRawParameterValue("preset"); }
     void setPresetInt(int newPresetInt) { auto* param = parameters.getParameter("preset"); auto range = param->getNormalisableRange(); param->setValueNotifyingHost(range.convertTo0to1(newPresetInt)); }
-
-
 
     float getDefaultBpmFromHost()
     {
@@ -121,26 +114,18 @@ public:
     bool isDemoExpired = false;
     float oldHostBpm = 120;
     bool firstSync = true;
-
     juce::AudioProcessorValueTreeState parameters;
-
-    // cycle reset-based params should be double-buffered
     float placeholderBpm = 120.0;
     float placeholderBeats = 8.0;
-
     bool placeholderHold = false;
-//    int placeholderOctave = 0;
-
     int sPs = 0;
     std::bitset<32> symbolExecuted;
     std::bitset<32> playbackSymbolExecuted;
     std::bitset<32> fractionalSymbolExecuted;
     int positionMarkerX = 0;
     int sampleDrift = 0;
-
     std::atomic<int> oldVoiceBuffer_readPos{ -1 };
     juce::LinearSmoothedValue<float> crossfadeFrac{ 0.0f };
-
     void resetTiming()
     {
         inputAudioBuffer.clear();
@@ -175,74 +160,31 @@ public:
         adsrParams.release = static_cast<float>(sPs) / static_cast<float>(getSampleRate());
         adsr.setParameters(adsrParams);
     }
-
-
-
     std::atomic<bool> isActive{ false };
-
-
     juce::AudioBuffer<float> inputAudioBuffer;
     std::atomic<int> inputAudioBuffer_samplesToRecord{ 0 };
     std::atomic<int> inputAudioBuffer_writePos{ 0 };
-
-
     std::vector<int> detectedNoteNumbers;
-
-
-    //std::vector<int> capturedMelody
-    //{ 
-    //    -1, -1, -1, -1, -1, -1, -1, -1,
-    //    -1, -1, -1, -1, -1, -1, -1, -1,
-    //    -1, -1, -1, -1, -1, -1, -1, -1,
-    //    -1, -1, -1, -1, -1, -1, -1, -1
-    //};
-
     std::vector<int> capturedMelody = std::vector<int>(32, -1);
-
     int frequencyToMidiNote(float frequency);
     juce::AudioBuffer<float> isolateBestNote();
-//    void timeStretch(juce::AudioBuffer<float> inputAudio, int length);
     void timeStretch(juce::AudioBuffer<float> inputAudio, float lengthSeconds);
-
-
     juce::AudioBuffer<float> pitchShiftByResampling(const juce::AudioBuffer<float>& input, int baseNote, int targetNote);
-
-    
     juce::AudioBuffer<float> voiceBuffer;
     std::atomic<int> newVoiceNoteNumber{ -1 };
     std::atomic<int> voiceNoteNumber{ -1 };
-
     juce::AudioBuffer<float> finalVoiceBuffer;
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
-
-
-    //std::vector<int> generatedMelody
-    //{
-    //    70, -2, -2, -2, -2, -2, -2, -2,
-    //    -2, -2, -2, -2, -2, -2, -2, -2,
-    //    75, -2, -2, -2, -2, -2, -2, -2,
-    //    -2, -2, -2, -2, -2, -2, -2, 74
-    //};
-
     std::vector<int> generatedMelody = std::vector<int>(32, -1);
+    std::vector<int> melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement);
     std::vector<int> lastGeneratedMelody = std::vector<int>(32, -1);
-
     int playbackNote = -1;
     bool playbackNoteActive = false;
-
     juce::dsp::DryWetMixer<float> dryWetMixer;
-
-
-
     juce::ADSR adsr;
     juce::ADSR::Parameters adsrParams;
     std::atomic<bool> useADSR{ false };
-
-
     void copyMelodiesTo(std::vector<int>& outCaptured, std::vector<int>& outGenerated) const;
-
-
-
 
 //                         `. ___
 //                    __,' __`.                _..----....____
