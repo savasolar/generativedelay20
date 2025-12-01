@@ -1065,6 +1065,12 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     generatedMelody = result;
 }
 
+std::vector<int> CounterTuneAudioProcessor::melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement)
+{
+
+
+    return {};
+}
 
 
 bool CounterTuneAudioProcessor::hasEditor() const
