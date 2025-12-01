@@ -1052,14 +1052,44 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     for (int& note : scale) { note += key; } // transpose to the correct key
     for (int& note : scale) { note += 60; } // transpose to a regular range
     
-    result = melodySequence(scale, rhythm);
+//    result = melodySequence(scale, rhythm);
 
-    generatedMelody = result;
+    // construct a melody sequence
+    std::vector<int> processed_input;
+    // construct processed_input such that it contains "int notes" # of indices,
+    // and each index is a randomly picked value from the scale vector.
+    processed_input.reserve(notes);
+    juce::Random rand;
+    for (int i = 0; i < notes; ++i)
+    {
+        int idx = rand.nextInt(static_cast<int>(scale.size()));
+        processed_input.push_back(scale[idx]);
+    }
+
+    // length distribution logic
+
+    std::vector<int> post_processed;
+
+    if (rhythm == 1) // straight quarter notes
+    {
+
+    }
+    if (rhythm == 2) // straight eighth notes
+    {
+
+    }
+    if (rhythm == 3) // intelligent rhythmic determinism
+    {
+
+    }
+
+
+    generatedMelody = post_processed;
 }
 
 std::vector<int> CounterTuneAudioProcessor::melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement)
 {
-
+    
 
     return {};
 }
