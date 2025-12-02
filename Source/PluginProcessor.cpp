@@ -1069,10 +1069,11 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     // length distribution logic
 
     std::vector<int> post_processed;
-    post_processed.resize(32);
+    
 
     if (rhythm == 1) // straight quarter notes
     {
+        post_processed = std::vector<int>(32, -2);
 //        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
         const int num_slots = 8;  // 8 note positions (even indices 0,4,...,28)
 
@@ -1098,6 +1099,7 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     }
     if (rhythm == 2) // straight eighth notes
     {
+        post_processed = std::vector<int>(32, -2);
 //        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
         const int num_slots = 16;  // 16 note positions (even indices 0,2,...,30)
 
@@ -1165,11 +1167,11 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     DBG(debugPostProcessed);
 
 
-//    generatedMelody = post_processed;
+    generatedMelody = post_processed;
 
 
 
-    generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
+//    generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
 
 
 
