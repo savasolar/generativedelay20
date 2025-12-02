@@ -1069,10 +1069,11 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     // length distribution logic
 
     std::vector<int> post_processed;
+    post_processed.resize(32);
 
     if (rhythm == 1) // straight quarter notes
     {
-        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
+//        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
         const int num_slots = 8;  // 8 note positions (even indices 0,4,...,28)
 
         if (notes > 0) {  // Avoid division by zero
@@ -1083,21 +1084,21 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
             // Tile the full sequence 'repeats' times
             for (int r = 0; r < repeats; ++r) {
                 for (int i = 0; i < notes; ++i) {
-                    post_processed[slot_idx * 2] = processed_input[i];
+                    post_processed[slot_idx * 4] = processed_input[i];
                     ++slot_idx;
                 }
             }
 
             // Add the remainder from the start of the sequence
             for (int i = 0; i < remainder; ++i) {
-                post_processed[slot_idx * 2] = processed_input[i];
+                post_processed[slot_idx * 4] = processed_input[i];
                 ++slot_idx;
             }
         }
     }
     if (rhythm == 2) // straight eighth notes
     {
-        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
+//        std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
         const int num_slots = 16;  // 16 note positions (even indices 0,2,...,30)
 
         if (notes > 0) {  // Avoid division by zero
@@ -1125,7 +1126,7 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
         std::random_device rd;
         std::mt19937 g(rd());
 
-        std::vector<int> post_processed;
+//        std::vector<int> post_processed;
 
         // Generate random lengths
         if (notes < 1 || notes > 32)
