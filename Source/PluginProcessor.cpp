@@ -1164,7 +1164,15 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     DBG(debugPostProcessed);
 
 
-    generatedMelody = post_processed;
+//    generatedMelody = post_processed;
+
+
+
+    generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
+
+
+
+
 }
 
 std::vector<int> CounterTuneAudioProcessor::melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement)
