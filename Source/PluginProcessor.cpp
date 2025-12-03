@@ -296,8 +296,14 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     // prepare a note for playback if there's a note number
                     if (generatedMelody[n] >= 0)
                     {
-                        finalVoiceBuffer = pitchShiftByResampling(voiceBuffer, voiceNoteNumber.load(), generatedMelody[n]);
+//                        finalVoiceBuffer = pitchShiftByResampling(voiceBuffer, voiceNoteNumber.load(), generatedMelody[n]);
+//                        finalVoiceBuffer_readPos.store(0);
+
+                        int shiftedNote = generatedMelody[n] + getOctaveInt() * 12;
+                        finalVoiceBuffer = pitchShiftByResampling(voiceBuffer, voiceNoteNumber.load(), shiftedNote);
                         finalVoiceBuffer_readPos.store(0);
+
+
                     }
 
                     // if next generatedMelody symbol indicates a fadeout in the current symbol is needed, activate useADSR here
@@ -1035,17 +1041,17 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     if (chaos == 8)
     {
 
-        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 6 };
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ /*6*/ /*or, alternatively:*/ 17};
         rhythm = 3;
     }
     if (chaos == 9)
     {
-        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 1, 6, 10 };
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ /*1, 6, 10*/ /*or, alternatively:*/ 14, 17, 23 };
         rhythm = 3;
     }
     if (chaos == 10)
     {
-        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ 1, 3, 6, 8, 10 };
+        scale = { 0, 2, 4, 5, 7, 9, 11, 12, /*disjunct intervals:*/ /*1, 3, 6, 8, 10*/ /*or, alternatively:*/ 14, 16, 17, 21, 23 };
         rhythm = 3;
     }
 
