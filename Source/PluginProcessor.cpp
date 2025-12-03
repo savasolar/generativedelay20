@@ -347,7 +347,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-
+                detectKey(capturedMelody);
                 produceMelody2(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
             }
 
@@ -810,127 +810,11 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 
     std::array<int, 12> keys{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
     int key = keys[best_tonic];
-    DBG("Detected key: " + key);
-
-    //if (key == 0)
-    //    generatedMelody = { 60, -2, -2, -2, 62, -2, -2, -2, 64, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2 };
-    //if (key == 1)
-    //    generatedMelody = { 61, -2, -2, -2, 63, -2, -2, -2, 65, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2 };
-    //if (key == 2)
-    //    generatedMelody = { 62, -2, -2, -2, 64, -2, -2, -2, 66, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2 };
-    //if (key == 3)
-    //    generatedMelody = { 63, -2, -2, -2, 65, -2, -2, -2, 67, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2 };
-    //if (key == 4)
-    //    generatedMelody = { 64, -2, -2, -2, 66, -2, -2, -2, 68, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2 };
-    //if (key == 5)
-    //    generatedMelody = { 65, -2, -2, -2, 67, -2, -2, -2, 69, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 77, -2, -2, -2 };
-    //if (key == 6)
-    //    generatedMelody = { 66, -2, -2, -2, 68, -2, -2, -2, 70, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 78, -2, -2, -2 };
-    //if (key == 7)
-    //    generatedMelody = { 67, -2, -2, -2, 69, -2, -2, -2, 71, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 79, -2, -2, -2 };
-    //if (key == 8)
-    //    generatedMelody = { 68, -2, -2, -2, 70, -2, -2, -2, 72, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 80, -2, -2, -2 };
-    //if (key == 9)
-    //    generatedMelody = { 69, -2, -2, -2, 71, -2, -2, -2, 73, -2, -2, -2, 74, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 81, -2, -2, -2 };
-    //if (key == 10)
-    //    generatedMelody = { 70, -2, -2, -2, 72, -2, -2, -2, 74, -2, -2, -2, 75, -2, -2, -2, 77, -2, -2, -2, 79, -2, -2, -2, 81, -2, -2, -2, 82, -2, -2, -2 };
-    //if (key == 11)
-    //    generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
-
-
-//    generatedMelody = { 60, -2, -2, -2, -2, -2, -2, -2, 60, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2, -2 };
-}
-void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes, float chaos)
-{
-//    std::vector<int> scale{ 2, 4, 6, 7, 9, 11, 13, 14 }; // hardcoded d major scale for now
-
-
-    std::vector<int> scale{ 4, 6, 9, 11, 13 }; // hardcoded d major scale for now
-
-    for (int& note : scale) { note += 60; }
-
-    std::vector<int> processed_input;
-
-    // construct processed_input such that it contains "int notes" # of indices, and each index is a randomly picked value from the scale vector.
-
-    processed_input.reserve(notes);
-    juce::Random rand;
-    for (int i = 0; i < notes; ++i)
-    {
-        int idx = rand.nextInt(static_cast<int>(scale.size()));
-        processed_input.push_back(scale[idx]);
-    }
-
-    // now arrange length distribution logic
-
-    //std::random_device rd;
-    //std::mt19937 g(rd());
-
-    //std::vector<int> post_processed;
-
-    //// Generate random lengths
-    //if (notes < 1 || notes > 32)
-    //{
-    //    return;
-    //}
-    //std::vector<int> lengths(notes, 1);
-    //int extras = 32 - notes;
-    //std::uniform_int_distribution<> dis(0, notes - 1);
-    //for (int i = 0; i < extras; ++i)
-    //{
-    //    int idx = dis(g);
-    //    lengths[idx]++;
-    //}
-
-    //// Build post_processed
-    //for (size_t i = 0; i < static_cast<size_t>(notes); ++i)
-    //{
-    //    post_processed.push_back(processed_input[i]);
-    //    for (int j = 1; j < lengths[i]; ++j)
-    //    {
-    //        post_processed.push_back(-2);
-    //    }
-    //}
-
-    //// Magnetize to on-beats 100% of the time
-    //magnetize(post_processed, 1.0);
-
-    // ADDED: Straight eighth notes arrangement
-    std::vector<int> post_processed(32, -2);  // Initialize with -2 in all positions
-    const int num_slots = 16;  // 16 note positions (even indices 0,2,...,30)
-
-    if (notes > 0) {  // Avoid division by zero
-        int repeats = num_slots / notes;
-        int remainder = num_slots % notes;
-        int slot_idx = 0;
-
-        // Tile the full sequence 'repeats' times
-        for (int r = 0; r < repeats; ++r) {
-            for (int i = 0; i < notes; ++i) {
-                post_processed[slot_idx * 2] = processed_input[i];
-                ++slot_idx;
-            }
-        }
-
-        // Add the remainder from the start of the sequence
-        for (int i = 0; i < remainder; ++i) {
-            post_processed[slot_idx * 2] = processed_input[i];
-            ++slot_idx;
-        }
-    }
-
-    // Debug print post-processed output
-    //juce::String debugPostProcessed = "post-processed output: ";
-    //for (const int& event : post_processed)
-    //{
-    //    debugPostProcessed += juce::String(event) + " ";
-    //}
-    //DBG(debugPostProcessed);
-
-    generatedMelody = post_processed;
-
+    detectedKey = key;
+    DBG("Detected key: " + juce::String(key));
 
 }
+
 void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probability) const
 {
     if (probability <= 0.0f) return;
@@ -1055,7 +939,17 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
         rhythm = 3;
     }
 
-    for (int& note : scale) { note += key; } // transpose to the correct key
+
+    if (key == 12)
+    {
+        for (int& note : scale) { note += detectedKey; } // transpose to detected key
+    }
+    else
+    {
+        for (int& note : scale) { note += key; } // transpose to selected key
+    }
+
+
     for (int& note : scale) { note += 60; } // transpose to a regular range
     
 //    result = melodySequence(scale, rhythm);

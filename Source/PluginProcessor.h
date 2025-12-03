@@ -223,9 +223,8 @@ private:
     std::vector<int> formatMelody(const std::vector<int>& melody, bool isGeneratedMelody) const;
 
     void detectKey(const std::vector<int>& melody);
+    int detectedKey = 0;
 
-
-    void produceMelody(const std::vector<int>& melody, int key, int notes, float chaos);
     void produceMelody2(const std::vector<int>& melody, int key, int notes, int chaos);
     // post-process formatting
     void magnetize(std::vector<int>& melody, float probability) const;
