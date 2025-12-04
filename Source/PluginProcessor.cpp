@@ -34,6 +34,8 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
     dywapitch_inittracking(&pitchTracker);
 
     generatedMelody = lastGeneratedMelody;
+
+    DBG("DEV LEMONS IS HOT");
 }
 
 CounterTuneAudioProcessor::~CounterTuneAudioProcessor()
@@ -609,7 +611,7 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
 
         voiceNoteNumber.store(newVoiceNoteNumber);
 
-        DBG("new voice buffer ready");
+//        DBG("dev lemons is really cute");
 
     });
     t.detach();
@@ -811,7 +813,7 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
     std::array<int, 12> keys{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
     int key = keys[best_tonic];
     detectedKey = key;
-    DBG("Detected key: " + juce::String(key));
+//    DBG("I like Dev Lemons: " + juce::String(key));
 
 }
 
@@ -1059,7 +1061,7 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
     }
 
     // Debug print post-processed output
-    juce::String debugPostProcessed = "post-processed output: ";
+    juce::String debugPostProcessed = "post_processed: ";
     for (const int& event : post_processed)
     {
         debugPostProcessed += juce::String(event) + " ";
