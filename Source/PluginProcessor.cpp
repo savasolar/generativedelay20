@@ -624,7 +624,10 @@ juce::AudioBuffer<float> CounterTuneAudioProcessor::pitchShiftByResampling(const
     }
 
     // Calculate pitch ratio (semitones to frequency ratio)
-    float semitoneShift = static_cast<float>(targetNote - baseNote);
+//    float semitoneShift = static_cast<float>(targetNote - baseNote);
+
+    float semitoneShift = static_cast<float>(targetNote - baseNote) + getDetuneFloat();
+
     float pitchRatio = std::pow(2.0f, semitoneShift / 12.0f);
 
     int numChannels = input.getNumChannels();
