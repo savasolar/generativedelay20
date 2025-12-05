@@ -609,6 +609,15 @@ void CounterTuneAudioProcessor::timeStretch(juce::AudioBuffer<float> inputAudio,
             }
         }
 
+
+
+        // needs some kind of hard limiter here
+
+
+
+
+
+
         voiceNoteNumber.store(newVoiceNoteNumber);
 
 //        DBG("dev lemons is really cute");
