@@ -1114,11 +1114,49 @@ juce::AudioProcessorEditor* CounterTuneAudioProcessor::createEditor()
 }
 void CounterTuneAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
+    auto state = parameters.copyState();
 
+    {
+        juce::ScopedLock sl(melodyLock);
+        // Store lastGeneratedMelody as binary data
+        juce::MemoryBlock melodyData(lastGeneratedMelody.data(), lastGeneratedMelody.size() * sizeof(int));
+        state.setProperty("lastGeneratedMelody", melodyData.toBase64Encoding(), nullptr);
+    }
+
+    std::unique_ptr<juce::XmlElement> xml(state.createXml());
+    copyXmlToBinary(*xml, destData);
 }
 void CounterTuneAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
+    std::unique_ptr<juce::XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+    stateLoaded = true;
+    if (xmlState.get() != nullptr)
+    {
+        juce::ValueTree state = juce::ValueTree::fromXml(*xmlState);
+        parameters.replaceState(state);
 
+        // Restore lastGeneratedMelody
+        juce::String melodyBase64 = state.getProperty("lastGeneratedMelody");
+        if (melodyBase64.isNotEmpty())
+        {
+            juce::MemoryBlock melodyData;
+            melodyData.fromBase64Encoding(melodyBase64);
+
+            {
+                juce::ScopedLock sl(melodyLock);
+                if (melodyData.getSize() == lastGeneratedMelody.size() * sizeof(int))
+                {
+                    std::memcpy(lastGeneratedMelody.data(), melodyData.getData(), melodyData.getSize());
+
+                    if (getLoopBool())
+                    {
+                        generatedMelody = lastGeneratedMelody;
+                    }
+                }
+            }
+
+        }
+    }
 }
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
