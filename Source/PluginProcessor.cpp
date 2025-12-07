@@ -357,6 +357,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 }
             }
 
+            lastGeneratedMelody = generatedMelody;
+
+
+
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());

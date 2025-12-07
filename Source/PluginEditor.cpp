@@ -40,7 +40,11 @@ void CounterTuneAudioProcessorEditor::timerCallback()
     {
         updateTempoValueLabel();
         updateBeatsValueLabel();
+//        key!?
+        updateKeyValueLabel();
         updateNotesValueLabel();
+//        chaos!?
+        updateChaosValueLabel();
         updateOctaveValueLabel();
         updateDetuneValueLabel();
         updateMixValueLabel();
