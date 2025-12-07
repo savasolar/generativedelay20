@@ -353,7 +353,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 detectKey(capturedMelody);
                 if (!getLoopBool())
                 {
-                    produceMelody2(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
+                    produceMelody(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
                 }
             }
 
@@ -836,7 +836,6 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 //    DBG("I like Dev Lemons: " + juce::String(key));
 
 }
-
 void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probability) const
 {
     if (probability <= 0.0f) return;
@@ -895,10 +894,7 @@ void CounterTuneAudioProcessor::copyMelodiesTo(std::vector<int>& outCaptured, st
     outCaptured = capturedMelody;
     outGenerated = generatedMelody;
 }
-
-
-
-void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, int key, int notes, int chaos)
+void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, int key, int notes, int chaos)
 {
     std::vector<int> result;
 
@@ -973,8 +969,6 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
 
 
     for (int& note : scale) { note += 60; } // transpose to a regular range
-    
-//    result = melodySequence(scale, rhythm);
 
     // construct a melody sequence
     std::vector<int> processed_input;
@@ -1099,14 +1093,6 @@ void CounterTuneAudioProcessor::produceMelody2(const std::vector<int>& melody, i
 
 
 }
-
-std::vector<int> CounterTuneAudioProcessor::melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement)
-{
-    
-
-    return {};
-}
-
 
 bool CounterTuneAudioProcessor::hasEditor() const
 {

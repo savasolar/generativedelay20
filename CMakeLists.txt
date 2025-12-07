@@ -126,6 +126,7 @@ juce_add_binary_data(BinaryResources SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/preset-menu.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/preset-menu-hover.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/ui-body.png
+    ${CMAKE_CURRENT_SOURCE_DIR}/Resources/demo-expired-screen.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/switch-off.png
     ${CMAKE_CURRENT_SOURCE_DIR}/Resources/switch-on.png
 )

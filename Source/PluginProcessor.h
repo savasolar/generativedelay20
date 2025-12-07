@@ -111,6 +111,7 @@ public:
         }
     }
     bool stateLoaded = false;
+    int demoCounter = 0;
     bool isDemoExpired = false;
     float oldHostBpm = 120;
     bool firstSync = true;
@@ -176,7 +177,6 @@ public:
     juce::AudioBuffer<float> finalVoiceBuffer;
     std::atomic<int> finalVoiceBuffer_readPos{ 0 };
     std::vector<int> generatedMelody = std::vector<int>(32, -1);
-    std::vector<int> melodySequence(std::vector<int> acceptableIntervals, int rhythmicArrangement);
     std::vector<int> lastGeneratedMelody = std::vector<int>(32, -1);
     int playbackNote = -1;
     bool playbackNoteActive = false;
@@ -225,7 +225,7 @@ private:
     void detectKey(const std::vector<int>& melody);
     int detectedKey = 0;
 
-    void produceMelody2(const std::vector<int>& melody, int key, int notes, int chaos);
+    void produceMelody(const std::vector<int>& melody, int key, int notes, int chaos);
     // post-process formatting
     void magnetize(std::vector<int>& melody, float probability) const;
 
