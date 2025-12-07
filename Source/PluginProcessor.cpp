@@ -19,7 +19,6 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"beats", 1}, "Beats", 1.0f, 16.0f, 8.0f),
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"key", 1}, "Key", 0, 12, 12),//12=auto, 0=c, ... 11=b
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"notes", 1}, "Notes", 1, 16, 8),
-            //std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"chaos", 1}, "Chaos", 0.1f, 1.0f, 0.5f),
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"chaos", 1}, "Chaos", 1, 10, 5),
             std::make_unique<juce::AudioParameterInt>(juce::ParameterID{"octave", 1}, "Octave", -4, 4, 0),
             std::make_unique<juce::AudioParameterFloat>(juce::ParameterID{"detune", 1}, "Detune", -1.0f, 1.0f, 0.0f),
@@ -30,9 +29,7 @@ CounterTuneAudioProcessor::CounterTuneAudioProcessor()
 #endif
 {
     inputAudioBuffer.setSize(2, 1); // dummy size for now
-
     dywapitch_inittracking(&pitchTracker);
-
     generatedMelody = lastGeneratedMelody;
 
     DBG("DEV LEMONS IS HOT");
@@ -345,12 +342,19 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 isActive.store(false);
                 voiceBuffer.clear();
                 finalVoiceBuffer.clear();
-                std::fill(generatedMelody.begin(), generatedMelody.end(), -1);
+
+                if (!getLoopBool())
+                {
+                    std::fill(generatedMelody.begin(), generatedMelody.end(), -1);
+                }
             }
             else
             {
                 detectKey(capturedMelody);
-                produceMelody2(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
+                if (!getLoopBool())
+                {
+                    produceMelody2(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
+                }
             }
 
             // populate voice buffer with latest info 
