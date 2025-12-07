@@ -10,6 +10,7 @@ CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudi
     setWantsKeyboardFocus(true);
 
     backgroundImage = juce::ImageCache::getFromMemory(BinaryData::uibody_png, BinaryData::uibody_pngSize);
+    demoExpiredImage = juce::ImageCache::getFromMemory(BinaryData::demoexpiredscreen_png, BinaryData::demoexpiredscreen_pngSize);
     presetMenuDefault = juce::ImageCache::getFromMemory(BinaryData::presetmenu_png, BinaryData::presetmenu_pngSize);
     presetMenuHover = juce::ImageCache::getFromMemory(BinaryData::presetmenuhover_png, BinaryData::presetmenuhover_pngSize);
 
@@ -66,13 +67,9 @@ void CounterTuneAudioProcessorEditor::timerCallback()
 
 void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
 {
-
     g.drawImage(backgroundImage, getLocalBounds().toFloat());
     
     paintPresetMenu(g);
-
-
-
 
     // draw a 1px dotted line
 
@@ -89,8 +86,6 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
     drawDottedLine(g, 25, 389, 614, 1);
     drawDottedLine(g, 25, 419, 614, 1);
     drawDottedLine(g, 25, 449, 614, 1);
-
-
 
     // Dynamic vertical dotted lines based on beats
     int numBeats = static_cast<int>(std::round(audioProcessor.getBeatsFloat() * 4));
@@ -205,8 +200,6 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
         }
     }
 
-
-
     // draw 1px solid white line at x: 25, y: 479, w: 614, h: 1
     // draw 1px solid white line at x: 639, y: 120, w: 1, h: 360
 
@@ -214,7 +207,12 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
     g.fillRect(25, 479, 614, 1);
     g.fillRect(639, 120, 1, 360);
 
-
+    // draw demoExpiredImage 
+    if (audioProcessor.isDemoExpired)
+    {
+        g.drawImage(demoExpiredImage, juce::Rectangle<float>(1, 121, 638, 358));
+        // link button at x 220, y 290, w 200 h 20, https://countertune.com/
+    }
 }
 
 void CounterTuneAudioProcessorEditor::resized()

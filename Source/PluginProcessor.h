@@ -112,7 +112,7 @@ public:
     }
     bool stateLoaded = false;
     int demoCounter = 0;
-    bool isDemoExpired = false;
+    bool isDemoExpired = true;
     float oldHostBpm = 120;
     bool firstSync = true;
     juce::AudioProcessorValueTreeState parameters;

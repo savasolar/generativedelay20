@@ -24,6 +24,7 @@ private:
     bool firstLoad = true;
     
     juce::Image backgroundImage;
+    juce::Image demoExpiredImage;
 
     struct TransparentButton : public juce::TextButton
     {
@@ -52,9 +53,7 @@ private:
     juce::Colour foregroundColor = juce::Colour(0xffffffff);
     juce::Colour backgroundColor = juce::Colour(0xff000000);
 
-
     juce::TextEditor presetTitleLabel;
-//    bool isMenuDown = false;
     juce::String presetTitleText{ "" };
     TransparentButton presetTitleButton;
     juce::TextEditor presetBackgroundBox;
@@ -129,22 +128,12 @@ private:
     juce::Slider keyKnob;
     juce::TextEditor keyValueLabel;
 
+    juce::StringArray keyNames{ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "AUTO" };
 
-    juce::StringArray keyNames{
-    "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "AUTO"
-    };
-
-    juce::StringArray altKeyNames{
-        "C", "DB", "D", "EB", "E", "F", "GB", "G", "AB", "A", "BB", "B", "AUTO"
-    };
-
+    juce::StringArray altKeyNames{ "C", "DB", "D", "EB", "E", "F", "GB", "G", "AB", "A", "BB", "B", "AUTO" };
 
     void updateKeyValueLabel()
     {
-        //int value = audioProcessor.getKeyInt();
-        //juce::String text = juce::String(value);
-        //keyValueLabel.setText(text, false);
-
         int value = audioProcessor.getKeyInt();
         juce::String text = (value >= 0 && value < keyNames.size()) ? keyNames[value] : juce::String(value);
         keyValueLabel.setText(text, false);
