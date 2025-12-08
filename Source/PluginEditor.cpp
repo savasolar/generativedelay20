@@ -207,7 +207,11 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
     if (audioProcessor.isDemoExpired)
     {
         g.drawImage(demoExpiredImage, juce::Rectangle<float>(1, 121, 638, 358));
-        // link button at x 220, y 290, w 200 h 20, https://countertune.com/
+
+        addAndMakeVisible(websiteButton);
+        websiteButton.setBounds(220, 290, 200, 20);
+        websiteButton.setMouseCursor(juce::MouseCursor::PointingHandCursor);
+        websiteButton.onClick = [] { juce::URL("https://countertune.com").launchInDefaultBrowser(); };
     }
 }
 

@@ -25,6 +25,7 @@ private:
     
     juce::Image backgroundImage;
     juce::Image demoExpiredImage;
+    
 
     struct TransparentButton : public juce::TextButton
     {
@@ -66,6 +67,8 @@ private:
     juce::TextEditor presetOption4;
     TransparentButton presetOption4Button;
     juce::Slider hiddenPresetKnob;
+
+    TransparentButton websiteButton;
 
     void updatePresetLabel()
     {
