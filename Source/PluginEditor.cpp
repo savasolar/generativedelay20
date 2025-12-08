@@ -67,10 +67,8 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
     
     paintPresetMenu(g);
 
-    // draw a 1px dotted line
 
     drawDottedLine(g, 25, 121, 1, 358);
-
     drawDottedLine(g, 25, 149, 614, 1);
     drawDottedLine(g, 25, 179, 614, 1);
     drawDottedLine(g, 25, 209, 614, 1);
@@ -95,7 +93,6 @@ void CounterTuneAudioProcessorEditor::paint (juce::Graphics& g)
             drawDottedLine(g, x, 121, 1, 358);
         }
     }
-
 
     // paint melodies
 

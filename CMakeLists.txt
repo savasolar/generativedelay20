@@ -1,4 +1,7 @@
-# mklink /D "C:\Program Files\Common Files\VST3\generativedelay20-debug.vst3" "C:\Users\savas\Documents\JUCE Projects\generativedelay20\cmake_build\generativedelay20_artefacts\Debug\VST3\generativedelay20.vst3"
+# Symbolic link for debugging demo:
+# mklink /D "C:\Program Files\Common Files\VST3\CounterTune-Demo-debug.vst3" "C:\Users\savas\Documents\JUCE Projects\generativedelay20\cmake_build\CounterTune_artefacts\Debug\VST3\CounterTune Demo.vst3"
+# Symbolic link for debugging full version:
+# mklink /D "C:\Program Files\Common Files\VST3\CounterTune-debug.vst3" "C:\Users\savas\Documents\JUCE Projects\generativedelay20\cmake_build\CounterTune_artefacts\Debug\VST3\CounterTune.vst3"
 # command: C:\Program Files (x86)\Image-Line\FL Studio 12\FL64.exe
 # 
 # 
@@ -8,7 +11,7 @@ if(APPLE)
     set(CMAKE_OSX_ARCHITECTURES "x86_64" CACHE STRING "Build architectures for macOS")
 endif()
 
-project(generativedelay20 VERSION 1.0.0)
+project(CounterTune VERSION 1.0.0)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -40,8 +43,15 @@ if(MSVC)
     )
 endif()
 
-# Product name
-set(PLUGIN_PRODUCT_NAME "generativedelay20")
+# # Product name
+# set(PLUGIN_PRODUCT_NAME "generativedelay20")
+
+# Conditional product name
+if(DEMO_BUILD)
+    set(PLUGIN_PRODUCT_NAME "CounterTune Demo")
+else()
+    set(PLUGIN_PRODUCT_NAME "CounterTune")
+endif()
 
 # Define user library path for plugin installation (macOS-specific)
 if(APPLE)
@@ -55,7 +65,7 @@ set(PLUGIN_ARGS
     FORMATS ${PLUGIN_FORMATS}
     PRODUCT_NAME "${PLUGIN_PRODUCT_NAME}"
     COMPANY_NAME "54v450l4r"
-    BUNDLE_ID "com.54v450l4r.generativedelay20"
+    BUNDLE_ID "com.54v450l4r.countertune"
     PLUGIN_IS_A_SYNTH FALSE
     NEEDS_MIDI_INPUT FALSE
     IS_MIDI_EFFECT FALSE
@@ -80,9 +90,9 @@ else()
 endif()
 
 # Plugin setup
-juce_add_plugin(generativedelay20 ${PLUGIN_ARGS})
+juce_add_plugin(CounterTune ${PLUGIN_ARGS})
 
-target_compile_definitions(generativedelay20
+target_compile_definitions(CounterTune
     PRIVATE
         JUCE_DISABLE_VST2_BUILDING=1
         JUCE_PLUGINHOST_VST3=1
@@ -95,7 +105,7 @@ target_compile_definitions(generativedelay20
         JUCE_STRICT_REFCOUNTEDPOINTER=1
 )
 
-target_include_directories(generativedelay20 PRIVATE
+target_include_directories(CounterTune PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/signalsmith/stretch
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/
     ${CMAKE_CURRENT_SOURCE_DIR}/Dependencies/dywapitchtrack/
@@ -105,7 +115,7 @@ target_include_directories(generativedelay20 PRIVATE
 # Source files
 
 
-target_sources(generativedelay20 PRIVATE
+target_sources(CounterTune PRIVATE
     Source/PluginEditor.cpp
     Source/PluginEditor.h
     Source/PluginProcessor.cpp
@@ -114,7 +124,6 @@ target_sources(generativedelay20 PRIVATE
 )
 
 set_source_files_properties(Dependencies/dywapitchtrack/src/dywapitchtrack.c PROPERTIES LANGUAGE C)
-
 
 # Binary data
 juce_add_binary_data(BinaryResources SOURCES
@@ -132,7 +141,7 @@ juce_add_binary_data(BinaryResources SOURCES
 )
 
 # Link everything
-target_link_libraries(generativedelay20 PRIVATE
+target_link_libraries(CounterTune PRIVATE
     BinaryResources
     juce::juce_audio_basics
     juce::juce_audio_devices
@@ -150,5 +159,5 @@ target_link_libraries(generativedelay20 PRIVATE
     juce::juce_osc
 )
 
-juce_generate_juce_header(generativedelay20)
+juce_generate_juce_header(CounterTune)
 

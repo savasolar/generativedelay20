@@ -336,6 +336,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
         {
             DBG("CYCLE END");
 
+#ifdef DEMO_BUILD
+            if (demoCounter >= 10)
+                isDemoExpired = true;
+#endif
+
             symbolExecuted.reset();
             playbackSymbolExecuted.reset();
             fractionalSymbolExecuted.reset();
@@ -355,9 +360,12 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             else
             {
                 detectKey(capturedMelody);
-                if (!getLoopBool())
+                if (!getLoopBool() && !isDemoExpired)
                 {
                     produceMelody(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
+#ifdef DEMO_BUILD
+                    demoCounter += 1;
+#endif
                 }
             }
 
