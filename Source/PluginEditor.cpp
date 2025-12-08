@@ -41,10 +41,8 @@ void CounterTuneAudioProcessorEditor::timerCallback()
     {
         updateTempoValueLabel();
         updateBeatsValueLabel();
-//        key!?
         updateKeyValueLabel();
         updateNotesValueLabel();
-//        chaos!?
         updateChaosValueLabel();
         updateOctaveValueLabel();
         updateDetuneValueLabel();
@@ -57,9 +55,7 @@ void CounterTuneAudioProcessorEditor::timerCallback()
 
     // paint melodies
 
-
     audioProcessor.copyMelodiesTo(capturedMelody, generatedMelody);
-
 
     repaint();
 

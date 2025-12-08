@@ -186,7 +186,11 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     juce::ScopedNoDenormals noDenormals;
 
 #ifdef DEMO_BUILD
-
+    if (isDemoExpired)
+    {
+        buffer.clear();
+        return;
+    }
 #endif
     synchronizeBpm();
 
