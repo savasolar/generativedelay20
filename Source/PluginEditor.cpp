@@ -404,13 +404,42 @@ void CounterTuneAudioProcessorEditor::paintPresetMenu(juce::Graphics& g)
     presetTitleButton.setBounds(481, 20, 140, 20);
 
     if (presetOption1Button.isMouseButtonDown())
+    {
         hiddenPresetKnob.setValue(1);
+    }
     if (presetOption2Button.isMouseButtonDown())
+    {
         hiddenPresetKnob.setValue(2);
+        // set "minimal" param values here
+        beatsKnob.setValue(8);
+        updateBeatsValueLabel();
+        notesKnob.setValue(4);
+        updateNotesValueLabel();
+        chaosKnob.setValue(4);
+        updateChaosValueLabel();
+    }
     if (presetOption3Button.isMouseButtonDown())
+    {
         hiddenPresetKnob.setValue(3);
+        // set "moderate" param values here
+        beatsKnob.setValue(8);
+        updateBeatsValueLabel();
+        notesKnob.setValue(8);
+        updateNotesValueLabel();
+        chaosKnob.setValue(5);
+        updateChaosValueLabel();
+    }
     if (presetOption4Button.isMouseButtonDown())
+    {
         hiddenPresetKnob.setValue(4);
+        // set "maximal" param values here
+        beatsKnob.setValue(4);
+        updateBeatsValueLabel();
+        notesKnob.setValue(16);
+        updateNotesValueLabel();
+        chaosKnob.setValue(8);
+        updateChaosValueLabel();
+    }
 
     if (!presetOption1Button.isMouseOver())
     {
