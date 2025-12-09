@@ -371,13 +371,10 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
 
             lastGeneratedMelody = generatedMelody;
 
-
-
             // populate voice buffer with latest info 
             juce::AudioBuffer<float> tempVoiceBuffer = isolateBestNote();
-            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
-            // <realtime detection>
+            // <realtime detection> ---- call this BEFORE time stretch
             double currentTime = juce::Time::getMillisecondCounterHiRes() / 1000.0;
             double elapsedWallTime = currentTime - cycleStartTime;  // Actual elapsed time (wall-clock)
 
@@ -394,6 +391,9 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                 DBG("realtime");
             }
             // </realtime detection>
+
+            // time stretch
+            timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
 
             resetTiming();
