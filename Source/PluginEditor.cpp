@@ -241,7 +241,7 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
     // a good dropdown menu can be created simply with a rectangle and buttons
     presetAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "preset", hiddenPresetKnob);
     hiddenPresetKnob.setSliderStyle(juce::Slider::LinearBar);
-    hiddenPresetKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    hiddenPresetKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     hiddenPresetKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     hiddenPresetKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     hiddenPresetKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -536,7 +536,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     tempoAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "tempo", tempoKnob);
     tempoKnob.setSliderStyle(juce::Slider::LinearBar);
-    tempoKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    tempoKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     tempoKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     tempoKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     tempoKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -596,7 +596,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     beatsAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "beats", beatsKnob);
     beatsKnob.setSliderStyle(juce::Slider::LinearBar);
-    beatsKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    beatsKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     beatsKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     beatsKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     beatsKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -656,7 +656,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     keyAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "key", keyKnob);
     keyKnob.setSliderStyle(juce::Slider::LinearBar);
-    keyKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    keyKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     keyKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     keyKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     keyKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -767,7 +767,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     notesAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "notes", notesKnob);
     notesKnob.setSliderStyle(juce::Slider::LinearBar);
-    notesKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    notesKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     notesKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     notesKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     notesKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -828,7 +828,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     chaosAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "chaos", chaosKnob);
     chaosKnob.setSliderStyle(juce::Slider::LinearBar);
-    chaosKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    chaosKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     chaosKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     chaosKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     chaosKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -893,7 +893,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     octaveAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "octave", octaveKnob);
     octaveKnob.setSliderStyle(juce::Slider::LinearBar);
-    octaveKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    octaveKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     octaveKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     octaveKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     octaveKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -959,7 +959,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     detuneAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "detune", detuneKnob);
     detuneKnob.setSliderStyle(juce::Slider::LinearBar);
-    detuneKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    detuneKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     detuneKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     detuneKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     detuneKnob.setColour(juce::Slider::trackColourId, foregroundColor);
@@ -1060,7 +1060,7 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     mixAttachment = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(parameters, "mix", mixKnob);
     mixKnob.setSliderStyle(juce::Slider::LinearBar);
-    mixKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+//    mixKnob.setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
     mixKnob.setColour(juce::Slider::textBoxOutlineColourId, juce::Colours::transparentBlack);
     mixKnob.setColour(juce::Slider::backgroundColourId, juce::Colours::transparentBlack);
     mixKnob.setColour(juce::Slider::trackColourId, foregroundColor);
