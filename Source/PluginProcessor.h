@@ -138,28 +138,22 @@ public:
         positionMarkerX = 0;
 
         placeholderBpm = getTempoFloat();
-//        DBG("updated bpm: " + juce::String(placeholderBpm));
         placeholderBeats = getBeatsFloat();
-//        DBG("updated bts: " + juce::String(placeholderBeats));
-
         float currentBpm = placeholderBpm;
         float currentBeats = placeholderBeats;
-
         sPs = static_cast<int>(std::round(60.0 / currentBpm * getSampleRate() / 4.0 * currentBeats / 8.0));
-
-//        DBG("sPs: " + juce::String(sPs));
 
         int requiredSize = 32 * sPs + 4096;
         inputAudioBuffer.setSize(2, requiredSize, false, true);
         inputAudioBuffer_samplesToRecord.store(requiredSize);
-
-
 
         adsrParams.attack = 0.0f;
         adsrParams.decay = 0.0f;
         adsrParams.sustain = 1.0f;
         adsrParams.release = static_cast<float>(sPs) / static_cast<float>(getSampleRate());
         adsr.setParameters(adsrParams);
+
+        cycleStartTime = juce::Time::getMillisecondCounterHiRes() / 1000.0;  // Record wall-clock start time
     }
     std::atomic<bool> isActive{ false };
     juce::AudioBuffer<float> inputAudioBuffer;
@@ -204,7 +198,7 @@ public:
 private:
     juce::CriticalSection melodyLock;
     std::atomic<bool> awaitingResponse{ false };
-    std::atomic<bool> exportMode{ false };
+//    std::atomic<bool> exportMode{ false };
 
     // Sound detection utilities
     bool detectSound(const juce::AudioBuffer<float>& buffer);
@@ -229,6 +223,9 @@ private:
     // post-process formatting
     void magnetize(std::vector<int>& melody, float probability) const;
 
+    // Offline mode ________________________________________________________________
+    std::atomic<bool> exportMode{ false };
+    double cycleStartTime = 0.0;
 
 
 //     ________________________________         
