@@ -359,7 +359,18 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             }
             else
             {
-                detectKey(capturedMelody);
+                //// Debug print capturedmelody
+                //juce::String debugCapturedMelody = "capturedMelody: ";
+                //for (const int& event : capturedMelody)
+                //{
+                //    debugCapturedMelody += juce::String(event) + " ";
+                //}
+                //DBG(debugCapturedMelody);
+
+                DBG("starting key detection");
+
+                detectKey(capturedMelody); // this takes an unformatted capturedMelody with lots of repetitive numbers and -1s but no -2s
+
                 if (!getLoopBool() && !isDemoExpired)
                 {
                     produceMelody(capturedMelody, getKeyInt(), getNotesInt(), getChaosInt());
@@ -367,6 +378,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
                     demoCounter += 1;
 #endif
                 }
+
             }
 
             lastGeneratedMelody = generatedMelody;
@@ -852,7 +864,7 @@ std::vector<int> CounterTuneAudioProcessor::formatMelody(const std::vector<int>&
 }
 void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
 {
-    std::array<double, 12> hist{};
+    /*std::array<double, 12> hist{};
     double total = 0.0;
     for (int note : melody)
     {
@@ -862,7 +874,37 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
             hist[pc] += 1.0;
             total += 1.0;
         }
+    }*/
+
+    // Ignore repeated instances of the same note number
+    std::array<double, 12> hist{};
+    double total = 0.0;
+    int last_note = -1;  // Track the last valid note to skip consecutives
+    for (int note : melody)
+    {
+        if (note >= 0)
+        {
+            if (note != last_note)
+            {
+                int pc = note % 12;
+                hist[pc] += 1.0;
+                total += 1.0;
+                last_note = note;
+            }
+        }
+        else
+        {
+            last_note = -1;  // Reset on gaps (-1) to allow same note later
+        }
     }
+
+    juce::String histStr = "Histogram (consecutive deduped): [";
+    for (int i = 0; i < 12; ++i)
+        histStr += juce::String(hist[i], 1) + (i < 11 ? ", " : "");
+    histStr += "]  total = " + juce::String(total);
+    DBG(histStr);
+
+
 
     if (total == 0.0)
     {
@@ -923,8 +965,6 @@ void CounterTuneAudioProcessor::detectKey(const std::vector<int>& melody)
     std::array<int, 12> keys{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 };
     int key = keys[best_tonic];
     detectedKey = key;
-//    DBG("I like Dev Lemons: " + juce::String(key));
-
 }
 void CounterTuneAudioProcessor::magnetize(std::vector<int>& melody, float probability) const
 {
@@ -1164,24 +1204,15 @@ void CounterTuneAudioProcessor::produceMelody(const std::vector<int>& melody, in
         magnetize(post_processed, 1.0);
     }
 
-    // Debug print post-processed output
-    juce::String debugPostProcessed = "post_processed: ";
-    for (const int& event : post_processed)
-    {
-        debugPostProcessed += juce::String(event) + " ";
-    }
-    DBG(debugPostProcessed);
-
+    //// Debug print post-processed output
+    //juce::String debugPostProcessed = "post_processed: ";
+    //for (const int& event : post_processed)
+    //{
+    //    debugPostProcessed += juce::String(event) + " ";
+    //}
+    //DBG(debugPostProcessed);
 
     generatedMelody = post_processed;
-
-
-
-//    generatedMelody = { 71, -2, -2, -2, 73, -2, -2, -2, 75, -2, -2, -2, 76, -2, -2, -2, 78, -2, -2, -2, 80, -2, -2, -2, 82, -2, -2, -2, 83, -2, -2, -2 };
-
-
-
-
 }
 
 bool CounterTuneAudioProcessor::hasEditor() const
