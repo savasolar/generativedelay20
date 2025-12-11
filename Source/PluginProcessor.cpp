@@ -186,15 +186,14 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
     juce::ScopedNoDenormals noDenormals;
 
 #ifdef DEMO_BUILD
-    if (isDemoExpired)
+    if (isDemoExpired || exportMode.load())
     {
         buffer.clear();
         return;
     }
 #endif
+
     synchronizeBpm();
-
-
 
     if (!isActive.load())
     {
@@ -337,7 +336,7 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             DBG("CYCLE END");
 
 #ifdef DEMO_BUILD
-            if (demoCounter >= 10)
+            if (demoCounter >= 50)
                 isDemoExpired = true;
 #endif
 
