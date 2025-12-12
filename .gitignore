@@ -12,3 +12,4 @@ _deps
 CMakeUserPresets.json
 /Builds
 /cmake_build
+.DS_Store

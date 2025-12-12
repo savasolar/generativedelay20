@@ -277,9 +277,14 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     // unanimated preset menu settings
     addAndMakeVisible(presetTitleLabel);
+#ifdef JUCE_MAC
+    presetTitleLabel.setBounds(481, 21, 120, 14);
+    presetTitleLabel.setFont(getCustomFont(14.0f));
+#else
     presetTitleLabel.setBounds(481, 22, 120, 14);
-    presetTitleLabel.setJustification(juce::Justification::centredLeft);
     presetTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    presetTitleLabel.setJustification(juce::Justification::centredLeft);    
     presetTitleLabel.setReadOnly(true);
     presetTitleLabel.setCaretVisible(false);
     presetTitleLabel.setMouseCursor(juce::MouseCursor::NormalCursor);
@@ -312,9 +317,14 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     addAndMakeVisible(presetOption1);
     presetOption1.setVisible(false);
+#ifdef JUCE_MAC
+    presetOption1.setBounds(481, 39, 140, 20);
+    presetOption1.setFont(getCustomFont(14.0f));
+#else
     presetOption1.setBounds(481, 40, 140, 20);
-    presetOption1.setJustification(juce::Justification::centredLeft);
     presetOption1.setFont(getCustomFont(18.0f));
+#endif
+    presetOption1.setJustification(juce::Justification::centredLeft);
     presetOption1.setColour(juce::TextEditor::textColourId, foregroundColor);
     presetOption1.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     presetOption1.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -329,9 +339,14 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     addAndMakeVisible(presetOption2);
     presetOption2.setVisible(false);
+#ifdef JUCE_MAC
+    presetOption2.setBounds(481, 59, 140, 20);
+    presetOption2.setFont(getCustomFont(14.0f));
+#else
     presetOption2.setBounds(481, 60, 140, 20);
-    presetOption2.setJustification(juce::Justification::centredLeft);
     presetOption2.setFont(getCustomFont(18.0f));
+#endif
+    presetOption2.setJustification(juce::Justification::centredLeft);
     presetOption2.setColour(juce::TextEditor::textColourId, foregroundColor);
     presetOption2.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     presetOption2.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -346,9 +361,14 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     addAndMakeVisible(presetOption3);
     presetOption3.setVisible(false);
+#ifdef JUCE_MAC
+    presetOption3.setBounds(481, 79, 140, 20);
+    presetOption3.setFont(getCustomFont(14.0f));
+#else
     presetOption3.setBounds(481, 80, 140, 20);
-    presetOption3.setJustification(juce::Justification::centredLeft);
     presetOption3.setFont(getCustomFont(18.0f));
+#endif
+    presetOption3.setJustification(juce::Justification::centredLeft);
     presetOption3.setColour(juce::TextEditor::textColourId, foregroundColor);
     presetOption3.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     presetOption3.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -363,9 +383,14 @@ void CounterTuneAudioProcessorEditor::setupPresetMenu()
 
     addAndMakeVisible(presetOption4);
     presetOption4.setVisible(false);
+#ifdef JUCE_MAC
+    presetOption4.setBounds(481, 99, 140, 20);
+    presetOption4.setFont(getCustomFont(14.0f));
+#else
     presetOption4.setBounds(481, 100, 140, 20);
-    presetOption4.setJustification(juce::Justification::centredLeft);
     presetOption4.setFont(getCustomFont(18.0f));
+#endif
+    presetOption4.setJustification(juce::Justification::centredLeft);
     presetOption4.setColour(juce::TextEditor::textColourId, foregroundColor);
     presetOption4.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     presetOption4.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -529,9 +554,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
 {
     // TEMPO 
     addAndMakeVisible(tempoTitleLabel);
+#ifdef JUCE_MAC
+    tempoTitleLabel.setBounds(1, 59, 60, 20);
+    tempoTitleLabel.setFont(getCustomFont(14.0f));
+#else
     tempoTitleLabel.setBounds(1, 60, 60, 20);
-    tempoTitleLabel.setJustification(juce::Justification::centred);
     tempoTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    tempoTitleLabel.setJustification(juce::Justification::centred);
     tempoTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     tempoTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     tempoTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -556,13 +586,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(tempoKnob);
 
     addAndMakeVisible(tempoValueLabel);
+#ifdef JUCE_MAC
+    tempoValueLabel.setBounds(1, 99, 60, 16);
+    tempoValueLabel.setFont(getCustomFont(14.0f));
+#else
     tempoValueLabel.setBounds(1, 100, 60, 16);
+    tempoValueLabel.setFont(getCustomFont(18.0f));
+#endif
     tempoValueLabel.setJustification(juce::Justification::centredTop);
     tempoValueLabel.setMultiLine(false);
     tempoValueLabel.setReturnKeyStartsNewLine(false);
     tempoValueLabel.setInputRestrictions(10, "0123456789.-+");
     tempoValueLabel.setSelectAllWhenFocused(true);
-    tempoValueLabel.setFont(getCustomFont(18.0f));
     tempoValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     tempoValueLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     tempoValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -589,9 +624,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     // BEATS
     addAndMakeVisible(beatsTitleLabel);
+#ifdef JUCE_MAC
+    beatsTitleLabel.setBounds(73, 59, 60, 20);
+    beatsTitleLabel.setFont(getCustomFont(14.0f));
+#else
     beatsTitleLabel.setBounds(73, 60, 60, 20);
-    beatsTitleLabel.setJustification(juce::Justification::centred);
     beatsTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    beatsTitleLabel.setJustification(juce::Justification::centred);
     beatsTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     beatsTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     beatsTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -615,13 +655,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(beatsKnob);
 
     addAndMakeVisible(beatsValueLabel);
+#ifdef JUCE_MAC
+    beatsValueLabel.setBounds(73, 99, 60, 16);
+    beatsValueLabel.setFont(getCustomFont(14.0f));
+#else
     beatsValueLabel.setBounds(73, 100, 60, 16);
+    beatsValueLabel.setFont(getCustomFont(18.0f));
+#endif
     beatsValueLabel.setJustification(juce::Justification::centredTop);
     beatsValueLabel.setMultiLine(false);
     beatsValueLabel.setReturnKeyStartsNewLine(false);
     beatsValueLabel.setInputRestrictions(10, "0123456789.-+");
     beatsValueLabel.setSelectAllWhenFocused(true);
-    beatsValueLabel.setFont(getCustomFont(18.0f));
     beatsValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     beatsValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     beatsValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -649,9 +694,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     // KEY
     addAndMakeVisible(keyTitleLabel);
+#ifdef JUCE_MAC
+    keyTitleLabel.setBounds(145, 59, 60, 20);
+    keyTitleLabel.setFont(getCustomFont(14.0f));
+#else
     keyTitleLabel.setBounds(145, 60, 60, 20);
-    keyTitleLabel.setJustification(juce::Justification::centred);
     keyTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    keyTitleLabel.setJustification(juce::Justification::centred);
     keyTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     keyTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     keyTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -675,13 +725,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(keyKnob);
 
     addAndMakeVisible(keyValueLabel);
+#ifdef JUCE_MAC
+    keyValueLabel.setBounds(145, 99, 60, 16);
+    keyValueLabel.setFont(getCustomFont(14.0f));
+#else
     keyValueLabel.setBounds(145, 100, 60, 16);
+    keyValueLabel.setFont(getCustomFont(18.0f));
+#endif
     keyValueLabel.setJustification(juce::Justification::centredTop);
     keyValueLabel.setMultiLine(false);
     keyValueLabel.setReturnKeyStartsNewLine(false);
 //    keyValueLabel.setInputRestrictions(10, "0123456789.-+");
     keyValueLabel.setSelectAllWhenFocused(true);
-    keyValueLabel.setFont(getCustomFont(18.0f));
     keyValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     keyValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     keyValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -760,9 +815,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     // NOTES
     addAndMakeVisible(notesTitleLabel);
+#ifdef JUCE_MAC
+    notesTitleLabel.setBounds(217, 59, 60, 20);
+    notesTitleLabel.setFont(getCustomFont(14.0f));
+#else
     notesTitleLabel.setBounds(217, 60, 60, 20);
-    notesTitleLabel.setJustification(juce::Justification::centred);
     notesTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    notesTitleLabel.setJustification(juce::Justification::centred);
     notesTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     notesTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     notesTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -786,13 +846,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(notesKnob);
 
     addAndMakeVisible(notesValueLabel);
+#ifdef JUCE_MAC
+    notesValueLabel.setBounds(217, 99, 60, 16);
+    notesValueLabel.setFont(getCustomFont(14.0f));
+#else
     notesValueLabel.setBounds(217, 100, 60, 16);
+    notesValueLabel.setFont(getCustomFont(18.0f));
+#endif
     notesValueLabel.setJustification(juce::Justification::centredTop);
     notesValueLabel.setMultiLine(false);
     notesValueLabel.setReturnKeyStartsNewLine(false);
     notesValueLabel.setInputRestrictions(10, "0123456789.-+");
     notesValueLabel.setSelectAllWhenFocused(true);
-    notesValueLabel.setFont(getCustomFont(18.0f));
     notesValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     notesValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     notesValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -821,9 +886,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
 
     // CHAOS
     addAndMakeVisible(chaosTitleLabel);
+#ifdef JUCE_MAC
+    chaosTitleLabel.setBounds(289, 59, 60, 20);
+    chaosTitleLabel.setFont(getCustomFont(14.0f));
+#else
     chaosTitleLabel.setBounds(289, 60, 60, 20);
-    chaosTitleLabel.setJustification(juce::Justification::centred);
     chaosTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    chaosTitleLabel.setJustification(juce::Justification::centred);
     chaosTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     chaosTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     chaosTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -848,13 +918,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(chaosKnob);
 
     addAndMakeVisible(chaosValueLabel);
+#ifdef JUCE_MAC
+    chaosValueLabel.setBounds(289, 99, 60, 16);
+    chaosValueLabel.setFont(getCustomFont(14.0f));
+#else
     chaosValueLabel.setBounds(289, 100, 60, 16);
+    chaosValueLabel.setFont(getCustomFont(18.0f));
+#endif
     chaosValueLabel.setJustification(juce::Justification::centredTop);
     chaosValueLabel.setMultiLine(false);
     chaosValueLabel.setReturnKeyStartsNewLine(false);
     chaosValueLabel.setInputRestrictions(10, "0123456789.-+");
     chaosValueLabel.setSelectAllWhenFocused(true);
-    chaosValueLabel.setFont(getCustomFont(18.0f));
     chaosValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     chaosValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     chaosValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -886,9 +961,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
     // OCTAVE
 
     addAndMakeVisible(octaveTitleLabel);
+#ifdef JUCE_MAC
+    octaveTitleLabel.setBounds(361, 59, 60, 20);
+    octaveTitleLabel.setFont(getCustomFont(14.0f));
+#else
     octaveTitleLabel.setBounds(361, 60, 60, 20);
-    octaveTitleLabel.setJustification(juce::Justification::centred);
     octaveTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    octaveTitleLabel.setJustification(juce::Justification::centred);
     octaveTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     octaveTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     octaveTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -912,13 +992,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(octaveKnob);
 
     addAndMakeVisible(octaveValueLabel);
+#ifdef JUCE_MAC
+    octaveValueLabel.setBounds(361, 99, 60, 16);
+    octaveValueLabel.setFont(getCustomFont(14.0f));
+#else
     octaveValueLabel.setBounds(361, 100, 60, 16);
+    octaveValueLabel.setFont(getCustomFont(18.0f));
+#endif
     octaveValueLabel.setJustification(juce::Justification::centredTop);
     octaveValueLabel.setMultiLine(false);
     octaveValueLabel.setReturnKeyStartsNewLine(false);
     octaveValueLabel.setInputRestrictions(10, "0123456789.-+");
     octaveValueLabel.setSelectAllWhenFocused(true);
-    octaveValueLabel.setFont(getCustomFont(18.0f));
     octaveValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     octaveValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     octaveValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -952,9 +1037,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
     // DETUNE
 
     addAndMakeVisible(detuneTitleLabel);
+#ifdef JUCE_MAC
+    detuneTitleLabel.setBounds(433, 59, 60, 20);
+    detuneTitleLabel.setFont(getCustomFont(14.0f));
+#else
     detuneTitleLabel.setBounds(433, 60, 60, 20);
-    detuneTitleLabel.setJustification(juce::Justification::centred);
     detuneTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    detuneTitleLabel.setJustification(juce::Justification::centred);
     detuneTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     detuneTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     detuneTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -978,13 +1068,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(detuneKnob);
 
     addAndMakeVisible(detuneValueLabel);
+#ifdef JUCE_MAC
+    detuneValueLabel.setBounds(433, 99, 60, 16);
+    detuneValueLabel.setFont(getCustomFont(14.0f));
+#else
     detuneValueLabel.setBounds(433, 100, 60, 16);
+    detuneValueLabel.setFont(getCustomFont(18.0f));
+#endif
     detuneValueLabel.setJustification(juce::Justification::centredTop);
     detuneValueLabel.setMultiLine(false);
     detuneValueLabel.setReturnKeyStartsNewLine(false);
     detuneValueLabel.setInputRestrictions(10, "0123456789.-+");
     detuneValueLabel.setSelectAllWhenFocused(true);
-    detuneValueLabel.setFont(getCustomFont(18.0f));
     detuneValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     detuneValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     detuneValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -1013,9 +1108,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
     // LOOP
 
     addAndMakeVisible(loopTitleLabel);
+#ifdef JUCE_MAC
+    loopTitleLabel.setBounds(505, 59, 60, 20);
+    loopTitleLabel.setFont(getCustomFont(14.0f));
+#else
     loopTitleLabel.setBounds(505, 60, 60, 20);
-    loopTitleLabel.setJustification(juce::Justification::centred);
     loopTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    loopTitleLabel.setJustification(juce::Justification::centred);
     loopTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     loopTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     loopTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -1026,9 +1126,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
     loopTitleLabel.setText("LOOP", dontSendNotification);
 
     addAndMakeVisible(loopValueLabel);
+#ifdef JUCE_MAC
+    loopValueLabel.setBounds(505, 99, 60, 16);
+    loopValueLabel.setFont(getCustomFont(14.0f));
+#else
     loopValueLabel.setBounds(505, 100, 60, 16);
-    loopValueLabel.setJustification(juce::Justification::centred);
     loopValueLabel.setFont(getCustomFont(18.0f));
+#endif
+    loopValueLabel.setJustification(juce::Justification::centred);
     loopValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     loopValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     loopValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -1053,9 +1158,14 @@ void CounterTuneAudioProcessorEditor::setupParams()
     // MIX
 
     addAndMakeVisible(mixTitleLabel);
+#ifdef JUCE_MAC
+    mixTitleLabel.setBounds(579, 59, 60, 20);
+    mixTitleLabel.setFont(getCustomFont(14.0f));
+#else
     mixTitleLabel.setBounds(579, 60, 60, 20);
-    mixTitleLabel.setJustification(juce::Justification::centred);
     mixTitleLabel.setFont(getCustomFont(18.0f));
+#endif
+    mixTitleLabel.setJustification(juce::Justification::centred);
     mixTitleLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     mixTitleLabel.setColour(juce::TextEditor::backgroundColourId, juce::Colours::transparentBlack);
     mixTitleLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
@@ -1079,13 +1189,18 @@ void CounterTuneAudioProcessorEditor::setupParams()
     addAndMakeVisible(mixKnob);
 
     addAndMakeVisible(mixValueLabel);
+#ifdef JUCE_MAC
+    mixValueLabel.setBounds(579, 99, 60, 16);
+    mixValueLabel.setFont(getCustomFont(14.0f));
+#else
     mixValueLabel.setBounds(579, 100, 60, 16);
+    mixValueLabel.setFont(getCustomFont(18.0f));
+#endif
     mixValueLabel.setJustification(juce::Justification::centredTop);
     mixValueLabel.setMultiLine(false);
     mixValueLabel.setReturnKeyStartsNewLine(false);
     mixValueLabel.setInputRestrictions(10, "0123456789.-+");
     mixValueLabel.setSelectAllWhenFocused(true);
-    mixValueLabel.setFont(getCustomFont(18.0f));
     mixValueLabel.setColour(juce::TextEditor::textColourId, foregroundColor);
     mixValueLabel.setColour(juce::TextEditor::backgroundColourId, backgroundColor);
     mixValueLabel.setColour(juce::TextEditor::outlineColourId, juce::Colours::transparentBlack);
