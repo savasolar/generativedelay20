@@ -3,6 +3,13 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+// damn
+//#ifdef JUCE_MAC
+//#define DEFAULT_FONT_SIZE 22.0f  // Larger on macOS
+//#else
+//#define DEFAULT_FONT_SIZE 18.0f  // Default for Windows/Linux
+//#endif
+
 CounterTuneAudioProcessorEditor::CounterTuneAudioProcessorEditor(CounterTuneAudioProcessor& p)
     : AudioProcessorEditor(&p), audioProcessor(p), parameters(p.parameters)
 {
