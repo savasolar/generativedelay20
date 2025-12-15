@@ -4,27 +4,22 @@
 ░▀▀▀░▀▀▀░▀▀▀░▀░▀░░▀░░▀▀▀░▀░▀░░▀░░▀▀▀░▀░▀░▀▀▀░
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-         INSTALLATION INSTRUCTIONS
+     INSTALLATION INSTRUCTIONS - WINDOWS
 _____________________________________________
 
-░▀█░░░░  Move "CounterTune.component" to
+░▀█░░░░  Move "CounterTune.vst3" to
 ░░█░░░░
-░▀▀▀░▀░  /Library/Audio/Plug-Ins/Components
+░▀▀▀░▀░  C:\Program Files\Common Files\VST3
 _____________________________________________
 
-░▀▀▄░░░  Move "CounterTune.vst3" to
-░▄▀░░░░
-░▀▀▀░▀░  /Library/Audio/Plug-Ins/VST3
+░▀▀▄░░░  
+░▄▀░░░░  Delete any older versions
+░▀▀▀░▀░  
 _____________________________________________
 
-░▀▀█░░░  Remove preexisting demo versions
-░░▀▄░░░  from these directories, if
-░▀▀░░▀░  applicable
-_____________________________________________
-
-░█░█░░░
-░▀▀█░░░  Rescan DAW plugins and enjoy!
-░░░▀░▀░
+░▀▀█░░░  
+░░▀▄░░░  Rescan DAW plugins and enjoy!
+░▀▀░░▀░  
 _____________________________________________
 
    THANK YOU SO MUCH FOR YOUR SUPPORT!!!!    

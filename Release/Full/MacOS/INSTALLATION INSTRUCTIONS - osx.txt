@@ -4,7 +4,7 @@
 ░▀▀▀░▀▀▀░▀▀▀░▀░▀░░▀░░▀▀▀░▀░▀░░▀░░▀▀▀░▀░▀░▀▀▀░
 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
 
-         INSTALLATION INSTRUCTIONS
+        INSTALLATION INSTRUCTIONS - OSX
 _____________________________________________
 
 ░▀█░░░░  Move "CounterTune.component" to
@@ -17,9 +17,9 @@ _____________________________________________
 ░▀▀▀░▀░  /Library/Audio/Plug-Ins/VST3
 _____________________________________________
 
-░▀▀█░░░  Remove preexisting demo versions
-░░▀▄░░░  from these directories, if
-░▀▀░░▀░  applicable
+░▀▀█░░░  
+░░▀▄░░░  Delete any older versions
+░▀▀░░▀░  
 _____________________________________________
 
 ░█░█░░░
