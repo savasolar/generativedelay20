@@ -3,11 +3,8 @@
 #pragma once
 
 #include <JuceHeader.h>
-//#include <pitch_detector.h>
-//#include <source/PitchMPM.h>
 #include "dywapitchtrack.h"
 #include "signalsmith-stretch.h"
-//#include "MelodyGenerator.h"
 #include <bitset>
 #include <thread>
 
