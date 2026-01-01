@@ -207,6 +207,9 @@ private:
 
     // Time stretch utilities
     signalsmith::stretch::SignalsmithStretch<float> stretcher;
+	
+	// make a custom time stretcher from first principles
+	// still here
 
     // Melody capture utilities
     int melodyCaptureFillPos = 0;
