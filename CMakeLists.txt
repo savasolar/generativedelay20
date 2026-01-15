@@ -160,4 +160,3 @@ target_link_libraries(CounterTune PRIVATE
 )
 
 juce_generate_juce_header(CounterTune)
-
