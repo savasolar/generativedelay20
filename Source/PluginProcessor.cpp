@@ -406,6 +406,8 @@ void CounterTuneAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, j
             // time stretch
             timeStretch(tempVoiceBuffer, static_cast<float>(16 * sPs) / getSampleRate());
 
+			// change time stretch to be real-time safe using overlap-add method
+
 
             resetTiming();
         }
